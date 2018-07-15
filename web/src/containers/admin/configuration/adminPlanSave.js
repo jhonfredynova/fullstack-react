@@ -16,7 +16,7 @@ class AdminPlanSave extends Component {
     super(props)
     this.state = {
       errors: {
-        model: { transactionValue: {} }
+        model: {}
       },
       plans: this.props.plan.plans.records,
       model: {
@@ -71,10 +71,10 @@ class AdminPlanSave extends Component {
       errors.model.planCode = "Select payu plan."
     }
     if (this.state.model.paymentType==='transaction' && Object.isEmpty(get(this.state.model.transactionValue, 'currency'))) {
-      errors.model.transactionValue.currency = "Select transaction currency."
+      set(errors.model.transactionValue, 'currency', 'Select transaction currency.')
     }
     if (this.state.model.paymentType==='transaction' && Object.isEmpty(get(this.state.model.transactionValue, 'value'))) {
-      errors.model.transactionValue.value = "Enter transaction value."
+      set(errors.model.transactionValue, 'value',  'Enter transaction value.')
     }
     if(Object.isEmpty(this.state.model.order)) {
       errors.model.order = "Enter order."
@@ -110,10 +110,6 @@ class AdminPlanSave extends Component {
 
   render() {    
     const { currencies } = this.props.app.config.appIntl
-    const transactionValue = {
-      currency: get(this.state.model.transactionValue, 'currency'),
-      value: get(this.state.model.transactionValue, 'value')
-    }
     return (
       <div id="adminPlanSave">
         <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update Plan' : 'New Plan'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/plan')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
@@ -154,15 +150,15 @@ class AdminPlanSave extends Component {
             <label>Transaction Value *</label>
             <div className="row">
               <div className="col-xs-4 noPaddingRight">
-                <Select placeholder='Select...' className="form-control" options={currencies} optionRenderer={option => option.label} valueRenderer={option => option.label} value={transactionValue.currency} simpleValue={true} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.transactionValue.currency', value)} /> 
-                <span className="text-danger">{transactionValue.currency}</span>
+                <Select placeholder='Select...' className="form-control" options={currencies} optionRenderer={option => option.label} valueRenderer={option => option.label} value={get(this.state.model.transactionValue, 'currency')} simpleValue={true} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.transactionValue.currency', value)} /> 
+                <span className="text-danger">{get(this.state.errors.model.transactionValue, 'currency')}</span>
               </div>
               <div className="col-xs-8">
                 <div className="input-group">
                   <span className="input-group-addon">$</span>
-                  <Numeric className="form-control" data={{currencyConversion:this.state.currencyConversion, amount: transactionValue.value, from: transactionValue.currency, to: transactionValue.currency}} onChange={value => this.handleChangeState('model.transactionValue.value', value)} />
+                  <Numeric className="form-control" data={{currencyConversion:this.state.currencyConversion, amount: get(this.state.model.transactionValue, 'value'), from: get(this.state.model.transactionValue, 'currency'), to: get(this.state.model.transactionValue, 'currency')}} onChange={value => this.handleChangeState('model.transactionValue.value', value)} />
                 </div>
-                <span className="text-danger">{transactionValue.value}</span>
+                <span className="text-danger">{get(this.state.errors.model.transactionValue, 'value')}</span>
               </div>
             </div>
           </div>
