@@ -1,0 +1,10 @@
+#message {
+  position: sticky;
+  top: 0px;
+  z-index: 99;
+}
+#message .alert{
+  margin-top: -20px;
+  margin-bottom: 10px;
+  border-radius: 0px;
+}

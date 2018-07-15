@@ -1,0 +1,18 @@
+#menu .navbar-collapse ul{
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+#menu .navbar-nav li.navItemWithButton > a{
+  padding: 7px 5px;
+}
+#menu .navbar-nav li.navItemWithButton > a .Select{
+  margin-right: 4px;
+}
+#menu .navbar-form a {
+  margin-left: 4px;
+}
+
+#menu .navbar-nav{
+  margin-top: 0px;
+  margin-bottom: 0px;
+}

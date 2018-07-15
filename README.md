@@ -1,1 +1,3 @@
-# scaffolding-fullstack-sails-react
+# Venpad
+
+a [Sails](http://sailsjs.org) application

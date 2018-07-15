@@ -1,0 +1,23 @@
+footer {
+  margin-top: 20px;
+  padding: 20px;
+  background: #475268;
+  color: #fff;
+  display: block;
+  font-weight: 300;
+}
+footer hr{
+  border: 1px solid #CCC;
+  border-width: 1px 0 0 0;
+}
+footer h4{
+  color: #CCC;
+}
+footer a{
+  color: #FFF;
+}
+footer a:hover,
+footer a:active,
+footer a:focus{
+  color: #FFF;
+}

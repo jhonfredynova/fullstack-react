@@ -1,0 +1,29 @@
+#navigationBar{
+  display: table;
+  border-bottom: 1px solid #CCC;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+#navigationBar .btn-navigation,
+#navigationBar .head-navigation{
+  display: table-cell;
+  vertical-align: middle;
+}
+
+#navigationBar .btn-navigation{
+  width: 50px;
+  font-weight: normal;
+  cursor: pointer;
+}
+
+#navigationBar .head-navigation h1,
+#navigationBar .head-navigation h2{
+  margin-top: 10px;
+}
+
+#navigationBar .head-navigation h2{
+  color: gray;
+  font-weight: normal;
+  font-size: 14px;
+}
