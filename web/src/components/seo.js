@@ -34,8 +34,8 @@ class SEO extends Component {
         <meta property="og:description" content={this.state.title} /> 
         {/* TWITTER  */}
         <meta name="twitter:card" content={this.state.description} />
-        <meta name="twitter:creator" content="@venpadapp" />
-        <meta name="twitter:site" content="@venpadapp" />
+        <meta name="twitter:creator" content="@jhonfredynova" />
+        <meta name="twitter:site" content="@jhonfredynova" />
       </Helmet>
     )
   }

@@ -20,7 +20,7 @@ async function processSubscriptionControl() {
       }
       await axios.put(`${process.env.LOCAL_API_URL}/usuario/${user._id}`, user, requestHeaders)
       await axios.get(`${process.env.LOCAL_API_URL}/plan/${user.planDetails.plan}`, requestHeaders)
-      axios.post(`${process.env.LOCAL_API_URL}/common/send-message`, { fromName: 'Venpad', fromEmail: config.app.emails.system, toEmail: user.email, subject: 'SE HA CANCELADO TU SUSCRIPCIÓN', message: 'Se canceló tu suscripción, ahora has regresado al <b>PLAN GRATUITO</b>.' })
+      axios.post(`${process.env.LOCAL_API_URL}/common/send-message`, { fromName: config.app.appName, fromEmail: config.app.emails.system, toEmail: user.email, subject: 'SE HA CANCELADO TU SUSCRIPCIÓN', message: 'Se canceló tu suscripción, ahora has regresado al <b>PLAN GRATUITO</b>.' })
     }
     //CHANGE-SUBSCRIPTIONS
     var newPlanDetails = null
@@ -46,15 +46,15 @@ async function processSubscriptionControl() {
         }
       }
       await axios.put(`${process.env.LOCAL_API_URL}/usuario/${user._id}`, user, requestHeaders)
-      await axios.post(`${process.env.LOCAL_API_URL}/common/send-message`, { fromName: 'Venpad', fromEmail: config.app.emails.system, toEmail: user.email, subject: 'SE HA ACTUALIZADO TU SUSCRIPCIÓN', message: msgResponseChangeSubscription })
+      await axios.post(`${process.env.LOCAL_API_URL}/common/send-message`, { fromName: config.app.appName, fromEmail: config.app.emails.system, toEmail: user.email, subject: 'SE HA ACTUALIZADO TU SUSCRIPCIÓN', message: msgResponseChangeSubscription })
     }
     //NOTIFICATION
     if (responseSubscriptions.data && responseSubscriptions.data.length>0) {
-      await axios.post(`${process.env.LOCAL_API_URL}/common/send-message`, { fromName: 'Venpad', fromEmail: config.app.emails.system, toEmail: 'support@venpad.com', subject: 'Worker CheckSubscriptions Exitoso', message: `Se ejecutó proceso correctamente, se procesó ${usersCancelSubscription.length} cancelaciones y ${usersChangeSubscription.length} cambios de plan.` })
+      await axios.post(`${process.env.LOCAL_API_URL}/common/send-message`, { fromName: config.app.appName, fromEmail: config.app.emails.system, toEmail: config.app.emails.support, subject: 'Worker CheckSubscriptions Exitoso', message: `Se ejecutó proceso correctamente, se procesó ${usersCancelSubscription.length} cancelaciones y ${usersChangeSubscription.length} cambios de plan.` })
     }
   }catch(e){
     console.error(e)
-    await axios.post(`${process.env.LOCAL_API_URL}/common/send-message`, { fromName: 'Venpad', fromEmail: config.app.emails.system, toEmail: 'support@venpad.com', subject: 'Worker CheckSubscriptions Falló', message: `Ocurrio un error al ejecutar el proceso: ${e}` })
+    await axios.post(`${process.env.LOCAL_API_URL}/common/send-message`, { fromName: config.app.appName, fromEmail: config.app.emails.system, toEmail: config.app.emails.support, subject: 'Worker CheckSubscriptions Falló', message: `Ocurrio un error al ejecutar el proceso: ${e}` })
   }
 }
 

@@ -49,7 +49,7 @@ class Home extends Component {
     })
     return (
       <div id="home">
-        <Seo data={{ title: this.context.t('homeTitle'), description: this.context.t('homeDescription'), keyword: ['venpad','invoice','bill','expenses'], siteName: this.context.t('siteName') }} />
+        <Seo data={{ title: this.context.t('homeTitle'), description: this.context.t('homeDescription'), keyword: [], siteName: this.context.t('siteName') }} />
         <NavigationBar data={{ title: <h1>{this.context.t('homeTitle')}</h1>, subTitle: <h2>{this.context.t('homeDescription')}</h2> }} />
         {
           chunk(sortBy(this.state.planFeatures, ['order']), 3).map((item, index) => 
