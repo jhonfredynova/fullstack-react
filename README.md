@@ -1,6 +1,8 @@
 # Scaffolding fullstack
 
-Based on the projects [Sails](http://sailsjs.org) and [create-react-app](https://github.com/facebook/create-react-app).
+Based on the following projects:
+- [Sails v0.12](http://sailsjs.org) 
+- [create-react-app v1.0.10](https://github.com/facebook/create-react-app).
 
 ## Running
 
