@@ -19,18 +19,18 @@ You can check each app on the following urls:
 - API: http://localhost:1337/api
 - WEB: http://localhost:3000
 
-## Sailsjs additions
+## Improvements sailsjs
 - Improvements to blueprints
 - Payu integration (subscriptions, payments)
 
-## create-react-app additions
+## Improvements create-react-app
 - Session management
 - Redux integration
 
 ## Application modules
-- App module (MultiCallingCodes, MultiCurrencies, MultiLanguage)
+- App module (MultiCallingCodes, MultiCurrencies, MultiLanguage, Preferences)
 - Admin module (Catalogs, Locales, Plans, Roles, Users)
 - Docs module (Docs, FAQ, Privacy, Terms)
 - Subscription module (Billing, Prices, Subscription)
 - User module (FogotAccount, Login, Register, ResetPassword)
-- Session module (Dashboard, Logout, Profile)
+- Session module (Dashboard, Logout, Messages, Profile)
