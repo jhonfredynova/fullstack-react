@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "author": "jhonfredynova",
   "private": true,
-  "proxy": "http://tuplace.com/api",
   "engines": {
     "node": "8.9.1"
   },
