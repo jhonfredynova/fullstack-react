@@ -1,11 +1,10 @@
 {
-  "name": "venpad",
+  "name": "XXX",
   "version": "0.0.1",
   "author": "jhonfredynova",
-  "description": "Archive and manage your income and expenses invoices, get real time reports of your personal or business finances.",
+  "description": "Scaffolding based on the projects sailsjs and create-react-app",
   "keywords": [
-    "jhonfredynova",
-    "venpad"
+    "jhonfredynova"
   ],
   "license": "",
   "main": "app.js",
@@ -18,11 +17,6 @@
     "debug": "concurrently \"node --inspect app\" \"cd web && npm run start\"",
     "start": "node app"
   },
-  "buildpacks": [
-    {
-      "url": "https://github.com/mars/create-react-app-buildpack"
-    }
-  ],
   "dependencies": {
     "axios": "^0.18.0",
     "bcrypt-nodejs": "0.0.3",
