@@ -46,7 +46,7 @@ class Pager extends Component {
   }
     
   render() {
-    const { records, recordsTotal } = this.props.data.items
+    const { records, recordsTotal } = this.props.items
     const thereIsData = records.length>0
     return (
       <div id="pager" className={this.props.className}>

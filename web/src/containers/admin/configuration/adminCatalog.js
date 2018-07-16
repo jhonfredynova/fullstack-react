@@ -16,8 +16,8 @@ class AdminCatalog extends Component {
     super(props)
     const { appPreferences } = this.props.app.config
     this.state = {
-      catalogs: {
-        items: this.props.catalog.catalogs,
+      catalogs: this.props.catalog.catalogs,
+      catalogsQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         populate: ['parent'],
         select: ['id','active','createdAt','updatedAt','parent','name'],
@@ -39,9 +39,7 @@ class AdminCatalog extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      catalogs: Object.assign(this.state.catalogs, { 
-        items: nextProps.catalog.catalogs
-      })
+      catalogs: nextProps.catalog.catalogs
     })
   }
 
@@ -52,7 +50,7 @@ class AdminCatalog extends Component {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getCatalog(this.state.catalogs))
+      await this.props.dispatch(getCatalog(this.state.catalogsQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -64,8 +62,8 @@ class AdminCatalog extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(setPreference({ [PREFERENCE.ADMIN_PAGINATION]: data.pageSize }))
-      await this.setState({ catalogs: Object.assign(this.state.catalogs, data) })
-      await this.props.dispatch(getCatalog(this.state.catalogs))
+      await this.setState({ catalogsQuery: Object.assign(this.state.catalogsQuery, data) })
+      await this.props.dispatch(getCatalog(this.state.catalogsQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -77,7 +75,7 @@ class AdminCatalog extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(deleteCatalog(item.id))
-      await this.props.dispatch(getCatalog(this.state.catalogs))
+      await this.props.dispatch(getCatalog(this.state.catalogsQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -90,7 +88,7 @@ class AdminCatalog extends Component {
       this.props.dispatch(showLoading())
       item.active = true
       await this.props.dispatch(updateCatalog(item))
-      await this.props.dispatch(getCatalog(this.state.catalogs))
+      await this.props.dispatch(getCatalog(this.state.catalogsQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -99,17 +97,17 @@ class AdminCatalog extends Component {
   }
 
   render() {    
-    const activeTab = this.state.catalogs.where.active ? 1 : 2
+    const activeTab = this.state.catalogsQuery.where.active ? 1 : 2
     const { isLoading } = this.props.app
-    const { records } = this.state.catalogs.items
+    const { records } = this.state.catalogs
     return (
     	<div>
         <NavigationBar data={{ title: <h1>Catalogs</h1>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/catalog/new')}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('catalogs.where.active', value===1); this.handleChangeSearch(this.state.catalogs) } }>
+        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('catalogsQuery.where.active', value===1); this.handleChangeSearch(this.state.catalogsQuery) } }>
           <NavItem eventKey={1}>Active</NavItem>
           <NavItem eventKey={2}>Inactive</NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.catalogs} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} data={this.state.catalogsQuery} items={this.state.catalogs} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>

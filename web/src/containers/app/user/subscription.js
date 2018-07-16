@@ -6,7 +6,7 @@ class Subscription extends Component {
   render() {
     return (
       <div id="subscription">
-        <NavigationBar data={{ title: <h1>Subscription</h1> }} />
+        <NavigationBar data={{ title: <h1>{this.context.t('subscriptionTitle')}</h1>, subTitle: <h2>{this.context.t('subscriptionDescription')}</h2> }} />
       </div>
     )
   }

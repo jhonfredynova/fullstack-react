@@ -43,9 +43,9 @@ module.exports = {
   },
   afterFind: async function(values){
     try{
-      let payuPlans = await paymentService.executeApiPayu('GET', '/plans', null)
+      let subscriptionPlans = await paymentService.executeApiPayu('GET', '/plans', null)
       for (let item of values){
-        item.planInfo = _.find(payuPlans.subscriptionPlanList, { planCode: item.planCode })
+        item.planInfo = _.find(subscriptionPlans.subscriptionPlanList, { planCode: item.planCode })
         if (item.planInfo) {
           item.planInfo.price = _.find(item.planInfo.additionalValues, { name:'PLAN_VALUE' })
         }

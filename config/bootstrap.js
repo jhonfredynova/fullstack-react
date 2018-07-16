@@ -9,11 +9,7 @@
  * http://sailsjs.org/#!/documentation/reference/sails.config/sails.config.bootstrap.html
  */
 
-if (process.env.NODE_ENV!=='production') {
-  require('dotenv').load()
-}
-
-module.exports.bootstrap = async function(cb) {
+module.exports.bootstrap = function(cb) {
 
   // It's very important to trigger this callback method when you are finished
   // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)

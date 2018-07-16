@@ -1,9 +1,10 @@
 import axios from 'axios'
-import { handleError } from 'components/helper'
+import { handleError, handleRequestQuery } from 'components/helper'
 
 export const SUBSCRIPTION = {
   GET_BILLING: 'GET_BILLING',
   GET_SUBSCRIPTION: 'GET_SUBSCRIPTION',
+  GET_SUBSCRIPTION_PLAN: 'GET_SUBSCRIPTION_PLAN',
   CREATE_SUBSCRIPTION: 'CREATE_SUBSCRIPTION',
   UPDATE_CREDITCARD: 'UPDATE_CREDITCARD',
   UPDATE_SUBSCRIPTION: 'UPDATE_SUBSCRIPTION',
@@ -22,6 +23,14 @@ export function getSubscription(parameters) {
   return dispatch => {
     return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/subscription/${parameters.subscriptionId}`)
     .then(response => dispatch({type: SUBSCRIPTION.GET_SUBSCRIPTION, payload: response.data}))
+    .catch(err => handleError(err) )
+  }
+}
+
+export function getSubscriptionPlan(parameters) {
+  return dispatch => {
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/subscription/plan?${handleRequestQuery(parameters)}`)
+    .then(response => dispatch({type: SUBSCRIPTION.GET_SUBSCRIPTION_PLAN, payload: response.data}))
     .catch(err => handleError(err) )
   }
 }

@@ -58,6 +58,7 @@ module.exports.routes = {
   //SUBSCRIPTION
   'get    /api/subscription/control': 'SubscriptionController.controlSubscriptions',
   'get    /api/subscription/billing/:clientCode': 'SubscriptionController.getBilling',
+  'get    /api/subscription/plan': 'SubscriptionController.getSubscriptionPlan',
   'get    /api/subscription/:subscriptionId': 'SubscriptionController.getSubscription',
   'post   /api/subscription': 'SubscriptionController.createSubscription',
   'put    /api/subscription/:subscriptionId/:clientCode/:creditCardId': 'SubscriptionController.updateCreditCard',

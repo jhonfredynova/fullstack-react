@@ -49,18 +49,18 @@ class Home extends Component {
     })
     return (
       <div id="home">
-        <Seo data={{ title: this.context.t('homeTitle'), description: this.context.t('homeDescription'), keyword: [], siteName: this.context.t('siteName') }} />
+        <Seo data={{ title: this.context.t('homeTitle'), description: this.context.t('homeDescription'), keyword: ['venpad','invoice','bill','expenses'], siteName: this.context.t('siteName') }} />
         <NavigationBar data={{ title: <h1>{this.context.t('homeTitle')}</h1>, subTitle: <h2>{this.context.t('homeDescription')}</h2> }} />
         {
-          chunk(sortBy(this.state.planFeatures, ['order']), 3).map((item, index) => 
+          chunk(sortBy(this.state.planFeatures, ['order']), 2).map((item, index) => 
             <div key={index} className="row">
               {
                 item.map(item =>
-                  <div key={item.id} className="col-md-4">
+                  <div key={item.id} className="col-xs-6">
                     <div className="well well-lg">
                       <h2 className="text-center">{item.name}</h2>
                       <h3 className="text-center"><i className={`${item.thumbnail} fa-2x`} /></h3>
-                      <p dangerouslySetInnerHTML={{__html: get(item, `value[${appPreferences.language}]`, '') }} />
+                      <article className="text-center" dangerouslySetInnerHTML={{__html: get(item, `value[${appPreferences.language}]`, '') }} />
                     </div>
                   </div>
                 )

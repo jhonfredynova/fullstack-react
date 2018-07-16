@@ -16,8 +16,8 @@ class AdminUser extends Component {
     super(props)
     const { appPreferences } = this.props.app.config
     this.state = {
-      users: {
-        items: this.props.user.users,
+      users: this.props.user.users,
+      usersQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','createdAt','updatedAt','firstname','lastname','email'],
         sort: {
@@ -33,16 +33,14 @@ class AdminUser extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      users: Object.assign(this.state.users, { 
-        items: nextProps.user.users
-      })
+      users: nextProps.user.users
     })
   }
 
   async componentWillMount(){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getUser(this.state.users))
+      await this.props.dispatch(getUser(this.state.usersQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -58,8 +56,8 @@ class AdminUser extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(setPreference({ [PREFERENCE.ADMIN_PAGINATION]: data.pageSize }))
-      await this.setState({ users: Object.assign(this.state.users, data) })
-      await this.props.dispatch(getUser(this.state.users))
+      await this.setState({ usersQuery: Object.assign(this.state.usersQuery, data) })
+      await this.props.dispatch(getUser(this.state.usersQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -71,7 +69,7 @@ class AdminUser extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(deleteUser(item.id))
-      await this.props.dispatch(getUser(this.state.users))
+      await this.props.dispatch(getUser(this.state.usersQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -84,7 +82,7 @@ class AdminUser extends Component {
       this.props.dispatch(showLoading())
       item.active = true
       await this.props.dispatch(updateUser(item))
-      await this.props.dispatch(getUser(this.state.users))
+      await this.props.dispatch(getUser(this.state.usersQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -93,17 +91,17 @@ class AdminUser extends Component {
   }
 
   render() {    
-    const activeTab = this.state.users.where.active ? 1 : 2
+    const activeTab = this.state.usersQuery.where.active ? 1 : 2
     const { isLoading } = this.props.app
-    const { records } = this.state.users.items
+    const { records } = this.state.users
     return (
       <div>
         <NavigationBar data={{ title: <h1>Users</h1>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user/new')}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('users.where.active', value===1); this.handleChangeSearch(this.state.users) } }>
+        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('usersQuery.where.active', value===1); this.handleChangeSearch(this.state.usersQuery) } }>
           <NavItem eventKey={1}>Active</NavItem>
           <NavItem eventKey={2}>Inactive</NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.users} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} data={this.state.usersQuery} items={this.state.users} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>

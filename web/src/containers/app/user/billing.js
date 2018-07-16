@@ -6,7 +6,7 @@ class Billing extends Component {
   render() {
     return (
       <div id="subscription">
-        <NavigationBar data={{ title: <h1>Billing</h1> }} />
+        <NavigationBar data={{ title: <h1>{this.context.t('billingTitle')}</h1>, subTitle: <h2>{this.context.t('billingDescription')}</h2> }} />
       </div>
     )
   }

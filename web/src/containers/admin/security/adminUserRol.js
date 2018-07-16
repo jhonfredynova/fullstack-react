@@ -16,9 +16,9 @@ class AdminUserRol extends Component {
     const { appPreferences } = this.props.app.config
     this.state = {
       user: {},
-      userRoles: {
+      userRoles: this.props.user.roles,
+      userRolesQuery: {
         association: { user: this.props.match.params.id },
-        items: this.props.user.roles,
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         sort: {
           name: 1
@@ -32,9 +32,7 @@ class AdminUserRol extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      userRoles: Object.assign(this.state.userRoles, { 
-        items: nextProps.user.roles
-      })
+      userRoles: nextProps.user.roles
     })
   }
   
@@ -43,7 +41,7 @@ class AdminUserRol extends Component {
       this.props.dispatch(showLoading())
       await this.props.dispatch(getUser({ where: { id: this.props.match.params.id } }))
       await this.setState({ user: this.props.user.temp })
-      await this.props.dispatch(getUserRol(this.state.userRoles))
+      await this.props.dispatch(getUserRol(this.state.userRolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -59,8 +57,8 @@ class AdminUserRol extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(setPreference({ [PREFERENCE.ADMIN_PAGINATION]: data.pageSize }))
-      await this.setState({ userRoles: Object.assign(this.state.userRoles, data) })
-      await this.props.dispatch(getUserRol(this.state.userRoles))
+      await this.setState({ userRolesQuery: Object.assign(this.state.userRolesQuery, data) })
+      await this.props.dispatch(getUserRol(this.state.userRolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -72,7 +70,7 @@ class AdminUserRol extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(deleteUserRol(data))
-      await this.props.dispatch(getUserRol(this.state.userRoles))
+      await this.props.dispatch(getUserRol(this.state.userRolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -82,11 +80,11 @@ class AdminUserRol extends Component {
 
   render() {    
     const { isLoading } = this.props.app
-    const { records } = this.state.userRoles.items
+    const { records } = this.state.userRoles
     return (
       <div className={classnames({'hide': isLoading})}>
         <NavigationBar data={{ title: <h1>Roles</h1>, subTitle: <h2>{this.state.user.username}</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/security/user/${this.props.match.params.id}/rol/new`)}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Pager isLoading={isLoading} data={this.state.userRoles} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} data={this.state.userRolesQuery} items={this.state.userRoles} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>

@@ -26,7 +26,7 @@ class Price extends Component {
   async componentWillMount(){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getPlan({ select: ['id', 'name','description','order','payuPlan'], populate: ['features', 'features.feature'] }))
+      await this.props.dispatch(getPlan({ select: ['id', 'name','description','order','paymentType'], populate: ['features', 'features.feature'] }))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -49,7 +49,7 @@ class Price extends Component {
           {
             sortBy(plans, ['order']).map(item =>
               <div key={item.id} className="col-md-4">
-                <PlanBox data={{ isLoading: isLoading, info: item, currency: appPreferences.currency, currencyConversion: config.appIntl.currencyConversion }} />
+                <PlanBox data={{ isLoading: isLoading, info: item, currentCurrency: appPreferences.currency, currencyConversion: config.appIntl.currencyConversion }} />
               </div>
             )
           }

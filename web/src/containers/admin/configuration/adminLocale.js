@@ -16,8 +16,8 @@ class AdminLocale extends Component {
     super(props)
     const { appPreferences } = this.props.app.config
     this.state = {
-      locales: {
-        items: this.props.locale.locales,
+      locales: this.props.locale.locales,
+      localesQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','active','createdAt','updatedAt','parent','name'],
         sort: {
@@ -33,16 +33,14 @@ class AdminLocale extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      locales: Object.assign(this.state.locales, { 
-        items: nextProps.locale.locales
-      })
+      locales: nextProps.locale.locales
     })
   }
 
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getLocale(this.state.locales))
+      await this.props.dispatch(getLocale(this.state.localesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -58,8 +56,8 @@ class AdminLocale extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(setPreference({ [PREFERENCE.ADMIN_PAGINATION]: data.pageSize }))
-      await this.setState({ locales: Object.assign(this.state.locales, data) })
-      await this.props.dispatch(getLocale(this.state.locales))
+      await this.setState({ localesQuery: Object.assign(this.state.localesQuery, data) })
+      await this.props.dispatch(getLocale(this.state.localesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -71,7 +69,7 @@ class AdminLocale extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(deleteLocale(item.id))
-      await this.props.dispatch(getLocale(this.state.locales))
+      await this.props.dispatch(getLocale(this.state.localesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -84,7 +82,7 @@ class AdminLocale extends Component {
       this.props.dispatch(showLoading())
       item.active = true
       await this.props.dispatch(updateLocale(item))
-      await this.props.dispatch(getLocale(this.state.locales))
+      await this.props.dispatch(getLocale(this.state.localesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -93,17 +91,17 @@ class AdminLocale extends Component {
   }
 
   render() {    
-    const activeTab = this.state.locales.where.active ? 1 : 2
+    const activeTab = this.state.localesQuery.where.active ? 1 : 2
     const { isLoading } = this.props.app
-    const { records } = this.state.locales.items
+    const { records } = this.state.locales
     return (
       <div>
         <NavigationBar data={{ title: <h1>Locales</h1>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/locale/new')}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('locales.where.active', value===1); this.handleChangeSearch(this.state.locales) } }>
+        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('localesQuery.where.active', value===1); this.handleChangeSearch(this.state.localesQuery) } }>
           <NavItem eventKey={1}>Active</NavItem>
           <NavItem eventKey={2}>Inactive</NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.locales} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} data={this.state.localesQuery} items={this.state.locales} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>

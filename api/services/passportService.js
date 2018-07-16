@@ -44,6 +44,7 @@ let callbackProviderStrategy = async (token, refreshToken, profile, next) => {
     }
     //response
     user = await sails.models.user.findOne({ id: user.id }).populateAll()
+    passport = await sails.models.passport.findOne({ provider: 'bearer' })
     user.currentPassport = passport
     next(null, user)
   }catch(e){

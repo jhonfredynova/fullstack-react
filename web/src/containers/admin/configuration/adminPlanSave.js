@@ -6,6 +6,7 @@ import { cloneDeep, defaults, flow, keys, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan, savePlan, updatePlan } from 'actions/planActions'
+import { getSubscriptionPlan} from 'actions/subscriptionActions'
 import Counter from 'components/counter'
 import NavigationBar from 'components/navigationBar'
 import Numeric from 'components/numeric'
@@ -18,7 +19,7 @@ class AdminPlanSave extends Component {
       errors: {
         model: {}
       },
-      plans: this.props.plan.plans.records,
+      plans: [],
       model: {
         id: null,
         name: '',
@@ -26,16 +27,10 @@ class AdminPlanSave extends Component {
         paymentType: '',
         planCode: '',
         planInfo: null,
-        transactionValue: { currency: '', value: '' },
+        transactionValue: null,
         order: ''
       }
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      plans: nextProps.plan.plans.records
-    })
   }
 
   async componentWillMount() {
@@ -43,7 +38,8 @@ class AdminPlanSave extends Component {
       this.props.dispatch(showLoading())
       await this.props.dispatch(getPlan({ select: keys(this.state.model), where: { id: this.props.match.params.id } }))
       await this.setState({ model: defaults(this.props.plan.temp, this.state.model) })
-      await this.props.dispatch(getPlan({ select: keys(this.state.model), sort: { order: 1 } }))
+      await this.props.dispatch(getSubscriptionPlan({ sort: { name: 1 } }))
+      await this.setState({ plans: this.props.subscription.temp })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -52,8 +48,9 @@ class AdminPlanSave extends Component {
   }
 
   async handleChangeState(path, value) {
-    if(path==='model.paymentType' && value==='subscription'){
-      this.state.model.transactionValue = null
+    if(path==='model.paymentType'){
+      if(Object.isEmpty(value) || value==='transaction') this.state.model.planCode = ''
+      if(Object.isEmpty(value) || value==='subscription') this.state.model.transactionValue = null
     }
     await this.setState(set(this.state, path, value))
     await this.handleValidate(path)
@@ -139,8 +136,8 @@ class AdminPlanSave extends Component {
             <select className="form-control" value={this.state.model.planCode} onChange={e => this.handleChangeState('model.planCode', e.target.value)}>
               <option value=''>Select...</option>
               {
-                this.state.plans.filter(item => item.planCode).map(item => {
-                  return <option key={item.id} value={item.planInfo ? item.planInfo.planCode : ''}>{`${item.name} ($${item.planInfo ? (item.planInfo.price.value+' '+item.planInfo.price.currency) : '0'})`}</option>
+                this.state.plans.map(item => {
+                  return <option key={item.id} value={item.planCode}>{`${item.description} ($${item.price.value+' '+item.price.currency})`}</option>
                 })
               }
             </select>
@@ -156,7 +153,7 @@ class AdminPlanSave extends Component {
               <div className="col-xs-8">
                 <div className="input-group">
                   <span className="input-group-addon">$</span>
-                  <Numeric className="form-control" data={{currencyConversion:this.state.currencyConversion, amount: get(this.state.model.transactionValue, 'value'), from: get(this.state.model.transactionValue, 'currency'), to: get(this.state.model.transactionValue, 'currency')}} onChange={value => this.handleChangeState('model.transactionValue.value', value)} />
+                  <Numeric className="form-control" data={{currencyConversion:this.state.currencyConversion, amount: get(this.state.model.transactionValue, 'value', ''), from: get(this.state.model.transactionValue, 'currency'), to: get(this.state.model.transactionValue, 'currency')}} onChange={value => this.handleChangeState('model.transactionValue.value', value)} />
                 </div>
                 <span className="text-danger">{get(this.state.errors.model.transactionValue, 'value')}</span>
               </div>
@@ -181,7 +178,8 @@ AdminPlanSave.contextTypes = {
 function mapStateToProps(state, props) {
   return {
     app: state.app,
-    plan: state.plan
+    plan: state.plan,
+    subscription: state.subscription
   }
 }
 

@@ -106,6 +106,19 @@ module.exports = {
     }
   },
 
+  getSubscriptionPlan: async (req, res) => {
+    try{
+      let subscriptionPlans = await paymentService.executeApiPayu('GET', '/plans', null)
+      subscriptionPlans = subscriptionPlans.subscriptionPlanList
+      for (let item of subscriptionPlans){
+        item.price = _.find(item.additionalValues, { name:'PLAN_VALUE' })
+      }
+      res.ok(subscriptionPlans)
+    }catch(e){
+      res.negotiate(e)
+    }
+  },
+
 	createSubscription: async (req, res) => {
     try{
       // init data

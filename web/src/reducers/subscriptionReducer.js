@@ -24,6 +24,12 @@ export default function reducer(
         temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
       }
 
+    case SUBSCRIPTION.GET_SUBSCRIPTION_PLAN:
+      return { 
+        ...state, 
+        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+      }
+
     case SUBSCRIPTION.CREATE_SUBSCRIPTION:
       return { 
         ...state, 

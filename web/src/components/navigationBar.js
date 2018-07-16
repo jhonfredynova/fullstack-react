@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import classnames from 'classnames'
 import './navigationBar.css'
 
 class NavigationBar extends Component {
@@ -20,12 +21,16 @@ class NavigationBar extends Component {
   render() {
     return (
       <div id="navigationBar">
-        <div className="btn-navigation">{this.state.btnLeft}</div>
+        <div className={classnames({'btn-navigation': true, 'hide': !this.state.btnLeft})}>
+          {this.state.btnLeft}
+        </div>
         <div className="head-navigation text-center">
           {this.state.title}
           {this.state.subTitle}
         </div>
-        <div className="btn-navigation">{this.state.btnRight}</div>
+        <div className={classnames({'btn-navigation': true, 'hide': !this.state.btnRight})}>
+          {this.state.btnRight}
+        </div>
       </div>
     )
   }

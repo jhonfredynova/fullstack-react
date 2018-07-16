@@ -102,7 +102,7 @@ class AdminCatalogSave extends Component {
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
           <div className="form-group col-md-6">
             <label>Parent Catalog</label>
-            <Select className="form-control" options={parentCatalogs} valueKey='id' value={this.state.model.parent ? this.state.model.parent.id : ''} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.parent', value)} />
+            <Select className="form-control" options={parentCatalogs} valueKey='id' value={this.state.model.parent} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.parent', value)} />
             <span className="text-danger">{this.state.errors.model.parent}</span>
           </div>
           <div className="form-group col-md-6">

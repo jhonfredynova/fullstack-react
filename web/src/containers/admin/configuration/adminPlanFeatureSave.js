@@ -15,7 +15,9 @@ class AdminPlanFeatureSave extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      errors: {},
+      errors: {
+        model: {}
+      },
       plan: {},
       planFeatures: this.props.catalog.catalogs.records,
       model: {

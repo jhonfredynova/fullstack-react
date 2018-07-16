@@ -38,6 +38,7 @@ class Header extends Component {
   render() {
     const { appLoaded } = this.props.data
     const { config } = this.props.data.app
+    const { isAuthenticated } = this.props.data.auth
     const { appPreferences } = config
     const currencies = get(config.appIntl, 'currencies', [])
     const languages = filter(get(config.appIntl, 'languages', []), item => config.appLanguages.indexOf(item.value)>-1)
@@ -80,7 +81,7 @@ class Header extends Component {
                   <Button className="btn btn-success btn-block"><i className="glyphicon glyphicon-bell"></i></Button>
                 </OverlayTrigger>
               </MenuItem>
-              <MenuItem>
+              <MenuItem className={classnames({'hide': !isAuthenticated})}>
                 <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={popoverMessages}>
                   <Button className="btn btn-success btn-block"><i className="glyphicon glyphicon-comment"></i></Button>
                 </OverlayTrigger>

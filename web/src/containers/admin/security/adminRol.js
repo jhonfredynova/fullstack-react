@@ -16,8 +16,8 @@ class AdminRol extends Component {
     super(props)
     const { appPreferences } = this.props.app.config
     this.state = {
-      roles: {
-        items: this.props.rol.roles,
+      roles: this.props.rol.roles,
+      rolesQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','active','createdAt','updatedAt','parent','name'],
         sort: {
@@ -33,16 +33,14 @@ class AdminRol extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      roles: Object.assign(this.state.roles, { 
-        items: nextProps.rol.roles
-      })
+      roles: nextProps.rol.roles
     })
   }
 
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getRol(this.state.roles))
+      await this.props.dispatch(getRol(this.state.rolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -58,8 +56,8 @@ class AdminRol extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(setPreference({ [PREFERENCE.ADMIN_PAGINATION]: data.pageSize }))
-      await this.setState({ roles: Object.assign(this.state.roles, data) })
-      await this.props.dispatch(getRol(this.state.roles))
+      await this.setState({ rolesQuery: Object.assign(this.state.rolesQuery, data) })
+      await this.props.dispatch(getRol(this.state.rolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -71,7 +69,7 @@ class AdminRol extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(deleteRol(item.id))
-      await this.props.dispatch(getRol(this.state.roles))
+      await this.props.dispatch(getRol(this.state.rolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -84,7 +82,7 @@ class AdminRol extends Component {
       this.props.dispatch(showLoading())
       item.active = true
       await this.props.dispatch(updateRol(item))
-      await this.props.dispatch(getRol(this.state.roles))
+      await this.props.dispatch(getRol(this.state.rolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -93,17 +91,17 @@ class AdminRol extends Component {
   }
 
   render() {    
-    const activeTab = this.state.roles.where.active ? 1 : 2
+    const activeTab = this.state.rolesQuery.where.active ? 1 : 2
     const { isLoading } = this.props.app
-    const { records } = this.state.roles.items
+    const { records } = this.state.roles
     return (
       <div>
         <NavigationBar data={{ title: <h1>Roles</h1>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/rol/new')}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('roles.where.active', value===1); this.handleChangeSearch(this.state.roles) } }>
+        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('rolesQuery.where.active', value===1); this.handleChangeSearch(this.state.rolesQuery) } }>
           <NavItem eventKey={1}>Active</NavItem>
           <NavItem eventKey={2}>Inactive</NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.roles} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} data={this.state.rolesQuery} items={this.state.roles} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>

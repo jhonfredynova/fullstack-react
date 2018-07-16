@@ -1,7 +1,7 @@
 import  React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import classnames from 'classnames'
-import { defaultTo, get, sortBy } from 'lodash'
+import { defaultTo, sortBy } from 'lodash'
 import PropTypes from 'prop-types' 
 import Numeric from 'components/numeric'
 import 'components/planBox.css'
@@ -12,7 +12,7 @@ class PlanBox extends Component {
     super(props)
     this.state = {
       info: defaultTo(this.props.data.info, {}),
-      currency: defaultTo(this.props.data.currency, 'USD'),
+      currentCurrency: defaultTo(this.props.data.currentCurrency, 'USD'),
       currencyConversion: defaultTo(this.props.data.currencyConversion, []),
     }
   }
@@ -24,14 +24,17 @@ class PlanBox extends Component {
   render() {
     const plan = this.state.info
     const { isLoading} = this.props.data
+    let planPrice = { currency: this.state.currentCurrency, value: 0 }
+    if(plan.paymentType==='subscription') planPrice = plan.planInfo.price
+    if(plan.paymentType==='transaction') planPrice = plan.transactionValue
     return (
       <div id="planBox" className={classnames({'mostPopular': plan.mostPopular, 'hide': isLoading})}>
         <div className="panel panel-default">
           <div className="panel-heading text-center">
             <h2>{plan.name}</h2>
-            <Numeric data={{ amount: get(plan, 'planInfo.price.value', 0), display: 'text', decimalScale: 2, from: this.state.currency, to: get(plan, 'planInfo.price.currency', this.state.currency), prefix: '$', currencyConversion: this.state.currencyConversion }} /> {this.state.currency.toUpperCase()} <small>{this.context.t('perMonth')}</small><br/>
+            <Numeric data={{ amount: planPrice.value, display: 'text', decimalScale: 2, from: this.state.currentCurrency, to: planPrice.currency, prefix: '$', currencyConversion: this.state.currencyConversion }} /> {this.state.currentCurrency.toUpperCase()} <small>{this.context.t('perMonth')}</small><br/>
             {
-              plan.planInfo 
+              planPrice.value>0
               ? <Link className="btn btn-success" to={`/buy/${Object.toUrl(plan.name)}`}>{this.context.t('buy')}</Link> 
               : <Link className="btn btn-success" to="/register">{this.context.t('try')}</Link>
             }

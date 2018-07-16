@@ -12,21 +12,16 @@ class Docs extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      docs: this.props.catalog.catalogs.records
+      txtDocs: this.props.catalog.catalogs.records
     }
-  }
-
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      docs: nextProps.catalog.catalogs.records
-    })
   }
 
   async componentWillMount(){
     try{
       this.props.dispatch(showLoading())
       const { config } = this.props.app
-      await this.props.dispatch(getCatalog({ where: { 'parent': config.catalogTxtDocs } }))
+      await this.props.dispatch(getCatalog({ where: { 'id': config.catalogTxtDocs } }))
+      await this.setState({ txtDocs: get(this.props.catalog.temp, `value[${config.appPreferences.language}]`, '') })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -35,26 +30,11 @@ class Docs extends Component {
   }
 
   render() {
-    const { appPreferences } = this.props.app.config
     return (
       <div id="docs">
         <Seo data={{ title: this.context.t('docsTitle'), description: this.context.t('docsDescription'), siteName: this.context.t('siteName') }} />
         <NavigationBar data={{ title: <h1>{this.context.t('docsTitle')}</h1>, subTitle: <h2>{this.context.t('docsDescription')}</h2> }} />
-        <section className="row">
-          {
-            this.state.docs.map(item => {
-              return (
-                <div key={item.id} className="col-md-6">
-                  <h2 className="text-center" dangerouslySetInnerHTML={{__html: item.name}}></h2>
-                  <article dangerouslySetInnerHTML={{__html: get(item, `value[${appPreferences.language}]`, '')}} />
-                  <div className="embed-responsive embed-responsive-16by9">
-                    <iframe title={item.name} className="embed-responsive-item" src={item.thumbnail}></iframe>
-                  </div>
-                </div>
-              )
-            })
-          }
-        </section>
+        <article dangerouslySetInnerHTML={{__html: this.state.txtDocs}} />
       </div>
     )
   }

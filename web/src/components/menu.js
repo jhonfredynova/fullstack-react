@@ -74,8 +74,8 @@ class Menu extends Component {
         {
           isAuthenticated && session.hasPermissions([ROL_REGISTERED]) ? 
           <Nav pullRight>
-            <LinkContainer exact to="/app/dashboard">
-              <NavItem>{this.context.t('dashboard')}</NavItem>
+            <LinkContainer exact to="/">
+              <NavItem>{this.context.t('home')}</NavItem>
             </LinkContainer>
             <NavDropdown id="navApp" title="App">
               <LinkContainer to="/app/dashboard">

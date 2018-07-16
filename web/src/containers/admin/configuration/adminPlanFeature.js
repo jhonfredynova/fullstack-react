@@ -16,8 +16,8 @@ class AdminPlanFeature extends Component {
     const { appPreferences } = this.props.app.config
     this.state = {
       plan: {},
-      planFeatures: {
-        items: this.props.plan.features,
+      planFeatures: this.props.plan.features,
+      planFeaturesQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         populate: ['feature'],
         select: ['id','plan','feature','order','quantity'],
@@ -28,6 +28,7 @@ class AdminPlanFeature extends Component {
         },
         where: {
           active: true,
+          'feature.name': { contains: '' },
           plan: this.props.match.params.id
         }
       }
@@ -36,9 +37,7 @@ class AdminPlanFeature extends Component {
 
   componentWillReceiveProps(nextProps) {
     this.setState({
-      planFeatures: Object.assign(this.state.planFeatures, { 
-        items: nextProps.plan.features
-      })
+      planFeatures: nextProps.plan.features
     })
   }
 
@@ -47,7 +46,7 @@ class AdminPlanFeature extends Component {
       this.props.dispatch(showLoading())
       await this.props.dispatch(getPlan({ select: ['id','name'], where: {id: this.props.match.params.id } }))
       await this.setState({ plan: this.props.plan.temp })
-      await this.props.dispatch(getPlanFeature(this.state.planFeatures))
+      await this.props.dispatch(getPlanFeature(this.state.planFeaturesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -63,8 +62,8 @@ class AdminPlanFeature extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(setPreference({ [PREFERENCE.ADMIN_PAGINATION]: data.pageSize }))
-      await this.setState({ planFeatures: Object.assign(this.state.planFeatures, data) })
-      await this.props.dispatch(getPlanFeature(this.state.planFeatures))
+      await this.setState({ planFeaturesQuery: Object.assign(this.state.planFeaturesQuery, data) })
+      await this.props.dispatch(getPlanFeature(this.state.planFeaturesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -76,7 +75,7 @@ class AdminPlanFeature extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(deletePlanFeature(data))
-      await this.props.dispatch(getPlanFeature(this.state.planFeatures))
+      await this.props.dispatch(getPlanFeature(this.state.planFeaturesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -89,7 +88,7 @@ class AdminPlanFeature extends Component {
       this.props.dispatch(showLoading())
       item.active = true
       await this.props.dispatch(updatePlanFeature(item))
-      await this.props.dispatch(getPlanFeature(this.state.planFeatures))
+      await this.props.dispatch(getPlanFeature(this.state.planFeaturesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -98,17 +97,17 @@ class AdminPlanFeature extends Component {
   }
 
   render() {    
-    const activeTab = this.state.planFeatures.where.active ? 1 : 2
+    const activeTab = this.state.planFeaturesQuery.where.active ? 1 : 2
     const { isLoading } = this.props.app
-    const { records } = this.state.planFeatures.items
+    const { records } = this.state.planFeatures
     return (
       <div id="adminPlanFeature">
         <NavigationBar data={{ title: <h1>{this.state.plan.name}</h1>, subTitle: <h2>Features</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan`)}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan/${this.props.match.params.id}/feature/new`)}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('planFeatures.where.active', value===1); this.handleChangeSearch(this.state.planFeatures) } }>
+        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('planFeaturesQuery.where.active', value===1); this.handleChangeSearch(this.state.planFeaturesQuery) } }>
           <NavItem eventKey={1}>Active</NavItem>
           <NavItem eventKey={2}>Inactive</NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.planFeatures} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} data={this.state.planFeaturesQuery} items={this.state.planFeatures} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>
