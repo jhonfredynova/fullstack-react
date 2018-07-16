@@ -47,33 +47,32 @@ npm start
 - Redux integration
 
 ## Application modules
-- App module
+- Application
   - MultiCallingCodes
   - MultiCurrencies
   - MultiLanguage (EN,ES)
   - Preferences
-- Admin module
+- Administrator
   - Catalogs
   - Locales
   - Plans
   - Roles
   - Users
-- Docs module 
+- Documents 
   - Docs
   - FAQ
   - Privacy
   - Terms
-- Subscription module 
+- Subscription 
   - Billing
   - Prices
   - Subscription
-- User module
+- User
+  - Dashboard
   - FogotAccount
   - Login
-  - Register
-  - ResetPassword
-- Session module
-  - Dashboard
   - Logout
   - Messages
   - Profile
+  - Register
+  - ResetPassword
