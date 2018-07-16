@@ -33,8 +33,8 @@ module.exports.app = {
   planPremium: 'XXX',
   planStandard: 'XXX',
   //ROLES
-  rolAdmin: 'XXX',
-  rolRegistered: 'XXX',
+  rolAdmin: '56507b29adc2d7c703be31fc',
+  rolRegistered: '56400a2b1b668b080243d2d7',
   //SOCIAL
   socialFacebook: 'https://www.facebook.com/jhonfredynova',
   socialGoogle: 'https://plus.google.com/+jhonfredynova',
