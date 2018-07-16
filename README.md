@@ -13,7 +13,7 @@ Configure the environment variables on the following files:
 
 Configure the database:
 ```
-mongorestore -h <dbHost>:<dbPort> -d <dbName> -u <user> -p <password> <directory>
+mongorestore -h <dbHost>:<dbPort> -d <dbName> -u <user> -p <password> db/
 ```
 
 Running application by run this commands:
