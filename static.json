@@ -1,8 +1,13 @@
 {
   "root": "../assets/",
-  "proxies": {
-    "/api/": {
-      "origin": "https://tucode.herokuapp.com"
+  "proxy": {
+    "/api": {
+      "target": "https://jhonfredynova.com",
+      "ws": true
+    },
+    "/foo": {
+      "target": "https://google.com",
+      "ws": true
     }
   }
 }
