@@ -3,11 +3,15 @@
   "proxy": {
     "/api": {
       "target": "https://jhonfredynova.com",
+      "ssl": true,
       "ws": true
     },
     "/foo": {
-      "target": "https://google.com",
+      "target": "http://google.com",
       "ws": true
+    },
+    "/fee": {
+      "target": "http://yahoo.com",
     }
   }
 }
