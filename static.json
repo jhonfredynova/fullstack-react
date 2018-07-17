@@ -1,9 +1,13 @@
 {
   "root": "../assets/",
+  "headers": {
+    "/": {
+      "Cache-Control": "no-store, no-cache"
+    },
+  },
   "proxies": {
-    "/api": {
-      "target": "https://restcountries.eu/rest/v2",
-      "changeOrigin": true
+    "/api/": {
+      "origin": "https://tucode.herokuapp.com"
     }
-  }
+  } 
 }
