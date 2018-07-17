@@ -2,6 +2,11 @@
   "name": "web",
   "version": "0.1.0",
   "author": "jhonfredynova",
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:3000"
+    }
+  },
   "engines": {
     "node": "8.9.1"
   },

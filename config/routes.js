@@ -32,10 +32,7 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-
-  'get    /api/app/config': 'AppController.getConfig',
-
-  'get /': {
+  '/': {
     asset: 'index.html',
     skipAssets: true
   },
