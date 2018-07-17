@@ -2,7 +2,7 @@
   "root": "../assets/",
   "proxies": {
     "/api/": {
-      "origin": "https://venpad.com"
+      "target": "https://venpad.com"
     }
   }
 }
