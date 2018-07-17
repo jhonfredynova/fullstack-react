@@ -5,6 +5,11 @@
   "engines": {
     "node": "8.9.1"
   },
+  "proxy": {
+    "/api": {
+      "target": "http://tucode.herokuapp.com"
+    }
+  },
   "reactSnapshot": {
     "include": [
       "/docs",
