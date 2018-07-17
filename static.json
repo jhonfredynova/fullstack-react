@@ -1,8 +1,8 @@
 {
   "root": "../assets/",
-  "proxy": {
-    "/api": {
-      "target": "https://tucode.herokuapp.com"
+  "proxies": {
+    "/api/": {
+      "origin": "http://localhost:1337"
     }
   }
 }
