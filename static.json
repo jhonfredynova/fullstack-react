@@ -1,15 +1,15 @@
 {
   "root": "../assets/",
   "proxies": {
-    "/api": {
+    "/api/": {
       "target": "https://jhonfredynova.com",
       "ssl": true,
       "ws": true
     },
-    "/faa": {
+    "/faa/": {
       "origin": "http://aa.com"
     },
-    "/foo": {
+    "/foo/": {
       "target": "http://google.com",
       "ws": true
     },
