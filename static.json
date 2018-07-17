@@ -3,7 +3,7 @@
   "headers": {
     "/": {
       "Cache-Control": "no-store, no-cache"
-    },
+    }
   },
   "proxies": {
     "/api/": {
