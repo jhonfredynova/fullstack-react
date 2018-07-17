@@ -1,6 +1,6 @@
 {
   "root": "../assets/",
-  "proxies": {
+  "proxies": { 
     "/api/**": {
       "origin": "https://tucode.herokuapp.com",
       "ssl": true
