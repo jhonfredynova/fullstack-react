@@ -34,7 +34,7 @@ module.exports.routes = {
 
   '/': {
     asset: 'index.html',
-    skipAssets: true
+    skipAssets: false
   },
 
   /***************************************************************************
