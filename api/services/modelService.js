@@ -49,7 +49,7 @@ module.exports = {
             }
           }
           if (associationIds.length>0) {
-            associationErrors.push(`The ${association.alias} assocation failed, no documents were found with that ID(s): ${associationIds.join(', ')}.`)
+            associationErrors.push(`The association ${associationName} failed for the property ${association.alias}`)
           }
         }
       }
