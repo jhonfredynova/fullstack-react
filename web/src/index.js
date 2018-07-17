@@ -106,6 +106,7 @@ render((
             <Route path="/register/confirm/:token" component={RegisterConfirm}/>
             <Route path="/reset-account/:token" component={ResetAccount}/>
             <Route path="/terms" component={Terms}/>
+            <Route component={NotFound}/>
           </Switch>
         </Main>
       </BrowserRouter>

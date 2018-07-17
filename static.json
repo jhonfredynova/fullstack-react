@@ -1,13 +1,8 @@
 {
   "root": "../assets/",
-  "headers": {
-    "/": {
-      "Cache-Control": "no-store, no-cache"
-    }
-  },
   "proxies": {
     "/api/": {
       "origin": "https://tucode.herokuapp.com"
     }
-  } 
+  }
 }
