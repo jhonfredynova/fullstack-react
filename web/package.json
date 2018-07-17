@@ -2,6 +2,11 @@
   "name": "web",
   "version": "0.1.0",
   "author": "jhonfredynova",
+  "proxy": {
+    "/api": {
+      "target": "https://tucode.herokuapp.com"
+    }
+  },
   "engines": {
     "node": "8.9.1"
   },
