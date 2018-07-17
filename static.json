@@ -1,8 +1,3 @@
 {
-  "root": "../assets/",
-  "proxies": {
-    "/api/": {
-      "target": "https://tucode.herokuapp.com"
-    }
-  }
+  "root": "../assets/"
 }
