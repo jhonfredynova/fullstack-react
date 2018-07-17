@@ -1,3 +1,8 @@
 {
-  "root": "../assets/"
+  "root": "../assets/",
+  "proxies": {
+    "/api": {
+      "target": "http://localhost:3000"
+    }
+  },
 }
