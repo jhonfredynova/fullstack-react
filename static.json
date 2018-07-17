@@ -2,19 +2,25 @@
   "root": "../assets/",
   "proxies": {
     "/api/": {
-      "target": "https://jhonfredynova.com",
-      "ssl": true,
-      "ws": true
+      "origin": "https://tucode.herokuapp.com"
     },
     "/faa/": {
-      "origin": "http://aa.com"
+      "target": "https://tucode.herokuapp.com",
+      "ssl": true
+    },
+    "/fee/": {
+      "origin": "https://localhost:1337",
+    },
+    "/fii/": {
+      "origin": "https://localhost:1337",
+      "ssl": true
     },
     "/foo/": {
-      "target": "http://google.com",
-      "ws": true
+      "target": "https://localhost:1337",
     },
-    "/fee": {
-      "target": "http://yahoo.com",
+    "/fuu/": {
+      "target": "https://localhost:1337",
+      "ssl": true
     }
   }
 }
