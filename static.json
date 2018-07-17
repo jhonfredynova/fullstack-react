@@ -1,3 +1,9 @@
 {
-  "root": "../assets/"
+  "root": "../assets/",
+  "proxies": {
+    "/api": {
+      "target": "https://restcountries.eu/rest/v2",
+      "changeOrigin": true
+    }
+  }
 }
