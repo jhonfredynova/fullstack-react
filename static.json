@@ -2,25 +2,7 @@
   "root": "../assets/",
   "proxies": {
     "/api/": {
-      "origin": "https://tucode.herokuapp.com"
-    },
-    "/faa/": {
-      "target": "https://tucode.herokuapp.com",
-      "ssl": true
-    },
-    "/fee/": {
-      "origin": "https://localhost:1337",
-    },
-    "/fii/": {
-      "origin": "https://localhost:1337",
-      "ssl": true
-    },
-    "/foo/": {
-      "target": "https://localhost:1337",
-    },
-    "/fuu/": {
-      "target": "https://localhost:1337",
-      "ssl": true
+      "target": "https://tucode.herokuapp.com"
     }
   }
 }
