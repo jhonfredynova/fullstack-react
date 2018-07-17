@@ -2,7 +2,7 @@
   "root": "../assets/",
   "proxies": {
     "/api/": {
-      "origin": "http://localhost:1337"
+      "origin": "https://tucode.herokuapp.com"
     }
   }
 }
