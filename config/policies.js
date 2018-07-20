@@ -29,6 +29,7 @@ module.exports.policies = {
   '*': ['passport'],
 
   'AppController': {
+    'getIndex': true,
     'getConfig': true,
     'getContact': true
   },

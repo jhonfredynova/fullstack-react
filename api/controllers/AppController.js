@@ -10,6 +10,15 @@ let axios = require('axios')
 
 module.exports = {
 
+  getIndex: async (req, res, next) => {
+    try{
+      if(new RegExp('^/api/(.*)').test(req.url)) return next()
+      res.sendfile('index.html', { root: `${sails.config.paths.public}/build` })
+    }catch(e){
+      res.serverError(e)
+    }
+  },
+
   getConfig: async (req, res) => {
     try{
       let params = await requestService.parseParams(req)

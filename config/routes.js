@@ -31,11 +31,10 @@ module.exports.routes = {
   * `assets` directory)                                                      *
   *                                                                          *
   ***************************************************************************/
-  '/': {
-    skipAssets: true,
-    fn: (req, res, next) => {
-      res.sendfile('index.html', { root: `${sails.config.paths.public}/build` })
-    }
+  '/*': {
+    action: 'getIndex',
+    controller: 'AppController',
+    skipAssets: true
   },
 
   /***************************************************************************
