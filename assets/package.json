@@ -2,7 +2,7 @@
   "name": "web",
   "version": "0.1.0",
   "author": "jhonfredynova",
-  "proxy": "https://tucode.herokuapp.com",
+  "homepage": "/build",
   "engines": {
     "node": "8.9.1"
   },

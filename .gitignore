@@ -38,8 +38,6 @@
 #    development.
 # 
 ################################################
-
-assets
 build
 config/local.js
 

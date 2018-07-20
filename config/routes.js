@@ -31,10 +31,11 @@ module.exports.routes = {
   * `assets` directory)                                                      *
   *                                                                          *
   ***************************************************************************/
-
-  '/web': {
-    asset: 'index.html',
-    skipAssets: true
+  '/': {
+    skipAssets: true,
+    fn: (req, res, next) => {
+      res.sendfile('index.html', { root: `${sails.config.paths.public}/build` })
+    }
   },
 
   /***************************************************************************
@@ -69,5 +70,4 @@ module.exports.routes = {
   'post   /api/user/forgot': 'UserController.forgot',
   'post   /api/user/reset/:token': 'UserController.reset',
   'post   /api/user/validate/:token': 'UserController.validate'
-  
 }
