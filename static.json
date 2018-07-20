@@ -1,3 +1,8 @@
 {
-  "root": "../assets/build"
+  "root": "../assets/build",
+  "proxies": {
+    "/api/": {
+      "origin": "https://tucode.herokuapp.com"
+    }
+  }
 }
