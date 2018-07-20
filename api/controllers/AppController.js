@@ -12,13 +12,7 @@ module.exports = {
 
   getIndex: async (req, res, next) => {
     try{
-      console.log('----INDEX---')
-      if(new RegExp('^/api/(.*)').test(req.url)){
-        console.log('----API---')
-        return next()
-      }
-      console.log('----HTML---')
-      console.log('----'+sails.config.paths.public+'---')
+      if(new RegExp('^/api/(.*)').test(req.url)) return next()
       res.sendfile('index.html', { root: `${sails.config.paths.public}/build` })
     }catch(e){
       res.serverError(e)
