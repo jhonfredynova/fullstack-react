@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 require('dotenv').config()
-
+ 
 var _ = require('lodash'),
     axios = require('axios'),
     config = require('../config/config')
