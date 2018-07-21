@@ -24,6 +24,21 @@ module.exports.routes = {
 
   /***************************************************************************
   *                                                                          *
+  * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
+  * etc. depending on your default view engine) your home page.              *
+  *                                                                          *
+  * (Alternatively, remove this and add an `index.html` file in your         *
+  * `assets` directory)                                                      *
+  *                                                                          *
+  ***************************************************************************/
+  '/*': {
+    action: 'getIndex',
+    controller: 'AppController',
+    skipAssets: true
+  },
+
+  /***************************************************************************
+  *                                                                          *
   * Custom routes here...                                                    *
   *                                                                          *
   * If a request to a URL doesn't match any of the custom routes above, it   *
@@ -53,20 +68,5 @@ module.exports.routes = {
   'post   /api/user/forgot': 'UserController.forgot',
   'post   /api/user/forgot': 'UserController.forgot',
   'post   /api/user/reset/:token': 'UserController.reset',
-  'post   /api/user/validate/:token': 'UserController.validate',
-
-  /***************************************************************************
-  *                                                                          *
-  * Make the view located at `views/homepage.ejs` (or `views/homepage.jade`, *
-  * etc. depending on your default view engine) your home page.              *
-  *                                                                          *
-  * (Alternatively, remove this and add an `index.html` file in your         *
-  * `assets` directory)                                                      *
-  *                                                                          *
-  ***************************************************************************/
-  '/*': {
-    action: 'getIndex',
-    controller: 'AppController',
-    skipAssets: true
-  }
+  'post   /api/user/validate/:token': 'UserController.validate'
 }
