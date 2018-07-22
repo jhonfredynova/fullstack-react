@@ -12,7 +12,7 @@
     "node": "8.9.1"
   },
   "scripts": {
-    "postinstall": "cd assets && npm i",
+    "postinstall": "cd assets && npm i && npm run build",
     "debug": "concurrently \"node --inspect app\" \"cd assets && npm run start\"",
     "start": "node app"
   },
