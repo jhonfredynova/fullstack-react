@@ -21,12 +21,10 @@
 // Load enviroment variables and local configuration
 try {
   let enviroment = process.env.NODE_ENV
-  console.log(process.env)
   if(Object.isEmpty(enviroment) || enviroment==='development'){
     require('dotenv').load()
     require('./config/local')
   }
-  console.log(process.env)
 } catch (e) {
   console.error('Warning: local configuration not found')
 }
