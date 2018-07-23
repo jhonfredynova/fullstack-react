@@ -13,7 +13,10 @@ Configure database by executing this command:
 mongorestore -h <dbHost>:<dbPort> -d <dbName> -u <user> -p <password> db/
 ```
 This command will create the following collections:
+- catalog
 - locale
+- plan
+- planFeature
 - rol
 Running application by run this commands:
 ```
@@ -27,11 +30,9 @@ You can check each app on the following urls:
 - WEB: http://localhost:3000
 
 ## Deployment
-Before deploying you must add the following buildpack on the server:
-- https://github.com/mars/create-react-app-buildpack
+Before deploying you must configure the environment variables in the server:
 ```
 npm i
-npm run build
 npm start
 ```
 
