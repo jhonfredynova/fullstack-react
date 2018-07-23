@@ -38,9 +38,7 @@
 #    development.
 # 
 ################################################
-build
 config/local.js
-coverage
 
 
 
