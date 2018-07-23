@@ -6,7 +6,7 @@ import { cloneDeep, defaults, flow, keys, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan, savePlan, updatePlan } from 'actions/planActions'
-import { getSubscriptionPlan} from 'actions/subscriptionActions'
+import { getSubscriptionPlan } from 'actions/paymentActions'
 import Counter from 'components/counter'
 import NavigationBar from 'components/navigationBar'
 import Numeric from 'components/numeric'
@@ -39,7 +39,7 @@ class AdminPlanSave extends Component {
       await this.props.dispatch(getPlan({ select: keys(this.state.model), where: { id: this.props.match.params.id } }))
       await this.setState({ model: defaults(this.props.plan.temp, this.state.model) })
       await this.props.dispatch(getSubscriptionPlan({ sort: { name: 1 } }))
-      await this.setState({ plans: this.props.subscription.temp })
+      await this.setState({ plans: this.props.payment.temp })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -178,8 +178,8 @@ AdminPlanSave.contextTypes = {
 function mapStateToProps(state, props) {
   return {
     app: state.app,
-    plan: state.plan,
-    subscription: state.subscription
+    payment: state.payment,
+    plan: state.plan
   }
 }
 

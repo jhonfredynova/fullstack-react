@@ -51,17 +51,21 @@ module.exports = {
       collection: 'passport',
       via: 'user'
     },
-    roles: {
-      collection: 'rol',
-      via: 'users',
-      defaultsTo: [sails.config.app.rolRegistered]
-    },
     preferences: {
       type: 'json',
       defaultsTo: []
     },
     clientCode: {
       type: 'string'
+    },
+    plan: {
+      model: 'userplan',
+      defaultsTo: sails.config.app.planFree
+    },
+    roles: {
+      collection: 'rol',
+      via: 'users',
+      defaultsTo: [sails.config.app.rolRegistered]
     },
     getFullName: () => {
       return `${this.firstname} ${this.lastname}`

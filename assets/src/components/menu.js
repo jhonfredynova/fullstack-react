@@ -21,7 +21,7 @@ class Menu extends Component {
 
   render() {
     const { isAuthenticated, session } = this.props.data.auth
-    const { ROL_ADMIN, ROL_REGISTERED } = PERMISSION
+    const { LEVEL_1, LEVEL_3 } = PERMISSION
     return (
       <div id="menu" className={this.props.className}>
         {/* SESSION */}
@@ -45,7 +45,7 @@ class Menu extends Component {
         }
         {/* ADMIN */}
         {
-          isAuthenticated && session.hasPermissions([ROL_ADMIN]) ? 
+          isAuthenticated && session.permissions[LEVEL_1] ? 
           <Nav pullRight>   
             <NavDropdown id="navAdmin" title="Admin">
               <MenuItem header><i className="fa fa-cogs"></i> CONFIGURATION</MenuItem>
@@ -72,7 +72,7 @@ class Menu extends Component {
         }
         {/* APP */}
         {
-          isAuthenticated && session.hasPermissions([ROL_REGISTERED]) ? 
+          isAuthenticated && session.permissions[LEVEL_3] ? 
           <Nav pullRight>
             <LinkContainer exact to="/">
               <NavItem>{this.context.t('home')}</NavItem>

@@ -13,8 +13,8 @@
       "/faq",
       "/login",
       "/price",
-      "/register",
       "/privacy",
+      "/register",
       "/terms"
     ],
     "exclude": [

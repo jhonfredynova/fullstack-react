@@ -12,10 +12,6 @@ module.exports = {
       model: 'plan',
       required: true
     },
-    user: {
-      model: 'user',
-      required: true
-    },
     quantity: {
       type: 'integer',
       required: true

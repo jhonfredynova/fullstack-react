@@ -61,12 +61,12 @@ module.exports.http = {
       protocol: 'https' 
     }),
 
-    myRequestLogger: function (req, res, next) {
+    myRequestLogger: (req, res, next) => {
       console.log("Requested :: ", req.method, req.url);
       next()
     },
 
-    setLanguage: function(req, res, next) {
+    setLanguage: (req, res, next) => {
       let language = req.headers['accept-language']
       if (language) {
         console.log(`Set api language at ${language}`)
@@ -74,7 +74,7 @@ module.exports.http = {
       }
       next()
     },
-
+    
   /***************************************************************************
   *                                                                          *
   * The body parser that will handle incoming multipart HTTP requests. By    *

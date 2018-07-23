@@ -4,10 +4,10 @@ import auth from 'reducers/authReducer'
 import catalog from 'reducers/catalogReducer'
 import { i18nState } from 'redux-i18n'
 import locale from 'reducers/localeReducer'
-import user from 'reducers/userReducer'
+import payment from 'reducers/paymentReducer'
 import plan from 'reducers/planReducer'
 import rol from 'reducers/rolReducer'
-import subscription from 'reducers/subscriptionReducer'
+import user from 'reducers/userReducer'
 
 export default combineReducers({
   app,
@@ -15,8 +15,8 @@ export default combineReducers({
   catalog,
   i18nState,
   locale,
-  user,
+  payment,
   plan,
   rol,
-  subscription
+  user
 })

@@ -1,4 +1,4 @@
-import { assignWith, defaultTo, hasIn, isArray, isEmpty, isEqual, isObject, trim, get, set } from 'lodash'
+import { assignWith, defaultTo, hasIn, isArray, isEmpty, isObject, trim, get, set } from 'lodash'
 //COMMANDS
 const supportedCommands = ['copy']
 Object.defineProperty(document, 'queryCommandSupported', {
@@ -31,15 +31,6 @@ Object.defaultComponentTo = (objSource, objDefault) => {
     return assignWith(objSource, objDefault, (sourceItem, defaultItem) => Object.isEmpty(get(sourceItem, 'props.children')) ? defaultTo(defaultItem, null) : defaultTo(sourceItem, null))
   }
   return defaultTo(get(objSource, 'props.children'), objDefault)
-}
-Object.includes = (objSource, objSearch, hasAll) => {
-  let matchedItems = []
-  for(let itemSearch of objSearch){
-    for(let itemSource of objSource){
-      if(isEqual(itemSearch, itemSource)) matchedItems.push(itemSearch)
-    }
-  }
-  return hasAll ? matchedItems.length===objSource.length : matchedItems.length>0
 }
 Object.isEmail = (value) => {
   let regExpEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/

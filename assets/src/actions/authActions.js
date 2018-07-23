@@ -1,6 +1,5 @@
 import axios from 'axios'
 import localStorage from 'localStorage'
-import { isEmpty } from 'lodash'
 import { handleError } from 'components/helper'
 
 export const AUTH = {
@@ -14,32 +13,16 @@ export const AUTH = {
 }
 
 export const PERMISSION = {
-  PLAN_PREMIUM: 'planPremium',
-  PLAN_STANDARD: 'planStandard',
-  ROL_ADMIN: 'rolAdmin',
-  ROL_REGISTERED: 'rolRegistered'
+  LEVEL_1: 'level1',
+  LEVEL_2: 'level2',
+  LEVEL_3: 'level3'
 }
 
 export function me() {
   return (dispatch, state) => {
     if (!state().auth.token) return
     return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/auth/me`)
-    .then(response => {
-      const { planPremium, planStandard, rolAdmin, rolRegistered } = state().app.config
-      const { PLAN_PREMIUM, PLAN_STANDARD, ROL_ADMIN, ROL_REGISTERED } = PERMISSION
-      response = isEmpty(response.data) ? null : response.data
-      if(response){
-        response.permissions = []
-        if(response.roles.find(item => item.id===planPremium)) response.permissions.push(PLAN_PREMIUM)
-        if(response.roles.find(item => item.id===planStandard)) response.permissions.push(PLAN_STANDARD)
-        if(response.roles.find(item => item.id===rolAdmin)) response.permissions.push(ROL_ADMIN)
-        if(response.roles.find(item => item.id===rolRegistered)) response.permissions.push(ROL_REGISTERED)
-        response.hasPermissions = (requiredPermissions, hasAll) => {
-          return Object.includes(response.permissions, requiredPermissions, hasAll)
-        }
-      }
-      dispatch({type: AUTH.GET, payload: response}) 
-    })
+    .then(response => dispatch({type: AUTH.GET, payload: response.data}))
     .catch(err => dispatch({type: AUTH.GET, payload: null}) )
   }
 }

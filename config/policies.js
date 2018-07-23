@@ -26,36 +26,75 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-  '*': ['passport'],
-
-  'AppController': {
-    'getIndex': true,
-    'getConfig': true,
-    'getContact': true
+  '*': false,
+  AppController: {
+    getIndex: true,
+    getConfig: true,
+    getContact: true
   },
-  
-  'AuthController': {
-    'me': ['passport'],
-    'register': true,
-    'login': true,
-    'provider': true,
-    'providerAction': true,
-    'providerCallback': true
+  AuthController: {
+    me: ['isAuthenticated'],
+    login: true,
+    register: true,
+    provider: true,
+    providerAction: true,
+    providerCallback: true
   },
-
-  'CatalogController': {
-    'find': true
+  CatalogController: {
+    find: true,
+    create: ['isAuthenticated','isLevel1'],
+    update: ['isAuthenticated','isLevel1'],
+    delete: ['isAuthenticated','isLevel1']
   },
-
-  'PlanController': {
-    'find': true
+  LocaleController: {
+    find: true,
+    create: ['isAuthenticated','isLevel1'],
+    update: ['isAuthenticated','isLevel1'],
+    delete: ['isAuthenticated','isLevel1']
   },
-  
-  'UserController': {
-    'forgot': true,
-    'reset': true,
-    'validate': true
-  }
+  PaymentController: {
+    controlSubscriptions: ['isAuthenticated',],
+    getBilling: ['isAuthenticated'],
+    getSubscription: ['isAuthenticated'],
+    getSubscriptionPlan: ['isAuthenticated'],
+    createSubscription: ['isAuthenticated'],
+    updateCreditCard: ['isAuthenticated'],
+    updateSubscription: ['isAuthenticated'],
+    deleteSubscription: ['isAuthenticated']
+  },
+  PlanController: {
+    find: true,
+    create: ['isAuthenticated','isLevel1'],
+    update: ['isAuthenticated','isLevel1'],
+    delete: ['isAuthenticated','isLevel1']
+  },
+  PlanFeatureController: {
+    find: true,
+    create: ['isAuthenticated','isLevel1'],
+    update: ['isAuthenticated','isLevel1'],
+    delete: ['isAuthenticated','isLevel1']
+  },
+  RolController: {
+    find: true,
+    create: ['isAuthenticated','isLevel1'],
+    update: ['isAuthenticated','isLevel1'],
+    delete: ['isAuthenticated','isLevel1']
+  },
+  UserController: {
+    find: ['isAuthenticated','isLevel1'],
+    create: ['isAuthenticated','isLevel1'],
+    update: ['isAuthenticated','isLevel1'],
+    delete: ['isAuthenticated','isLevel1'],
+    forgot: true,
+    reset: true,
+    validate: true
+  },
+  UserPlanController: {
+    find: ['isAuthenticated','isLevel1'],
+    create: ['isAuthenticated','isLevel1'],
+    update: ['isAuthenticated','isLevel1'],
+    delete: ['isAuthenticated','isLevel1']
+  },
 
   /***************************************************************************
   *                                                                          *

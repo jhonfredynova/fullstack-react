@@ -217,8 +217,8 @@ Buy.contextTypes = {
 function mapStateToProps(state, props) {
   return {
     app: state.app,
-    plan: state.plan,
-    subscription: state.subscription
+    payment: state.payment,
+    plan: state.plan
   }
 }
 
