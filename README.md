@@ -18,6 +18,7 @@ This command will create the following collections:
 - plan
 - planFeature
 - rol
+
 Running application by run this commands:
 ```
 git clone https://github.com/jhonfredynova/scaffolding-fullstack-sails-react
@@ -30,7 +31,9 @@ You can check each app on the following urls:
 - WEB: http://localhost:3000
 
 ## Deployment
-Before deploying you must configure the environment variables in the server:
+
+Before deploying you must configure the environment variables in the server and run this commands:
+
 ```
 npm i
 npm start
