@@ -156,5 +156,8 @@
   "subscriptionTitle": "Manage suscription",
   "subscriptionDescription": "Cancel, suspend or update your subscription plan",
   "billingTitle": "Billing",
-  "billingDescription": "Billing history"
+  "billingDescription": "Billing history",
+  "authStrategyNotAvailable": "Authentication startegy not available.",
+  "authStrategyNotProvided": "Authentication strategy not provided.",
+  "authStrategyFailed": "We are sorry, no users were found with that authentication strategy."
 }

@@ -20,7 +20,7 @@ class Terms extends Component {
     try{
       this.props.dispatch(showLoading())
       const { config } = this.props.app
-      await this.props.dispatch(getCatalog({ where: { 'id': config.catalogTxtTerms } }))
+      await this.props.dispatch(getCatalog({ where: { 'id': config.catalogs.txtTerms } }))
       await this.setState({ txtTerms: get(this.props.catalog.temp, `value[${config.appPreferences.language}]`, '') })
       this.props.dispatch(hideLoading())
     }catch(e){

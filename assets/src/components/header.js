@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { get, filter } from 'lodash'
 import classnames from 'classnames'
 import { Navbar, MenuItem, Popover, OverlayTrigger, Button } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 import Select from 'react-select'
 import { setLanguage } from 'redux-i18n'
 import { hideLoading, showLoading, getConfig, setMessage, setPreference, PREFERENCE  } from 'actions/appActions'
@@ -70,7 +71,9 @@ class Header extends Component {
           <div className="navbar-header">
             {/* BRAND */}
             <Navbar.Brand>
-              <img src={config.appLogo} alt={config.appName} /> <span>{config.appName}</span>
+              <Link to="/">
+                <img src={config.appLogo} alt={config.appName} /> <span>{config.appName}</span>
+              </Link>
             </Navbar.Brand> 
             {/* TOGGLE */}
             <Navbar.Toggle className={classnames({'hide': (!appLoaded || config.appDisabled) })} />

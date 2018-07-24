@@ -41,7 +41,7 @@ async function processSubscriptionControl() {
           newPlanDetails = await axios.get(`${process.env.LOCAL_API_URL}/plan/${user.planDetails.plan}`, requestHeaders)
           msgResponseChangeSubscription = `Se actualizó tu suscripción correctamente al <b>${newPlanDetails.data.data.name}</b>.`
         }catch(e){
-          user.planDetails.plan = config.app.data.catalogs.planFree
+          user.planDetails.plan = config.app.data.catalogs.plans.free
           msgResponseChangeSubscription = 'Se canceló tu suscripción, ahora has regresado al <b>PLAN GRATUITO</b>. Hubo problemas haciendo el cargo a tu tarjeta de crédito, comunícate con tu banco para obtener más información.'
         }
       }

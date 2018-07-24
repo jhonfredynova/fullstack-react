@@ -156,5 +156,8 @@
   "subscriptionTitle": "Administrar suscripción",
   "subscriptionDescription": "Cancelar, suspender o actualizar tu plan de suscripción",
   "billingTitle": "Facturación",
-  "billingDescription": "Historial de facturación"
+  "billingDescription": "Historial de facturación",
+  "authStrategyNotAvailable": "La estrategia de autenticación no esta disponible.",
+  "authStrategyNotProvided": "No se especificó strategia de autenticación.",
+  "authStrategyFailed": "Lo sentimos, no se econtrarón usuarios con esa estrategia de authenticación."
 }

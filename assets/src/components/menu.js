@@ -3,7 +3,7 @@ import { LinkContainer } from 'react-router-bootstrap'
 import { Button, Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import { setMessage } from 'actions/appActions'
-import { logout, PERMISSION } from 'actions/authActions'
+import { logout } from 'actions/authActions'
 import './menu.css'
 
 
@@ -21,7 +21,6 @@ class Menu extends Component {
 
   render() {
     const { isAuthenticated, session } = this.props.data.auth
-    const { LEVEL_1, LEVEL_3 } = PERMISSION
     return (
       <div id="menu" className={this.props.className}>
         {/* SESSION */}
@@ -45,7 +44,7 @@ class Menu extends Component {
         }
         {/* ADMIN */}
         {
-          isAuthenticated && session.permissions[LEVEL_1] ? 
+          isAuthenticated && Object.includes([1], session.permissions, true) ? 
           <Nav pullRight>   
             <NavDropdown id="navAdmin" title="Admin">
               <MenuItem header><i className="fa fa-cogs"></i> CONFIGURATION</MenuItem>
@@ -72,7 +71,7 @@ class Menu extends Component {
         }
         {/* APP */}
         {
-          isAuthenticated && session.permissions[LEVEL_3] ? 
+          isAuthenticated && Object.includes([2,3,4], session.permissions, false) ? 
           <Nav pullRight>
             <LinkContainer exact to="/">
               <NavItem>{this.context.t('home')}</NavItem>

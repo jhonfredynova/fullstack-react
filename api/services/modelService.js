@@ -29,7 +29,7 @@ module.exports = {
       //loop in associations
       for (let association of model.associations){
         //validating only if it is required
-        if (model._attributes[association.alias].required){
+        if (model._attributes[association.alias].required && data[association.alias]){
           //initialize model instance
           associationIds = []
           if (association.type==='collection') {

@@ -44,7 +44,7 @@ class AdminPlanFeatureSave extends Component {
       await this.props.dispatch(getPlan({ where: { id: idPlan }, select: ['id','name'] }))
       await this.setState({ plan: this.props.plan.temp })
       await this.setState({ model: Object.assign(this.state.model, { plan: this.state.plan.id }) })
-      await this.props.dispatch(getCatalog({ where: { 'parent': config.catalogPlanFeatures }, select: ['id','name'] }))
+      await this.props.dispatch(getCatalog({ where: { 'parent': config.catalogs.planFeatures }, select: ['id','name'] }))
       await this.props.dispatch(getPlanFeature({ where: { id: idFeature }, select: keys(this.state.model) }))
       await this.setState({ model: defaults(this.props.plan.temp, this.state.model) })
       this.props.dispatch(hideLoading())

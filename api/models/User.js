@@ -47,10 +47,6 @@ module.exports = {
     lastname: {
       type: 'string'
     },
-    passports: {
-      collection: 'passport',
-      via: 'user'
-    },
     preferences: {
       type: 'json',
       defaultsTo: []
@@ -58,17 +54,23 @@ module.exports = {
     clientCode: {
       type: 'string'
     },
-    plan: {
+    planInfo: {
       model: 'userplan',
-      defaultsTo: sails.config.app.planFree
+      required: true,
+      defaultsTo: {
+        plan: sails.config.app.plans.free,
+        quantity: 1,
+        trialDays: 0
+      }
+    },
+    passports: {
+      collection: 'passport',
+      via: 'user'
     },
     roles: {
       collection: 'rol',
       via: 'users',
-      defaultsTo: [sails.config.app.rolRegistered]
-    },
-    getFullName: () => {
-      return `${this.firstname} ${this.lastname}`
+      defaultsTo: [sails.config.app.roles.registered]
     }
   },
   afterFind: async function(values){
@@ -107,7 +109,7 @@ module.exports = {
   },
   beforeCreate: async (values, cb) => {
     try{      
-      if(polyfillService.isEmpty(values.password)) values.password = Math.random().toString(36).slice(-8)
+      if(Object.isEmpty(values.password)) values.password = Math.random().toString(36).slice(-8)
       sails.temp = values.password
       values.password = cipherService.hashPassword(values.password)
       cb()
@@ -132,7 +134,7 @@ module.exports = {
       //send notification
       let responseEmail = await mailService.sendEmail({
         fromName: sails.config.app.appName,
-        fromEmail: sails.config.app.emailNoreply,
+        fromEmail: sails.config.app.emails.noreply,
         toEmail: values.email,
         subject: intlService.__('mailWelcomeUserSubject'),
         message: intlService.__('mailWelcomeUserMessage', { 

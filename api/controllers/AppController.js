@@ -15,7 +15,7 @@ module.exports = {
       if(new RegExp('^/api/(.*)').test(req.url)) return next()
       res.sendfile('index.html', { root: `${sails.config.paths.public}/build` })
     }catch(e){
-      res.serverError(e)
+      res.negotiate(e)
     }
   },
 
@@ -27,7 +27,7 @@ module.exports = {
       response.appIntl = await intlService.getIntl(params)
       res.ok(response)
     }catch(e){
-      res.serverError(e)
+      res.negotiate(e)
     }
   },
 
@@ -35,8 +35,8 @@ module.exports = {
     try{
       let responseEmail = await mailService.sendEmail({
         fromName: sails.config.app.appName,
-        fromEmail: sails.config.app.emailNoreply,
-        toEmail: sails.config.app.emailSupport,
+        fromEmail: sails.config.app.emails.noreply,
+        toEmail: sails.config.app.emails.support,
         subject: intlService.__('mailContactSubject'),
         message: intlService.__('mailContactMessage', { 
           name: req.body.name, 
@@ -50,7 +50,7 @@ module.exports = {
       }
       res.json({ message: intlService.__('emailSuccess') })
     }catch(e){
-      res.serverError(e)
+      res.negotiate(e)
     }
   }
 	

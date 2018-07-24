@@ -17,6 +17,15 @@
  */
 
 
+let authorization = (requiredLevels, mustHaveAll) => {
+  return (req, res, next) => {
+    if(!Object.includes(requiredLevels, req.user.permissions, mustHaveAll)){
+      return res.forbidden(intlService.__('authNotPriviliges')) 
+    }
+    next()
+  }
+}
+
 module.exports.policies = {
 
   /***************************************************************************
@@ -42,58 +51,58 @@ module.exports.policies = {
   },
   CatalogController: {
     find: true,
-    create: ['isAuthenticated','isLevel1'],
-    update: ['isAuthenticated','isLevel1'],
-    delete: ['isAuthenticated','isLevel1']
+    create: ['isAuthenticated', authorization([1], true)],
+    update: ['isAuthenticated', authorization([1], true)],
+    delete: ['isAuthenticated', authorization([1], true)]
   },
   LocaleController: {
     find: true,
-    create: ['isAuthenticated','isLevel1'],
-    update: ['isAuthenticated','isLevel1'],
-    delete: ['isAuthenticated','isLevel1']
+    create: ['isAuthenticated', authorization([1], true)],
+    update: ['isAuthenticated', authorization([1], true)],
+    delete: ['isAuthenticated', authorization([1], true)]
   },
   PaymentController: {
-    controlSubscriptions: ['isAuthenticated',],
-    getBilling: ['isAuthenticated'],
-    getSubscription: ['isAuthenticated'],
-    getSubscriptionPlan: ['isAuthenticated'],
-    createSubscription: ['isAuthenticated'],
-    updateCreditCard: ['isAuthenticated'],
-    updateSubscription: ['isAuthenticated'],
-    deleteSubscription: ['isAuthenticated']
+    controlSubscriptions: ['isAuthenticated', authorization([1], true)],
+    getBilling: ['isAuthenticated', authorization([1,2,3,4], false)],
+    getSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
+    getSubscriptionPlan: ['isAuthenticated', authorization([1,2,3,4], false)],
+    createSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
+    updateCreditCard: ['isAuthenticated', authorization([1,2,3,4], false)],
+    updateSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
+    deleteSubscription: ['isAuthenticated', authorization([1,2,3,4], false)]
   },
   PlanController: {
     find: true,
-    create: ['isAuthenticated','isLevel1'],
-    update: ['isAuthenticated','isLevel1'],
-    delete: ['isAuthenticated','isLevel1']
+    create: ['isAuthenticated', authorization([1], true)],
+    update: ['isAuthenticated', authorization([1], true)],
+    delete: ['isAuthenticated', authorization([1], true)]
   },
   PlanFeatureController: {
     find: true,
-    create: ['isAuthenticated','isLevel1'],
-    update: ['isAuthenticated','isLevel1'],
-    delete: ['isAuthenticated','isLevel1']
+    create: ['isAuthenticated', authorization([1], true)],
+    update: ['isAuthenticated', authorization([1], true)],
+    delete: ['isAuthenticated', authorization([1], true)]
   },
   RolController: {
     find: true,
-    create: ['isAuthenticated','isLevel1'],
-    update: ['isAuthenticated','isLevel1'],
-    delete: ['isAuthenticated','isLevel1']
+    create: ['isAuthenticated', authorization([1], true)],
+    update: ['isAuthenticated', authorization([1], true)],
+    delete: ['isAuthenticated', authorization([1], true)]
   },
   UserController: {
-    find: ['isAuthenticated','isLevel1'],
-    create: ['isAuthenticated','isLevel1'],
-    update: ['isAuthenticated','isLevel1'],
-    delete: ['isAuthenticated','isLevel1'],
+    find: ['isAuthenticated', authorization([1], true)],
+    create: ['isAuthenticated', authorization([1], true)],
+    update: ['isAuthenticated', authorization([1,2,3,4], false)],
+    delete: ['isAuthenticated', authorization([1], true)],
     forgot: true,
     reset: true,
     validate: true
   },
   UserPlanController: {
-    find: ['isAuthenticated','isLevel1'],
-    create: ['isAuthenticated','isLevel1'],
-    update: ['isAuthenticated','isLevel1'],
-    delete: ['isAuthenticated','isLevel1']
+    find: ['isAuthenticated', authorization([1], true)],
+    create: ['isAuthenticated', authorization([1], true)],
+    update: ['isAuthenticated', authorization([1], true)],
+    delete: ['isAuthenticated', authorization([1], true)]
   },
 
   /***************************************************************************

@@ -1,17 +1,21 @@
 # Scaffolding fullstack
+
 Based on the following projects:
 - [Sails v0.12](http://sailsjs.org) 
 - [create-react-app v1.0.10](https://github.com/facebook/create-react-app).
 
 ## Running
+
 Configure the environment variables on the following files:
 - /.env
 - /config/app.js
 - /web/.env
+
 Configure database by executing this command:
 ```
 mongorestore -h <dbHost>:<dbPort> -d <dbName> -u <user> -p <password> db/
 ```
+
 This command will create the following collections:
 - catalog
 - locale
@@ -26,24 +30,26 @@ cd scaffolding-fullstack-sails-react
 npm i
 npm run debug
 ```
+
 You can check each app on the following urls:
 - API: http://localhost:1337/api
 - WEB: http://localhost:3000
 
 ## Deployment
 
-Before deploying you must configure the environment variables in the server and run this commands:
-
+Before deploying you must configure the environment variables in the server and run these commands:
 ```
 npm i
 npm start
 ```
 
 ## Improvements sailsjs
+
 - Improvements to blueprints
 - Payu integration (subscriptions, payments)
 
 ## Improvements create-react-app
+
 - Session management
 - Redux integration
 

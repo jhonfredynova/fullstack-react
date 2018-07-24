@@ -5,7 +5,6 @@ import I18n from "redux-i18n"
 import { Provider } from "react-redux"
 import Store from "./store"
 import RegisterServiceWorker from './registerServiceWorker'
-import { PERMISSION } from 'actions/authActions'
 import 'components/polyfill'
 //CSS
 import 'bootstrap/dist/css/bootstrap.css'
@@ -54,7 +53,6 @@ import RegisterConfirm from 'containers/registerConfirm'
 import Terms from 'containers/terms'
 import NotFound from 'components/notFound'
 //RENDER
-const { LEVEL_1, LEVEL_2, LEVEL_3 } = PERMISSION
 render((
   <Provider store={Store}>
     <I18n translations={{}} initialLang={'en'} fallbackLang={'en'} useReducer={true}>
@@ -63,33 +61,33 @@ render((
           <Switch>
             {/* ADMIN */}
             {/* CONFIGURATION */}
-            <Route path="/admin/configuration/catalog" exact component={Authorization(AdminCatalog, LEVEL_1)}/>
-            <Route path="/admin/configuration/catalog/new" component={Authorization(AdminCatalogSave, LEVEL_1)}/>
-            <Route path="/admin/configuration/catalog/:id" component={Authorization(AdminCatalogSave, LEVEL_1)}/> 
-            <Route path="/admin/configuration/locale" exact component={Authorization(AdminLocale, LEVEL_1)}/>
-            <Route path="/admin/configuration/locale/new" component={Authorization(AdminLocaleSave, LEVEL_1)}/>
-            <Route path="/admin/configuration/locale/:id" component={Authorization(AdminLocaleSave, LEVEL_1)}/> 
-            <Route path="/admin/configuration/plan" exact component={Authorization(AdminPlan, LEVEL_1)}/>
-            <Route path="/admin/configuration/plan/new" component={Authorization(AdminPlanSave, LEVEL_1)}/>
-            <Route path="/admin/configuration/plan/:id/feature" exact component={Authorization(AdminPlanFeature, LEVEL_1)}/>
-            <Route path="/admin/configuration/plan/:id/feature/new" component={Authorization(AdminPlanFeatureSave, LEVEL_1)}/>
-            <Route path="/admin/configuration/plan/:id/feature/:idFeature" component={Authorization(AdminPlanFeatureSave, LEVEL_1)}/> 
-            <Route path="/admin/configuration/plan/:id" component={Authorization(AdminPlanSave, LEVEL_1)}/> 
+            <Route path="/admin/configuration/catalog" exact component={Authorization(AdminCatalog, [1], true)}/>
+            <Route path="/admin/configuration/catalog/new" component={Authorization(AdminCatalogSave, [1], true)}/>
+            <Route path="/admin/configuration/catalog/:id" component={Authorization(AdminCatalogSave, [1], true)}/> 
+            <Route path="/admin/configuration/locale" exact component={Authorization(AdminLocale, [1], true)}/>
+            <Route path="/admin/configuration/locale/new" component={Authorization(AdminLocaleSave, [1], true)}/>
+            <Route path="/admin/configuration/locale/:id" component={Authorization(AdminLocaleSave, [1], true)}/> 
+            <Route path="/admin/configuration/plan" exact component={Authorization(AdminPlan, [1], true)}/>
+            <Route path="/admin/configuration/plan/new" component={Authorization(AdminPlanSave, [1], true)}/>
+            <Route path="/admin/configuration/plan/:id/feature" exact component={Authorization(AdminPlanFeature, [1], true)}/>
+            <Route path="/admin/configuration/plan/:id/feature/new" component={Authorization(AdminPlanFeatureSave, [1], true)}/>
+            <Route path="/admin/configuration/plan/:id/feature/:idFeature" component={Authorization(AdminPlanFeatureSave, [1], true)}/> 
+            <Route path="/admin/configuration/plan/:id" component={Authorization(AdminPlanSave, [1], true)}/> 
             {/* SECURITY */}
-            <Route path="/admin/security/user" exact component={Authorization(AdminUser, LEVEL_1)}/>
-            <Route path="/admin/security/user/new" component={Authorization(AdminUserSave, LEVEL_1)}/>
-            <Route path="/admin/security/user/:id/rol" exact component={Authorization(AdminUserRol, LEVEL_1)}/>
-            <Route path="/admin/security/user/:id/rol/new" exact component={Authorization(AdminUserRolSave, LEVEL_1)}/>
-            <Route path="/admin/security/user/:id" component={Authorization(AdminUserSave, LEVEL_1)}/>  
-            <Route path="/admin/security/rol" exact component={Authorization(AdminRol, LEVEL_1)}/>
-            <Route path="/admin/security/rol/new" component={Authorization(AdminRolSave, LEVEL_1)}/>
-            <Route path="/admin/security/rol/:id" component={Authorization(AdminRolSave, LEVEL_1)}/>    
+            <Route path="/admin/security/user" exact component={Authorization(AdminUser, [1], true)}/>
+            <Route path="/admin/security/user/new" component={Authorization(AdminUserSave, [1], true)}/>
+            <Route path="/admin/security/user/:id/rol" exact component={Authorization(AdminUserRol, [1], true)}/>
+            <Route path="/admin/security/user/:id/rol/new" exact component={Authorization(AdminUserRolSave, [1], true)}/>
+            <Route path="/admin/security/user/:id" component={Authorization(AdminUserSave, [1], true)}/>  
+            <Route path="/admin/security/rol" exact component={Authorization(AdminRol, [1], true)}/>
+            <Route path="/admin/security/rol/new" component={Authorization(AdminRolSave, [1], true)}/>
+            <Route path="/admin/security/rol/:id" component={Authorization(AdminRolSave, [1], true)}/>    
             {/* APP */}
             {/* USER */}
-            <Route path="/app/dashboard" component={Authorization(Dashboard, LEVEL_2)}/>
-            <Route path="/app/user/profile" component={Authorization(Profile, LEVEL_3)}/>   
-            <Route path="/app/user/subscription" component={Authorization(Subscription, LEVEL_3)}/>
-            <Route path="/app/user/billing" component={Authorization(Billing, LEVEL_3)}/>
+            <Route path="/app/dashboard" component={Authorization(Dashboard, [1,2,3,4], false)}/>
+            <Route path="/app/user/profile" component={Authorization(Profile, [1,2,3,4], false)}/>   
+            <Route path="/app/user/subscription" component={Authorization(Subscription, [1,2,3,4], false)}/>
+            <Route path="/app/user/billing" component={Authorization(Billing, [1,2,3,4], false)}/>
             {/* HOME */}
             <Route path="/" exact component={Home}/>
             <Route path="/buy/:idPlan" exact component={Buy}/>

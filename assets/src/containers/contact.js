@@ -7,7 +7,7 @@ import 'containers/contact.css'
 
 class Contact extends Component {
   render() {
-    const { config } = this.props.app
+    const { social } = this.props.app.config
     return (
     	<div id="contact">
         <Seo data={{ title: this.context.t('contactTitle'), description: this.context.t('contactDescription'), siteName: this.context.t('siteName') }} />
@@ -16,37 +16,37 @@ class Contact extends Component {
       		<div className="col-lg-4 col-md-4 col-sm-6 col-xs-6 text-center">
             <h3>
               <i className="fa fa-users fa-2x" aria-hidden="true"></i>
-              <a href={config.socialSupportForum} target="_blank" rel="noopener noreferrer">Support</a>
+              <a href={social.supportForum} target="_blank" rel="noopener noreferrer">Support</a>
             </h3>
 			    </div>
 			    <div className="col-lg-4 col-md-4 col-sm-6 col-xs-6 text-center">
 			      <h3>
               <i className="fa fa-facebook-official fa-2x" aria-hidden="true"></i>
-              <a href={config.socialFacebook} target="_blank" rel="noopener noreferrer">Facebook</a>
+              <a href={social.facebook} target="_blank" rel="noopener noreferrer">Facebook</a>
             </h3>
 			    </div>
 			    <div className="col-lg-4 col-md-4 col-sm-6 col-xs-6 text-center">
 			      <h3>
               <i className="fa fa-twitter fa-2x" aria-hidden="true"></i>
-              <a href={config.socialTwitter} target="_blank" rel="noopener noreferrer">Twitter</a>
+              <a href={social.twitter} target="_blank" rel="noopener noreferrer">Twitter</a>
             </h3>
 			    </div>
 			    <div className="col-lg-4 col-md-4 col-sm-6 col-xs-6 text-center">
 			      <h3>
               <i className="fa fa-linkedin-square fa-2x" aria-hidden="true"></i>
-              <a href={config.socialLinkedin} target="_blank" rel="noopener noreferrer">Linkedin</a>
+              <a href={social.linkedin} target="_blank" rel="noopener noreferrer">Linkedin</a>
             </h3>
 			    </div>
 			    <div className="col-lg-4 col-md-4 col-sm-6 col-xs-6 text-center">
 			      <h3>
               <i className="fa fa-youtube-play fa-2x" aria-hidden="true"></i>
-              <a href={config.socialYoutube} target="_blank" rel="noopener noreferrer">YouTube</a>
+              <a href={social.youtube} target="_blank" rel="noopener noreferrer">YouTube</a>
             </h3>
 			    </div>
 			    <div className="col-lg-4 col-md-4 col-sm-6 col-xs-6 text-center">
 			      <h3>
               <i className="fa fa-google-plus-official fa-2x" aria-hidden="true"></i>
-              <a href={config.socialGoogle} target="_blank" rel="noopener noreferrer">Google Plus</a>
+              <a href={social.google} target="_blank" rel="noopener noreferrer">Google Plus</a>
             </h3>
 			    </div>
 			  </div>

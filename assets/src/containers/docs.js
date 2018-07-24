@@ -20,7 +20,7 @@ class Docs extends Component {
     try{
       this.props.dispatch(showLoading())
       const { config } = this.props.app
-      await this.props.dispatch(getCatalog({ where: { 'id': config.catalogTxtDocs } }))
+      await this.props.dispatch(getCatalog({ where: { 'id': config.catalogs.txtDocs } }))
       await this.setState({ txtDocs: get(this.props.catalog.temp, `value[${config.appPreferences.language}]`, '') })
       this.props.dispatch(hideLoading())
     }catch(e){

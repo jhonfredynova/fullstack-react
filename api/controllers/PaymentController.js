@@ -9,7 +9,7 @@ module.exports = {
 
   controlSubscriptions: async (req, res) => {
     try{
-      let users = await sails.models.user.find({ roles: sails.config.app.rolRegistered })
+      let users = await sails.models.user.find({ roles: sails.config.app.roles.registered })
       users = users.toObject()
       for (let user of users)
       {
@@ -32,10 +32,10 @@ module.exports = {
           let nextBilling = _.sortByOrder(recurringBills, ['dateCharge'], ['desc'])[0]
         }
         // cancel subscription
-        if (user.planDetails.plan!==sails.config.app.planFree && (!currentBilling || (currentBilling && currentBilling.state==='NOT_PAID' || currentBilling.state==='CANCELLED'))) {
+        if (user.planDetails.plan!==sails.config.app.plans.free && (!currentBilling || (currentBilling && currentBilling.state==='NOT_PAID' || currentBilling.state==='CANCELLED'))) {
           user.process = 'CANCEL_SUBSCRIPTION'
           user.planDetails.subscriptionId = currentBilling.subscriptionId
-          user.planDetails.plan = sails.config.app.planFree
+          user.planDetails.plan = sails.config.app.plans.free
           user.changePlan = {}
         }
         // change subscription
@@ -49,7 +49,7 @@ module.exports = {
           user.changePlan = {}
         }
         // update user
-        if (user.planDetails.plan===sails.config.app.planFree) {
+        if (user.planDetails.plan===sails.config.app.plans.free) {
           user.planDetails.payuPlanCode = '';
           continue
         }
@@ -217,7 +217,7 @@ module.exports = {
       // send notification
       let responseEmail = await mailService.sendEmail({
         fromName: sails.config.app.appName,
-        fromEmail: sails.config.app.emailNoreply,
+        fromEmail: sails.config.app.emails.noreply,
         toEmail: data.client.email,
         subject: intlService.__('mailSubscriptionCreatedSubject', { appName: sails.config.appName }),
         message: intlService.__('mailSubscriptionCreatedMessage', { appName: sails.config.appName, startDate: subscription.currentPeriodStart })
@@ -267,7 +267,7 @@ module.exports = {
       // send notification
       let responseEmail = await mailService.sendEmail({
         fromName: sails.config.app.appName,
-        fromEmail: sails.config.app.emailNoreply,
+        fromEmail: sails.config.app.emails.noreply,
         toEmail: req.body.email,
         subject: intlService.__('mailSubscriptionSuspendedSubject', { appName: sails.config.appName }),
         message: intlService.__('mailSubscriptionSuspendedMessage', { expirationDate: expirationDate })

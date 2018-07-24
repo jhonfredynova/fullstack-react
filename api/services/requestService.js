@@ -43,7 +43,7 @@
         try{
           if(criteriaKey.includes('.')){
             associationAlias = criteriaKey.split('.')[0]
-            if(!polyfillService.isEmpty(polyfillService.compact(criteria[criteriaKey]))) {
+            if(!Object.isEmpty(Object.compactDeep(criteria[criteriaKey]))) {
               criteria[criteriaKey] = await sails.models[model._attributes[associationAlias].model].find({ select: ['id'] }).where({ [criteriaKey.split('.')[1]]: criteria[criteriaKey] })
               criteria[associationAlias] = _.map(criteria[criteriaKey], item => item.id)
             }
@@ -58,7 +58,7 @@
       for(let criteriaKey in criteria){
         // idCondition
         if(criteriaKey==='id'){
-          req.query[criteriaKey] = polyfillService.isEmpty(criteria[criteriaKey])? '-1' : criteria[criteriaKey]
+          req.query[criteriaKey] = Object.isEmpty(criteria[criteriaKey])? '-1' : criteria[criteriaKey]
         }
         // orCondition
         else if(criteriaKey==='or'){

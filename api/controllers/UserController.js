@@ -26,7 +26,7 @@ module.exports = {
       //notification
       let responseEmail = await mailService.sendEmail({
         fromName: sails.config.app.appName,
-        fromEmail: sails.config.app.emailNoreply,
+        fromEmail: sails.config.app.emails.noreply,
         toEmail: user.email,
         subject: intlService.__('mailForgotAccountSubject'),
         message: intlService.__('mailForgotAccountMessage', { url: `${sails.config.app.appUrl}/reset-account/${user.passwordResetToken}` })

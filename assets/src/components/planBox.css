@@ -1,15 +1,19 @@
 #planBox.mostPopular .panel-default > .panel-heading{
   background-color: #dff0d8;
 }
-#planBox.mostPopular .panel-body{
-  background-color: #ffc;
-}
-
-#planBox.mostPopular .panel-footer{
+#planBox.mostPopular .panel-default > .panel-heading > #tag{
   background-color: #ff6633;
   border-color: #ff6633;
   color: white;
   text-align: center;
   font-style: italic;
+  font-size: 12px;
   font-family: "Comic Sans MS", "Comic Sans", cursive;
+  position: absolute;
+  padding: 5px 8px;
+  right: 15px;
+  top: 0px;
+}
+#planBox.mostPopular .panel-body{
+  background-color: #ffc;
 }

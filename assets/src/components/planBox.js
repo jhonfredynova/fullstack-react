@@ -31,6 +31,9 @@ class PlanBox extends Component {
       <div id="planBox" className={classnames({'mostPopular': plan.mostPopular, 'hide': isLoading})}>
         <div className="panel panel-default">
           <div className="panel-heading text-center">
+            <div id="tag" className={classnames({'hide': !plan.mostPopular})}>
+              <i className="glyphicon glyphicon-star"></i> {this.context.t('mostPopular')}
+            </div>
             <h2>{plan.name}</h2>
             <Numeric data={{ amount: planPrice.value, display: 'text', decimalScale: 2, from: this.state.currentCurrency, to: planPrice.currency, prefix: '$', currencyConversion: this.state.currencyConversion }} /> {this.state.currentCurrency.toUpperCase()} <small>{this.context.t('perMonth')}</small><br/>
             {
@@ -49,9 +52,6 @@ class PlanBox extends Component {
                 )
               }
             </ul>
-          </div>
-          <div className={classnames({'panel-footer': true, 'hide': !plan.mostPopular})}>
-            <i className="glyphicon glyphicon-star"></i> {this.context.t('mostPopular')}
           </div>
         </div>
       </div>

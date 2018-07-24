@@ -1,9 +1,10 @@
-import { assignWith, defaultTo, hasIn, isArray, isEmpty, isObject, trim, get, set } from 'lodash'
+import { assignWith, defaultTo, difference, hasIn, isArray, isEmpty, isObject, trim, get, set } from 'lodash'
 //COMMANDS
 const supportedCommands = ['copy']
 Object.defineProperty(document, 'queryCommandSupported', {
   value: (cmd) => supportedCommands.includes(cmd)
 })
+
 Object.defineProperty(document, 'execCommand', {
   value: (cmd) => supportedCommands.includes(cmd)
 })
@@ -16,6 +17,7 @@ Object.cleanDeep = (object, value) => {
   }
   return object
 }
+
 Object.compactDeep = (object) => {
   for(let key in object) {
     if(Object.isEmpty(object[key])) delete object[key]
@@ -26,20 +28,29 @@ Object.compactDeep = (object) => {
   }
   return object
 }
+
 Object.defaultComponentTo = (objSource, objDefault) => {
   if (!isArray(objSource) && isObject(objSource)){
     return assignWith(objSource, objDefault, (sourceItem, defaultItem) => Object.isEmpty(get(sourceItem, 'props.children')) ? defaultTo(defaultItem, null) : defaultTo(sourceItem, null))
   }
   return defaultTo(get(objSource, 'props.children'), objDefault)
 }
+
+Object.includes = (objSource, objSearch, mustHaveAll) => {
+  let unmatchedItems = difference(objSource, objSearch)
+  return mustHaveAll ? unmatchedItems.length===0 : unmatchedItems.length<objSource.length
+}
+
 Object.isEmail = (value) => {
   let regExpEmail = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/
   return regExpEmail.test(value)
 }
+
 Object.isEmpty = (value) => {
   value = isObject(value) ? value : trim(value)
   return isEmpty(value)
 }
+
 Object.isHtml = (value) => {
   let div = document.createElement('div')
   div.innerHTML = value
@@ -48,6 +59,7 @@ Object.isHtml = (value) => {
   }
   return false
 }
+
 Object.setDeep = (object, property, value) => {
   for(let key in object) {
     if(hasIn(object[key], property)) object[key] = set(object[key], property, value)
@@ -55,6 +67,7 @@ Object.setDeep = (object, property, value) => {
   }
   return object
 }
+
 Object.toUrl = (value) => {
   let encodedUrl = value.toString().toLowerCase()
   encodedUrl = encodedUrl.replace(/[^\w ]+/g,'')

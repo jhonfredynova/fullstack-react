@@ -20,7 +20,7 @@ class Faq extends Component {
     try{
       this.props.dispatch(showLoading())
       const { config } = this.props.app
-      await this.props.dispatch(getCatalog({ where: { 'id': config.catalogTxtFAQ } }))
+      await this.props.dispatch(getCatalog({ where: { 'id': config.catalogs.txtFAQ } }))
       await this.setState({ txtFaq: get(this.props.catalog.temp, `value[${config.appPreferences.language}]`, '') })
       this.props.dispatch(hideLoading())
     }catch(e){

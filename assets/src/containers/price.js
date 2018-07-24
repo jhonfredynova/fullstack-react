@@ -38,7 +38,7 @@ class Price extends Component {
     const { isLoading, config } = this.props.app
     const { appPreferences } = config
     const plans = this.state.plans.map(item => {
-      item.mostPopular = item.id===config.planStandard
+      item.mostPopular = item.id===config.plans.standard
       return item
     })
     return (

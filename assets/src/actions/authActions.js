@@ -12,12 +12,6 @@ export const AUTH = {
   TOKEN_NAME: 'token'
 }
 
-export const PERMISSION = {
-  LEVEL_1: 'level1',
-  LEVEL_2: 'level2',
-  LEVEL_3: 'level3'
-}
-
 export function me() {
   return (dispatch, state) => {
     if (!state().auth.token) return

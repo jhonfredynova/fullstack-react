@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { setMessage } from 'actions/appActions'
 
-export default function(ComposedComponent, requiredLevel) {
+export default function(ComposedComponent, requiredLevels, mustHaveAll) {
   class Authorization extends React.Component {
 
     constructor(props) {
@@ -27,7 +27,7 @@ export default function(ComposedComponent, requiredLevel) {
         await props.history.push('/login')
         props.dispatch(setMessage({ type: 'error', message: this.context.t('authNotLogin') }))
         return
-      }else if(isAuthenticated && !session.permissions[requiredLevel]){
+      }else if(isAuthenticated && !Object.includes(requiredLevels, session.permissions, mustHaveAll)){
         await props.history.push('/')
         props.dispatch(setMessage({ type: 'error', message: this.context.t('authNotPriviliges') }))
         return

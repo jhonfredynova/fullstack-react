@@ -31,7 +31,7 @@ class Home extends Component {
     try{
       this.props.dispatch(showLoading())
       const { config } = this.props.app
-      await this.props.dispatch(getCatalog({ where: { 'parent': config.catalogPlanFeatures }, sort: { name: 1 } }))
+      await this.props.dispatch(getCatalog({ where: { 'parent': config.catalogs.planFeatures }, sort: { name: 1 } }))
       await this.props.dispatch(getPlan({ select: ['id', 'name','description','order','payuPlan'], populate: ['features', 'features.feature'] }))
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -44,7 +44,7 @@ class Home extends Component {
     const { config } = this.props.app
     const { appPreferences } = config
     const plans = this.state.plans.map(item => {
-      item.mostPopular = item.id===config.planStandard
+      item.mostPopular = item.id===config.plans.standard
       return item
     })
     return (
@@ -72,7 +72,7 @@ class Home extends Component {
           {
             sortBy(plans, ['order']).map(item =>
               <div key={item.id} className="col-md-4">
-                <PlanBox data={{ info: item, currency: appPreferences.currency, currencyConversion: config.appIntl.currencyConversion }} />
+                <PlanBox data={{ info: item, currentCurrency: appPreferences.currency, currencyConversion: config.appIntl.currencyConversion }} />
               </div>
             )
           }

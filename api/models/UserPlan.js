@@ -17,7 +17,8 @@ module.exports = {
       required: true
     },
     trialDays: {
-      type: 'integer'
+      type: 'integer',
+      required: true
     }
   },
   afterValidate: async function (values, cb) {
