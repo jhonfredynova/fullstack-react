@@ -1,74 +1,84 @@
+// packages
 let axios = require('axios')
 let fs = require('fs')
 let path = require('path')
 const CACHE = {
   INTL: 'CACHE_INTL',
+  LOCALES: 'CACHE_LOCALES',
   RATES: 'CACHE_RATES'
 }
 
 module.exports = {
-  
-  __: (phrase, args) => {
+
+  i18n: (phrase, args) => {
     return sails.__({ phrase: phrase, locale: sails.config.i18n.defaultLocale }, args)
   },
   
-  getIntl: async (params) => {
-    let intl = { callingCodes: [], currencies: [], currencyConversion: [], languages: [], locales: {} }
+  getIntl: async (args) => {
     try{
+      let intl = sails.config.app.appIntl
       //INTL
-      let responseIntl = cacheService.get(CACHE.INTL) 
-      if(!responseIntl){
-        responseIntl = await axios.get(`${process.env.INTL_API_URL}/all?fields=callingCodes;currencies;flag;languages;translations`)
-        responseIntl = responseIntl.data
-        cacheService.set(CACHE.INTL, responseIntl, 1500)      
+      let responseIntl = cacheService.get(CACHE.INTL)
+      if(!responseIntl){ 
+        let sourceIntl = await axios.get(`${process.env.INTL_API_URL}/all?fields=callingCodes;currencies;flag;languages;translations`)
+        sourceIntl = sourceIntl.data
+        responseIntl = { callingCodes: [], currencies: [], languages: [] }
+        //CALLING-CODES
+        _.forEach(sourceIntl, item => {
+          _.forEach(_.filter(item.callingCodes, item => item), callingCode => {
+            responseIntl.callingCodes.push({
+              id: parseInt(callingCode, 16),
+              flag: item.flag,
+              label: `+${callingCode}`,
+              value: `+${callingCode}`
+            })
+          })
+        })
+        responseIntl.callingCodes = _.sortBy(_.uniq(responseIntl.callingCodes, 'value'), 'id')
+        //CURRENCIES
+        _.forEach(sourceIntl, item => {
+          _.forEach(_.filter(item.currencies, item => (item.code && item.code!=='(none)')), currency => {
+            responseIntl.currencies.push({
+              flag: item.flag,
+              label: currency.code.toUpperCase(),
+              value: currency.code.toLowerCase()
+            })
+          })
+        })
+        responseIntl.currencies = _.sortBy(_.uniq(responseIntl.currencies, 'value'), 'value')
+        //LANGUAGES
+        _.forEach(sourceIntl, item => {
+          _.forEach(_.filter(item.languages, item => item.iso639_1), language => {
+            responseIntl.languages.push({
+              flag: item.flag,
+              label: language.name,
+              value: language.iso639_1
+            })
+          })
+        })
+        responseIntl.languages = _.sortBy(_.uniq(responseIntl.languages, 'value'), 'value')
+        cacheService.set(CACHE.INTL, responseIntl, 1500)
       }
-      //CALLING-CODES
-      _.forEach(responseIntl, item => {
-        _.forEach(_.filter(item.callingCodes, item => item), callingCode => {
-          intl.callingCodes.push({
-            id: parseInt(callingCode, 16),
-            flag: item.flag,
-            label: `+${callingCode}`,
-            value: `+${callingCode}`
-          })
-        })
-      })
-      intl.callingCodes = _.sortBy(_.uniq(intl.callingCodes, 'value'), 'id')
-      //CURRENCIES
-      _.forEach(responseIntl, item => {
-        _.forEach(_.filter(item.currencies, item => (item.code && item.code!=='(none)')), currency => {
-          intl.currencies.push({
-            flag: item.flag,
-            label: currency.code.toUpperCase(),
-            value: currency.code.toLowerCase()
-          })
-        })
-      })
-      intl.currencies = _.sortBy(_.uniq(intl.currencies, 'value'), 'value')
-      //LANGUAGES
-      _.forEach(responseIntl, item => {
-        _.forEach(_.filter(item.languages, item => item.iso639_1), language => {
-          intl.languages.push({
-            flag: item.flag,
-            label: language.name,
-            value: language.iso639_1
-          })
-        })
-      })
-      intl.languages = _.sortBy(_.uniq(intl.languages, 'value'), 'value')
+      intl.callingCodes = responseIntl.callingCodes
+      intl.currencies = responseIntl.currencies
+      intl.languages = responseIntl.languages
       //LOCALES
-      let responseLocales = await sails.models.locale.find({ active: true }) 
-      responseLocales = _.map(responseLocales, item => item.toJSON()) 
-      for (let locale of sails.config.app.appLanguages){
-        intl.locales[locale] = _.mapValues(_.mapKeys(responseLocales, 'name'), `value.${locale}`)
-        fs.writeFileSync(path.join(__dirname,'../../config/locales',`${locale}.json`), JSON.stringify(intl.locales[locale], null, 2))
+      let responseLocales = cacheService.get(CACHE.LOCALES) 
+      if(!responseLocales){
+        let sourceLocales = await sails.models.locale.find({ active: true })
+        responseLocales = {}
+        for(let locale of sails.config.app.appLanguages){
+          responseLocales[locale] = _.mapValues(_.mapKeys(sourceLocales, 'name'), `value.${locale}`)
+          fs.writeFileSync(path.join(__dirname,'../../config/locales',`${locale}.json`), JSON.stringify(responseLocales[locale], null, 2))
+        }
+        cacheService.set(CACHE.LOCALES, responseLocales, 1500)   
       }
+      intl.locales = responseLocales
       //RATES
-      params.baseCurrency = params.baseCurrency || 'USD'
-      params.baseCurrency = params.baseCurrency.toUpperCase()
+      let baseCurrency = args.baseCurrency ? args.baseCurrency.toUpperCase() : args.baseCurrency
       let responseRates = cacheService.get(CACHE.RATES) 
-      if(!responseRates || responseRates[params.baseCurrency]!==1){
-        responseRates = await axios.get(`${process.env.RATE_API_URL}?access_key=${process.env.RATE_API_KEY}&base=${params.baseCurrency}`)
+      if(!responseRates || (baseCurrency && responseRates[baseCurrency]!==1)){
+        responseRates = await axios.get(`${process.env.RATE_API_URL}?access_key=${process.env.RATE_API_KEY}&base=${baseCurrency || 'USD'}`)
         responseRates = responseRates.data.rates
         cacheService.set(CACHE.RATES, responseRates, 1500)      
       }
@@ -76,7 +86,7 @@ module.exports = {
       //RETURN
       return intl
     }catch(e){
-      return intl
+      return sails.config.app.appIntl
     }
   }
 

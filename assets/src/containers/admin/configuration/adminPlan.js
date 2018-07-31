@@ -21,9 +21,9 @@ class AdminPlan extends Component {
       plansQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','createdAt','updatedAt','name','description','order', 'planCode', 'paymentType','transactionValue'],
-        sort: {
-          order: 1
-        },
+        sort: [
+          { order: 'ASC' }
+        ],
         where: {
           active: true,
           name: { contains: '' }
@@ -69,7 +69,7 @@ class AdminPlan extends Component {
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(deletePlan(item.id))
+      await this.props.dispatch(deletePlan(item))
       await this.props.dispatch(getPlan(this.state.plansQuery))
       this.props.dispatch(hideLoading())
     }catch(e){

@@ -8,12 +8,12 @@ Based on the following projects:
 
 Configure the environment variables on the following files:
 - /.env
+- /assets/.env
 - /config/app.js
-- /web/.env
 
 Configure database by executing this command:
 ```
-mongorestore -h <dbHost>:<dbPort> -d <dbName> -u <user> -p <password> db/
+mongorestore -h <dbHost>:<dbPort> -d <dbName> -u <user> -p <password> ./config/db
 ```
 
 This command will create the following collections:
@@ -22,6 +22,12 @@ This command will create the following collections:
 - plan
 - planFeature
 - rol
+
+To create new collections is recommended establish collation system as:
+```
+{ locale: 'en', strength: 1 }
+```
+To avoid inconviniences with the comparision of strings, in this way you can execute queries with case-insensitive.
 
 Running application by run this commands:
 ```

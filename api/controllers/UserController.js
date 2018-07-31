@@ -12,13 +12,13 @@ module.exports = {
 
 	forgot: async (req, res, next) => {
     try{
-      let user = await sails.models.user.findOne({ $or: [{email: new RegExp(`^${req.body.username}$`, 'i')}, {username: new RegExp(`^${req.body.username}$`, 'i')}] }).populateAll()
+      let user = await sails.models.user.findOne({ $or: [{email: req.body.username}, {username: req.body.username}] }).populateAll()
       if (!user) {
-        throw new Error(intlService.__('usernameNotFound'))
+        throw intlService.i18n('usernameNotFound')
       }
       let passport = _.find(user.passports, { provider: 'bearer' })
       if (!passport) {
-        throw new Error(intlService.__('userNotHaveLocalPassport'))  
+        throw intlService.i18n('userNotHaveLocalPassport')
       }
       user.passwordResetExpiration = new Date(Date.now()+3600000)//Valid for 1 hour
       user.passwordResetToken = crypto.randomBytes(20).toString('hex')
@@ -28,15 +28,15 @@ module.exports = {
         fromName: sails.config.app.appName,
         fromEmail: sails.config.app.emails.noreply,
         toEmail: user.email,
-        subject: intlService.__('mailForgotAccountSubject'),
-        message: intlService.__('mailForgotAccountMessage', { url: `${sails.config.app.appUrl}/reset-account/${user.passwordResetToken}` })
+        subject: intlService.i18n('mailForgotAccountSubject'),
+        message: intlService.i18n('mailForgotAccountMessage', { url: `${sails.config.app.appUrl}/reset-account/${user.passwordResetToken}` })
       })
       if (!responseEmail){
-        throw new Error(intlService.__('emailError'))
+        throw intlService.i18n('emailError')
       }
-      res.json({ message: intlService.__('userRecoveryAccountSuccess') })
+      res.json({ message: intlService.i18n('userRecoveryAccountSuccess') })
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
@@ -44,18 +44,18 @@ module.exports = {
     try{
       let user = await sails.models.user.findOne({ passwordResetToken: req.params.token, passwordResetExpiration: { $gt: new Date(Date.now()) } })
       if (!user){ 
-        throw new Error(intlService.__('userResetError'))
+        throw intlService.i18n('userResetError')
       }
       if (!req.body.password) {
-        throw new Error(intlService.__('userResetPasswordEmpty'))
+        throw intlService.i18n('userResetPasswordEmpty')
       }
       user.password = req.body.password
       user.passwordResetExpiration = null
       user.passwordResetToken = null
       user = await user.save()
-      res.json({ message: intlService.__('userResetSuccess') })
+      res.json({ message: intlService.i18n('userResetSuccess') })
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
@@ -63,13 +63,13 @@ module.exports = {
     try{
       let user = await sails.models.user.findOne({ id: req.param('token') })
       if (!user) {
-        throw new Error(intlService.__('userValidateEmailError'))
+        throw intlService.i18n('userValidateEmailError')
       }
       user.emailConfirmed = true
       await user.save()
-      res.json({ message: intlService.__('userValidateEmailSuccess') })
+      res.json({ message: intlService.i18n('userValidateEmailSuccess') })
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   }
 

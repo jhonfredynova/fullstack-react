@@ -40,7 +40,7 @@ class AdminCatalogSave extends Component {
       this.props.dispatch(showLoading())
       await this.props.dispatch(getCatalog({ select: keys(this.state.model), where: {id: this.props.match.params.id} }))
       await this.setState({ model: defaults(this.props.catalog.temp, this.state.model) })
-      await this.props.dispatch(getCatalog({ select: keys(this.state.model), sort: {name: 1}, where: {active: true, parent: null} }))
+      await this.props.dispatch(getCatalog({ select: keys(this.state.model), sort: [{name: 'ASC'}], where: {active: true, parent: null} }))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))

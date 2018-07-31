@@ -32,9 +32,9 @@ export function updateLocale(data) {
   }
 }
 
-export function deleteLocale(id) {
+export function deleteLocale(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/locale/${id}`)
+    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/locale/${data.id}`)
     .then(response => dispatch({type: LOCALE.DELETE, payload: response.data}) )
     .catch(err => handleError(err) )
   }

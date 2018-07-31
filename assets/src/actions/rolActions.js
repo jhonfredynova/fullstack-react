@@ -32,9 +32,9 @@ export function updateRol(data) {
   }
 }
 
-export function deleteRol(id) {
+export function deleteRol(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/rol/${id}`)
+    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/rol/${data.id}`)
     .then(response => { dispatch({type: ROL.DELETE, payload: response.data}) })
     .catch(err => handleError(err) )
   }

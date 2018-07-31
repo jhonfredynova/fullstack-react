@@ -31,8 +31,8 @@ class Home extends Component {
     try{
       this.props.dispatch(showLoading())
       const { config } = this.props.app
-      await this.props.dispatch(getCatalog({ where: { 'parent': config.catalogs.planFeatures }, sort: { name: 1 } }))
-      await this.props.dispatch(getPlan({ select: ['id', 'name','description','order','payuPlan'], populate: ['features', 'features.feature'] }))
+      await this.props.dispatch(getCatalog({ where: { 'parent': config.catalogs.planFeatures }, sort: [{ name: 'ASC' }] }))
+      await this.props.dispatch(getPlan({ select: ['id','name','description','order','planCode','paymentType','transactionValue'] }))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))

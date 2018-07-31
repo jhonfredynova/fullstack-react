@@ -107,7 +107,7 @@ export function setPreference(data) {
   }
 }
 
-export function deleteMessage(id) {
+export function deleteMessage(data) {
   return (dispatch, state) => {
     dispatch({ type: APP.DELETE_MESSAGE, payload: [] })
   }

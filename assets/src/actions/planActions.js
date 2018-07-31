@@ -32,9 +32,9 @@ export function updatePlan(data) {
   }
 }
 
-export function deletePlan(id) {
+export function deletePlan(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/plan/${id}`)
+    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/plan/${data.id}`)
     .then(response => dispatch({type: PLAN.DELETE, payload: response.data}) )
     .catch(err => handleError(err) )
   }

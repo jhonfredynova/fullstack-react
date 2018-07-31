@@ -26,7 +26,7 @@ class Price extends Component {
   async componentWillMount(){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getPlan({ select: ['id', 'name','description','order','paymentType'], populate: ['features', 'features.feature'] }))
+      await this.props.dispatch(getPlan({ select: ['id', 'name','description','order','paymentType','planCode','transactionValue'] }))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))

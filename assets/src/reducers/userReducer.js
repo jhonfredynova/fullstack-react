@@ -70,6 +70,12 @@ export default function reducer(
         roles: handleResponseAction(ACTION.SAVE, state.roles, action.payload) 
       }
 
+    case USER_ROL.UPDATE:
+      return { 
+        ...state, 
+        roles: handleResponseAction(ACTION.UPDATE, state.roles, action.payload) 
+      }
+
     case USER_ROL.DELETE:
       return { 
         ...state, 

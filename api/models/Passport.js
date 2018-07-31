@@ -16,7 +16,8 @@ module.exports = {
       type: 'string'
     },    
     identifier: {
-      type: 'string'
+      type: 'string',
+      allowNull: true
     },
     token: {
       type: 'string'

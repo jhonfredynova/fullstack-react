@@ -20,9 +20,9 @@ class AdminUser extends Component {
       usersQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','createdAt','updatedAt','firstname','lastname','email'],
-        sort: {
-          name: 1
-        },
+        sort: [
+          { name: 'ASC' }
+        ],
         where: {
           active: true,
           email: { contains: '' }
@@ -68,7 +68,7 @@ class AdminUser extends Component {
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(deleteUser(item.id))
+      await this.props.dispatch(deleteUser(item))
       await this.props.dispatch(getUser(this.state.usersQuery))
       this.props.dispatch(hideLoading())
     }catch(e){

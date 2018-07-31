@@ -38,7 +38,7 @@ class AdminPlanSave extends Component {
       this.props.dispatch(showLoading())
       await this.props.dispatch(getPlan({ select: keys(this.state.model), where: { id: this.props.match.params.id } }))
       await this.setState({ model: defaults(this.props.plan.temp, this.state.model) })
-      await this.props.dispatch(getSubscriptionPlan({ sort: { name: 1 } }))
+      await this.props.dispatch(getSubscriptionPlan({ sort: [{name: 'ASC'}] }))
       await this.setState({ plans: this.props.payment.temp })
       this.props.dispatch(hideLoading())
     }catch(e){

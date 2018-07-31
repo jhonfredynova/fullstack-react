@@ -4,7 +4,7 @@ passportConfig = sails.config.passport
 let callbackProviderStrategy = async (token, refreshToken, profile, next) => {
   try{
     //create user
-    let user = await sails.models.user.findOne({ email: new RegExp(`^${profile.emails[0].value}$`, 'i') })
+    let user = await sails.models.user.findOne({ email: profile.emails[0].value })
     if (!user) {
       user = {}
       if (profile.username) {
@@ -26,7 +26,7 @@ let callbackProviderStrategy = async (token, refreshToken, profile, next) => {
       if (!user.username && !user.email) {
         throw 'Cannot create user, neither exist email nor username.'
       }
-      let usernameTaken= await sails.models.user.findOne({ username: new RegExp(`^${user.username}$`, 'i') })
+      let usernameTaken = await sails.models.user.findOne({ username: user.username })
       user.username = usernameTaken ? '' : user.username
       user = await sails.models.user.create(user)
     }

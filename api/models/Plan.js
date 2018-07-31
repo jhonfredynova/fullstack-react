@@ -21,54 +21,56 @@ module.exports = {
       required: true
     },
     order: {
-      type: 'integer',
+      type: 'number',
       required: true
     },
     paymentType: {
       type: 'string',
-      enum: ['subscription', 'transaction']
+      isIn: ['subscription', 'transaction']
     },
     planCode: {
       type: 'string'
     },
     transactionValue: {
-      type: 'json',
-      price: true
+      type: 'json'
     },
     features: {
       collection: 'planfeature',
-      via: 'plan',
-      through: 'planfeature'
+      via: 'plan'
     }
   },
-  afterFind: async function(values){
-    try{
+  afterFind: async (values, next) => {
+    try{ 
       let subscriptionPlans = await paymentService.executeApiPayu('GET', '/plans', null)
-      for (let item of values){
-        item.planInfo = _.find(subscriptionPlans.subscriptionPlanList, { planCode: item.planCode })
-        if (item.planInfo) {
-          item.planInfo.price = _.find(item.planInfo.additionalValues, { name:'PLAN_VALUE' })
+      let planFeatures = await sails.models.planfeature.find().populateAll()
+      for(let plan of values){
+        plan.features = _.filter(planFeatures, item => item.plan.id===plan.id)
+        plan.planInfo = _.find(subscriptionPlans.subscriptionPlanList, { planCode: plan.planCode })
+        if (plan.planInfo) {
+          plan.planInfo.price = _.find(plan.planInfo.additionalValues, { name:'PLAN_VALUE' })
         }
       } 
-      return values
+      next()
     }catch(e){
-      return values
+      next(e)
     }
   },
-  afterValidate: async (values, cb) => {
+  beforeCreate: async (values, next) => {
     try{
-      if(values.paymentType==='transaction') delete values.planCode
+      //validations
       let errors = []
-      let data = await Plan.findOne().where({ id: { '!': values.id }, name: values.name })
+      let data = await Plan.findOne({ where: { id: { '!=': values.id }, name: values.name } })
       if(data){
-        errors.push(intlService.__('planNameAlreadyExist'))
+        errors.push(intlService.i18n('planNameAlreadyExist'))
       }
       if(errors.length>0) {
-        throw new Error(errors.join(intlService.__('errorSeparator')))
+        throw errors.join(intlService.i18n('errorSeparator'))
       }
-      cb()
+      //others
+      if(values.paymentType==='transaction') delete values.planCode
+      next()
     }catch(e){
-      cb(e)
+      next(e)
     }
   }
 }

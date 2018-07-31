@@ -1,28 +1,81 @@
-'use strict';
+/**
+ * Module dependencies
+ */
 
-let actionUtil = require('sails/lib/hooks/blueprints/actionUtil')
+var _ = require('@sailshq/lodash');
+var formatUsageError = require('sails/lib/hooks/blueprints/formatUsageError');
 
-module.exports = async function destroyOneRecord(req, res) {
-  try{
-    let Model = actionUtil.parseModel(req)
-    let pk = actionUtil.requirePk(req)
-    //quering record
-    let record = await Model.findOne({ id: pk })
-    if(!record) return res.notFound('No record found with the specified `id`.')
-    //updating record
-    record.active = false
-    let records = await Model.update(pk, record.toJSON())
-    record = records[0]
-    //updating socket events
-    if (req._sails.hooks.pubsub) {
-      //Model.publishDestroy(pk, !req._sails.config.blueprints.mirror && req, {previous: record})
-      if (req.isSocket) {
-        Model.unsubscribe(req, record)
-        Model.retire(record)
+/**
+ * Destroy One Record
+ *
+ * http://sailsjs.com/docs/reference/blueprint-api/destroy
+ *
+ * Destroys the single model instance with the specified `id` from
+ * the data adapter for the given model if it exists.
+ *
+ */
+
+module.exports = function destroyOneRecord (req, res) {
+
+  var parseBlueprintOptions = req.options.parseBlueprintOptions || req._sails.config.blueprints.parseBlueprintOptions;
+
+  // Set the blueprint action for parseBlueprintOptions.
+  req.options.blueprintAction = 'destroy';
+
+  var queryOptions = parseBlueprintOptions(req);
+  var Model = req._sails.models[queryOptions.using];
+
+  var criteria = {};
+  criteria[Model.primaryKey] = queryOptions.criteria.where[Model.primaryKey];
+
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  // FUTURE: Use a database transaction here, if supported by the datastore.
+  // e.g.
+  // ```
+  // Model.getDatastore().transaction(function during(db, proceed){ ... })
+  // .exec(function afterwards(err, result){}));
+  // ```
+  // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  var query = Model.findOne(_.cloneDeep(criteria), queryOptions.populates).meta(queryOptions.meta);
+  query.exec(function foundRecord (err, record) {
+    if (err) {
+      // If this is a usage error coming back from Waterline,
+      // (e.g. a bad criteria), then respond w/ a 400 status code.
+      // Otherwise, it's something unexpected, so use 500.
+      switch (err.name) {
+        case 'UsageError': return res.badRequest(formatUsageError(err, req));
+        default: return res.serverError(err);
       }
-    }
-    return res.ok(record)
-  }catch(e){
-    return res.negotiate(e)
-  }
-}
+    }//-•
+
+    if(!record) { return res.notFound('No record found with the specified `id`.'); }
+
+    // (Note: this could be achieved in a single query, but a separate `findOne`
+    // is used first to provide a better experience for front-end developers
+    // integrating with the blueprint API out of the box.  If we didn't need
+    // or care about that, we could just use `.meta({fetch: true})` when calling
+    // `.destroy()`.
+    record = _.pick(record, ['id'])
+    record.active = false
+    Model.update(_.cloneDeep(criteria), record).exec(function destroyedRecord (err) {
+    //Model.destroy(_.cloneDeep(criteria)).exec(function destroyedRecord (err) {
+      if (err) {
+        switch (err.name) {
+          case 'UsageError': return res.badRequest(formatUsageError(err, req));
+          default: return res.serverError(err);
+        }
+      }//-•
+
+      if (req._sails.hooks.pubsub) {
+        Model._publishDestroy(criteria[Model.primaryKey], !req._sails.config.blueprints.mirror && req, {previous: record});
+        if (req.isSocket) {
+          Model.unsubscribe(req, [record[Model.primaryKey]]);
+          Model._retire(record);
+        }
+      }
+
+      return res.ok(record);
+    });
+  });
+};

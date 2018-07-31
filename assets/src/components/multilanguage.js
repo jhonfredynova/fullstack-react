@@ -1,9 +1,15 @@
 import React, { Component } from 'react'
 import { Tabs, Tab } from 'react-bootstrap'
-import ReactQuill from 'react-quill'
+import ReactQuill, { Quill } from 'react-quill'
 import shortid from 'shortid'
 import classnames from 'classnames'
 import { defaultTo, get, set } from 'lodash'
+// Editor configuration
+let BlockEmbed = Quill.import('blots/block/embed')
+class Hr extends BlockEmbed {}
+Hr.blotName = 'hr'
+Hr.tagName = 'hr'
+Quill.register({'formats/hr': Hr})
 
 export default class Multilanguage extends Component {
 
@@ -26,13 +32,12 @@ export default class Multilanguage extends Component {
   }
 
   render(){
-    const reactQuillColors = ['#FF0000','#001F3F','#0074D9','#7FDBFF','#39CCCC','#3D9970','#2ECC40','#01FF70','#FFDC00','#FF851B','#FF4136','#85144B','#F012BE','#B10DC9','#111111','#AAAAAA']
     const reactQuillModules = {
       toolbar: {
         container: [
-          [{'font': []}, { 'header': [1, 2, 3, false] }, { 'size': ['small', 'large', 'huge', false] }],
-          [{'background': reactQuillColors},'bold',{'color': reactQuillColors},'code','italic','link','strike',{ 'script': 'sub'},'underline'],
-          ['blockquote',{'indent': '-1'}, {'indent': '+1'},{'list': 'ordered'}, {'list': 'bullet'},{'align': [false,'center','right','justify']},'direction','code-block'],
+          [{'font': []}, { 'header': [] }, { 'size': [] }],
+          [{'background': []},'bold',{'color': []},'code','italic','link','strike',{ 'script': 'sub'},'underline'],
+          ['blockquote',{'indent': '-1'}, {'indent': '+1'},{'list': 'ordered'}, {'list': 'bullet'},{'align': []},'direction','code-block'],
           ['formula', 'image','video','clean']
         ]
       }

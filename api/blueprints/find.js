@@ -1,68 +1,76 @@
-'use strict'
+/**
+ * Module dependencies
+ */
 
-let actionUtil = require('sails/lib/hooks/blueprints/actionUtil')
+var _ = require('@sailshq/lodash');
+var actionUtil = require('sails/lib/hooks/blueprints/actionUtil');
+var formatUsageError = require('sails/lib/hooks/blueprints/formatUsageError');
 
-module.exports = async function findRecords(req, res) {
-  try{
-    // Look up the model and query params
-    let params = await requestService.parseParams(req)
-    let Model = actionUtil.parseModel(req)
+/**
+ * Find Records
+ *
+ * http://sailsjs.com/docs/reference/blueprint-api/find
+ *
+ * An API call to find and return model instances from the data adapter
+ * using the specified criteria.  If an id was specified, just the instance
+ * with that unique id will be returned.
+ *
+ */
 
-    // If an `id` param was specified, use the findOne blueprint action
-    // to grab the particular instance with its primary key === the value
-    // of the `id` param.   (mainly here for compatibility for 0.9, where
-    // there was no separate `findOne` action)
-    if ( actionUtil.parsePk(req) ) {
-      return require('./findOne')(req,res)
-    }
+module.exports = function findRecords (req, res) {
 
-    // Lookup for total records
-    let totalRecords = await Model.find()
-    .where( actionUtil.parseCriteria(req) )
+  var parseBlueprintOptions = req.options.parseBlueprintOptions || req._sails.config.blueprints.parseBlueprintOptions;
 
-    // Lookup for records that match the specified criteria
-    let select = _.isEmpty(params.select) ? {} : { select: params.select } 
-    let query = Model.find(select)
-    .where( actionUtil.parseCriteria(req) )
-    .limit( actionUtil.parseLimit(req) )
-    .skip( actionUtil.parseSkip(req) )
-    .sort( actionUtil.parseSort(req) )
-    query = actionUtil.populateRequest(query, req)
-    let matchingRecords = await new Promise((resolve, reject) => {
-      query.exec((err, data) => {
-        if(err) reject(err) 
-        resolve(data)
+  // Set the blueprint action for parseBlueprintOptions.
+  req.options.blueprintAction = 'find';
+
+  var queryOptions = parseBlueprintOptions(req);
+  var Model = req._sails.models[queryOptions.using];
+
+  Model
+  .find(_.cloneDeep(queryOptions.criteria), queryOptions.populates).meta(queryOptions.meta)
+  .exec(function found(err, matchingRecords) {
+    if (err) {
+      // If this is a usage error coming back from Waterline,
+      // (e.g. a bad criteria), then respond w/ a 400 status code.
+      // Otherwise, it's something unexpected, so use 500.
+      switch (err.name) {
+        case 'UsageError': return res.badRequest(formatUsageError(err, req));
+        default: return res.serverError(err);
+      }
+    }//-•
+
+    if (req._sails.hooks.pubsub && req.isSocket) {
+      Model.subscribe(req, _.pluck(matchingRecords, Model.primaryKey));
+      // Only `._watch()` for new instances of the model if
+      // `autoWatch` is enabled.
+      if (req.options.autoWatch) { Model._watch(req); }
+      // Also subscribe to instances of all associated models
+      _.each(matchingRecords, function (record) {
+        actionUtil.subscribeDeep(req, record);
+      });
+    }//>-
+
+    // Custom script yo paginate frontend 
+    // Get total records when the query does not have id criteria
+    Model.find(_.pick(_.cloneDeep(queryOptions.criteria), ['where']), queryOptions.populates).meta(queryOptions.meta)
+    .exec(function found(err, totalRecords) {
+      // Find if query does not have ID
+      // FindOne if query was have ID
+      if(!_.get(queryOptions.criteria, 'where.id')){
+        res.set('Access-Control-Expose-Headers', 'Content-Records')
+        res.set('Content-Records', totalRecords.length)
+      }else{
+        matchingRecords = _.first(matchingRecords)
+      }
+      // Custom lifecycle callback 
+      // After find records
+      let afterFindCallback = sails.models[Model.tableName].afterFind || ((values, next) => next())
+      afterFindCallback(matchingRecords, function(values){
+        res.ok(matchingRecords)
       })
     })
 
-    // Deep populate
-    if (params.populate) {
-      for (let populate of params.populate){
-        matchingRecords = await modelService.deepPopulate(Model, matchingRecords, populate)
-      }
-    }
-    
-    // lookup and callback after find
-    let afterFindCallback = sails.models[Model.adapter.identity].afterFind
-    if (afterFindCallback) {
-      matchingRecords = await afterFindCallback(matchingRecords)
-    }
+  });//</ .find().exec() >
 
-    // Updating sockets
-    if (req._sails.hooks.pubsub && req.isSocket) {
-      Model.subscribe(req, matchingRecords)
-      if (req.options.autoWatch) { Model.watch(req) }
-      // Also subscribe to instances of all associated models
-      _.each(matchingRecords, function (record) {
-        actionUtil.subscribeDeep(req, record)
-      })
-    }
-
-    // Return response
-    res.set('Access-Control-Expose-Headers', 'Content-Records')
-    res.set('Content-Records', totalRecords.length)
-    res.ok(matchingRecords)
-  }catch(e){
-    res.negotiate(e)
-  }
-}
+};

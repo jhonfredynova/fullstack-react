@@ -19,10 +19,10 @@ class AdminLocale extends Component {
       locales: this.props.locale.locales,
       localesQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
-        select: ['id','active','createdAt','updatedAt','parent','name'],
-        sort: {
-          name: 1
-        },
+        select: ['id','active','createdAt','updatedAt','name'],
+        sort: [
+          { name: 'ASC' }
+        ],
         where: {
           active: true,
           name: { contains: '' }
@@ -68,7 +68,7 @@ class AdminLocale extends Component {
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(deleteLocale(item.id))
+      await this.props.dispatch(deleteLocale(item))
       await this.props.dispatch(getLocale(this.state.localesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){

@@ -10,7 +10,6 @@ module.exports = {
   attributes: {
     active: {
       type: 'boolean',
-      required: true,
       defaultsTo: true
     },
     name: {
@@ -26,19 +25,19 @@ module.exports = {
       via: 'roles'
     }
   },
-  afterValidate: async (values, cb) => {
+  beforeCreate: async (values, next) => {
     try{
       let errors = []
-      let data = await Rol.findOne().where({ id: { '!': values.id }, name: values.name })
+      let data = await sails.models.rol.findOne({ where: { id: { '!=': values.id }, name: values.name } })
       if(data){
-        errors.push(intlService.__('rolNameAlreadyExist'))
+        errors.push(intlService.i18n('rolNameAlreadyExist'))
       }
       if(errors.length>0) {
-        throw new Error(errors.join(intlService.__('errorSeparator')))
+        throw errors.join(intlService.i18n('errorSeparator'))
       }
-      cb()
+      next()
     }catch(e){
-      cb(e)
+      next(e)
     }
   }  
   

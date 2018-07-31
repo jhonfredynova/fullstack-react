@@ -19,13 +19,12 @@ class AdminCatalog extends Component {
       catalogs: this.props.catalog.catalogs,
       catalogsQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
-        populate: ['parent'],
         select: ['id','active','createdAt','updatedAt','parent','name'],
-        sort: {
-          parent: 1,
-          order: 1,
-          name: 1
-        },
+        sort: [
+          { parent: 'ASC' },
+          { order: 'ASC' },
+          { name: 'ASC' }
+        ],
         where: {
           active: true,
           or: [
@@ -74,7 +73,7 @@ class AdminCatalog extends Component {
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(deleteCatalog(item.id))
+      await this.props.dispatch(deleteCatalog(item))
       await this.props.dispatch(getCatalog(this.state.catalogsQuery))
       this.props.dispatch(hideLoading())
     }catch(e){

@@ -35,9 +35,9 @@ export function updateUser(data) {
   }
 }
 
-export function deleteUser(id) {
+export function deleteUser(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/user/${id}`)
+    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.id}`)
     .then(response => { dispatch({type: USER.DELETE, payload: response.data}) })
     .catch(err => handleError(err) )
   }
@@ -70,6 +70,7 @@ export function validateUser(data) {
 export const USER_ROL = {
   GET: 'GET_USER_ROL',
   SAVE: 'SAVE_USER_ROL',
+  UPDATE: 'UPDATE_USER_ROL',
   DELETE: 'DELETE_USER_ROL'
 }
 
@@ -83,8 +84,16 @@ export function getUserRol(parameters) {
 
 export function saveUserRol(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`)
+    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`, data)
     .then(response => { dispatch({type: USER_ROL.SAVE, payload: response.data}) })
+    .catch(err => handleError(err) )
+  }
+}
+
+export function updateUserRol(data) {
+  return dispatch => {
+    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`, data)
+    .then(response => { dispatch({type: USER_ROL.UPDATE, payload: response.data}) })
     .catch(err => handleError(err) )
   }
 }

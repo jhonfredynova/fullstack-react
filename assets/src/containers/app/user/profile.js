@@ -35,7 +35,7 @@ class Profile extends Component {
     try{
       this.props.dispatch(showLoading())
       const { session } = this.props.auth
-      await this.props.dispatch(getUser({ where:{ id: session.id }, select: keys(this.state.model) }))
+      await this.props.dispatch(getUser({ where:{ id: session.id }, select: keys(omit(this.state.model,['passwordConfirmation'])) }))
       await this.setState({ model: defaults(this.props.user.temp, this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){

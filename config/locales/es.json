@@ -126,9 +126,9 @@
   "expirationDate": "Fecha de vencimiento",
   "securePaymentInfo": "Protegemos su información de pago con SSL (Secure Sockets Layer) cuando se envía a través de internet. SSL encripta la información de pago para que no pueda ser interceptada por un tercero. Venpad no guarda la información de su tarjeta de crédito.",
   "securePayment": "Pago seguro",
+  "mostPopular": "Más Popular!",
   "acceptTerms": "<p>Acepta los <a href=\"{{url}}\" target=\"_blank\" style=\"background-color: rgb(255, 255, 255);\">términos y condiciones</a></p>",
   "subscriptionWarnings": "<p>Entiendo que mi suscripción hará los cobros automáticos cada mes.</p><p>Entiendo que puedo suspender mi suscripción cuando quiera.</p>",
-  "mostPopular": "Más Popular!",
   "buy": "Comprar",
   "try": "Probar",
   "perMonth": "por mes",
@@ -159,5 +159,6 @@
   "billingDescription": "Historial de facturación",
   "authStrategyNotAvailable": "La estrategia de autenticación no esta disponible.",
   "authStrategyNotProvided": "No se especificó strategia de autenticación.",
-  "authStrategyFailed": "Lo sentimos, no se econtrarón usuarios con esa estrategia de authenticación."
+  "authStrategyFailed": "Lo sentimos, no se econtrarón usuarios con esa estrategia de authenticación.",
+  "mail": "<h1><img src=\"{{appLogo}}\" width=\"35\"> {{appName}}</h1><hr><h1>{{title}}</h1><p>{{message}}</p><hr><p>Cordialmente,</p><p><a href=\"{{appUrl}}\" target=\"_blank\">{{appUrl}}</a></p>"
 }

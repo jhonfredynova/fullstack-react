@@ -6,11 +6,9 @@
 */
 
 module.exports = {
-
   attributes: {
     active: {
       type: 'boolean',
-      required: true,
       defaultsTo: true
     },
     name: {
@@ -22,26 +20,19 @@ module.exports = {
       required: true
     }
   },
-  afterFind: async function(values){
-    try{
-      return values
-    }catch(e){
-      return values
-    }
-  },
-  afterValidate: async (values, cb) => {
+  beforeCreate: async (values, next) => {
     try{
       let errors = []
-      let data = await Locale.findOne().where({ id: { '!': values.id }, name: values.name })
+      let data = await sails.models.locale.findOne({ where: { id: { '!=': values.id }, name: values.name } })
       if(data){
-        errors.push(intlService.__('localeNameAlreadyExist'))
+        errors.push(intlService.i18n('localeNameAlreadyExist'))
       }
       if(errors.length>0){
-        throw new Error(errors.join(intlService.__('errorSeparator')))
+        throw errors.join(intlService.i18n('errorSeparator'))
       }
-      cb()
+      next()
     }catch(e){
-      cb(e)
+      next(e)
     }
   }
 }

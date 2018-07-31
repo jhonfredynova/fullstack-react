@@ -10,24 +10,19 @@ let axios = require('axios')
 
 module.exports = {
 
-  getIndex: async (req, res, next) => {
+  getIndex: async (req, res) => {
     try{
-      if(new RegExp('^/api/(.*)').test(req.url)) return next()
-      res.sendfile('index.html', { root: `${sails.config.paths.public}/build` })
+      res.sendFile('index.html', { root: `${sails.config.paths.public}/build` })
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
   getConfig: async (req, res) => {
     try{
-      let params = await requestService.parseParams(req)
-      let response = sails.config.app
-      response.appDisabled = JSON.parse(process.env.LOCAL_APP_DISABLED)
-      response.appIntl = await intlService.getIntl(params)
-      res.ok(response)
+      res.ok(sails.config.app)
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
@@ -37,8 +32,8 @@ module.exports = {
         fromName: sails.config.app.appName,
         fromEmail: sails.config.app.emails.noreply,
         toEmail: sails.config.app.emails.support,
-        subject: intlService.__('mailContactSubject'),
-        message: intlService.__('mailContactMessage', { 
+        subject: intlService.i18n('mailContactSubject'),
+        message: intlService.i18n('mailContactMessage', { 
           name: req.body.name, 
           email: req.body.email, 
           phone: req.body.phone, 
@@ -46,11 +41,11 @@ module.exports = {
         })
       })
       if (!responseEmail){
-        throw new Error(intlService.__('emailError'))
+        throw intlService.i18n('emailError')
       }
-      res.json({ message: intlService.__('emailSuccess') })
+      res.ok({ message: intlService.i18n('emailSuccess') })
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   }
 	

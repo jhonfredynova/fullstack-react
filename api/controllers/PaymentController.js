@@ -93,7 +93,7 @@ module.exports = {
       recurringBills = _.sortBy(recurringBills, 'dateCharge').reverse()
       res.json(recurringBills)
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     } 
   },
 
@@ -102,7 +102,7 @@ module.exports = {
       let data = await paymentService.executeApiPayu('GET', `/subscriptions/${req.param('subscriptionId')}`, null)
       res.json(data)
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
@@ -115,7 +115,7 @@ module.exports = {
       }
       res.ok(subscriptionPlans)
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
@@ -129,7 +129,7 @@ module.exports = {
       let subscription = null
       // validate data
       if (!data.plan.planCode){
-        throw new Error(intlService.__('subscriptionCreatedErrorPlan'))
+        throw intlService.i18n('subscriptionCreatedErrorPlan')
       }
       if (!data.creditCard.token) {
         creditCard = await paymentService.checkCreditCard(data.creditCard)
@@ -207,34 +207,34 @@ module.exports = {
         timeoutTransaction += 5
         if (timeoutTransaction>=120) {
           await paymentService.executeApiPayu('DELETE', `/subscriptions/${subscription.id}`)
-          throw new Error(intlService.__('subscriptionCreatedError'))
+          throw intlService.i18n('subscriptionCreatedError')
           break
         }
       }
       if (nextBilling.state==='NOT_PAID' || nextBilling.state==='CANCELLED') {
-        throw new Error(intlService.__('subscriptionCreatedErrorCard'))
+        throw intlService.i18n('subscriptionCreatedErrorCard')
       }
       // send notification
       let responseEmail = await mailService.sendEmail({
         fromName: sails.config.app.appName,
         fromEmail: sails.config.app.emails.noreply,
         toEmail: data.client.email,
-        subject: intlService.__('mailSubscriptionCreatedSubject', { appName: sails.config.appName }),
-        message: intlService.__('mailSubscriptionCreatedMessage', { appName: sails.config.appName, startDate: subscription.currentPeriodStart })
+        subject: intlService.i18n('mailSubscriptionCreatedSubject', { appName: sails.config.appName }),
+        message: intlService.i18n('mailSubscriptionCreatedMessage', { appName: sails.config.appName, startDate: subscription.currentPeriodStart })
       })
       if (!responseEmail){
-        console.error(intlService.__('emailError'))
+        console.error(intlService.i18n('emailError'))
       }
-      res.json({ message: intlService.__('subscriptionCreatedSuccess') })
+      res.json({ message: intlService.i18n('subscriptionCreatedSuccess') })
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
   updateCreditCard: async (req, res) => {
     try{
       if (!req.param('subscriptionId')) {
-        throw new Error('Subscription id not valid')
+        throw 'Subscription id not valid'
       }
       let creditCard = req.body
       let data = await paymentService.checkCreditCard(creditCard.number, creditCard.expMonth, creditCard.expYear, creditCard.cvc)
@@ -245,7 +245,7 @@ module.exports = {
       await paymentService.executeApiPayu('PUT', `/subscriptions/${req.param('subscriptionId')}`, { creditCardToken: data.token })
       res.json({ message: 'Se actualizó la tarjeta de crédito de la suscripción correctamente.' })
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }  
   },
 
@@ -254,7 +254,7 @@ module.exports = {
       let data = await paymentService.executeApiPayu('PUT', `/subscriptions/${req.param('subscriptionId')}`, { creditCardToken: req.body.creditCardToken })
       res.json(data)
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
@@ -269,15 +269,15 @@ module.exports = {
         fromName: sails.config.app.appName,
         fromEmail: sails.config.app.emails.noreply,
         toEmail: req.body.email,
-        subject: intlService.__('mailSubscriptionSuspendedSubject', { appName: sails.config.appName }),
-        message: intlService.__('mailSubscriptionSuspendedMessage', { expirationDate: expirationDate })
+        subject: intlService.i18n('mailSubscriptionSuspendedSubject', { appName: sails.config.appName }),
+        message: intlService.i18n('mailSubscriptionSuspendedMessage', { expirationDate: expirationDate })
       })
       if (!responseEmail){
-        console.error(intlService.__('emailError'))
+        console.error(intlService.i18n('emailError'))
       }
-      res.json({ message: intlService.__('subscriptionDeletedSuccess') })
+      res.json({ message: intlService.i18n('subscriptionDeletedSuccess') })
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   }
 

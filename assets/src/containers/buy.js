@@ -44,7 +44,7 @@ class Buy extends Component {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getPlan({ select: ['id', 'name','description','planCode'], populate: ['features','features.feature'] }))
+      await this.props.dispatch(getPlan({ select: ['id', 'name','description','planCode'] }))
       await this.setState({ plan: this.props.plan.plans.records.find(item => Object.toUrl(item.name)===this.props.match.params.idPlan) })
       this.props.dispatch(hideLoading())
     }catch(e){

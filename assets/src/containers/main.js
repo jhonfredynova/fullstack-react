@@ -11,7 +11,7 @@ import { setTranslations, setLanguage } from 'redux-i18n'
 import Header from 'components/header'
 import Footer from 'components/footer'
 import Message from 'components/message'
-import { hideLoading, showLoading, getConfig, getPreference, setMessage, setPreference, deleteMessage } from 'actions/appActions'
+import { hideLoading, showLoading, getConfig, getPreference, setMessage, deleteMessage } from 'actions/appActions'
 import { getToken, me } from 'actions/authActions'
 import './main.css'
 
@@ -34,8 +34,7 @@ class Main extends Component {
       await this.props.dispatch(me())
       const { config } = this.props.app
       const { session } = this.props.auth
-      const preferences = defaults(get(session, 'preferences', {}), localPreferences, config.appPreferences)
-      await this.props.dispatch(setPreference(preferences))
+      config.appPreferences = defaults(get(session, 'preferences', {}), localPreferences, config.appPreferences)
       await moment.locale(config.appPreferences.language)
       await this.props.dispatch(setTranslations(config.appIntl.locales))
       await this.props.dispatch(setLanguage(config.appPreferences.language))

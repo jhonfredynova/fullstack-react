@@ -4,8 +4,9 @@ module.exports.app = {
   appIntl: {
     callingCodes: [],
     currencies: [],
-    currencyConversion: [],
-    languages: []
+    currencyConversion: {},
+    languages: [],
+    locales: {}
   },
   appLanguages: ['en','es'],
   appLogo: 'https://s3.amazonaws.com/tucode/tucode.png',
@@ -26,7 +27,7 @@ module.exports.app = {
   },
   //EMAILS
   emails: {
-    noreply: 'noreply@gmail.com',
+    noreply: 'noreply@tucode.com',
     support: 'jhonfredynova@gmail.com'
   },
   //IMAGES

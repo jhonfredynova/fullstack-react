@@ -19,13 +19,12 @@ class AdminPlanFeature extends Component {
       planFeatures: this.props.plan.features,
       planFeaturesQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
-        populate: ['feature'],
         select: ['id','plan','feature','order','quantity'],
-        sort: {
-          parent: 1,
-          order: 1,
-          name: 1
-        },
+        sort: [
+          { parent: 'ASC' },
+          { order: 'ASC' },
+          { name: 'ASC' }
+        ],
         where: {
           active: true,
           'feature.name': { contains: '' },

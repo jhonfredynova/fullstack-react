@@ -20,9 +20,9 @@ class AdminUserRol extends Component {
       userRolesQuery: {
         association: { user: this.props.match.params.id },
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
-        sort: {
-          name: 1
-        },
+        sort: [
+          { name: 'ASC' }
+        ],
         where: {
           name: { contains: '' }
         }

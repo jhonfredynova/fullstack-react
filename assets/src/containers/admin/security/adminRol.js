@@ -20,9 +20,9 @@ class AdminRol extends Component {
       rolesQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','active','createdAt','updatedAt','parent','name'],
-        sort: {
-          name: 1
-        },
+        sort: [
+          { name: 'ASC' }
+        ],
         where: {
           active: true,
           name: { contains: '' }
@@ -68,7 +68,7 @@ class AdminRol extends Component {
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(deleteRol(item.id))
+      await this.props.dispatch(deleteRol(item))
       await this.props.dispatch(getRol(this.state.rolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){

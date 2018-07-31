@@ -32,9 +32,9 @@ export function updateCatalog(data) {
   }
 }
 
-export function deleteCatalog(id) {
+export function deleteCatalog(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/catalog/${id}`)
+    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/catalog/${data.id}`)
     .then(response => dispatch({type: CATALOG.DELETE, payload: response.data}) )
     .catch(err => handleError(err) )
   }

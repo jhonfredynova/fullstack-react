@@ -1,4 +1,4 @@
-import { get, defaultTo, isObject, forEach } from 'lodash'
+import { get, defaultTo, isObject, forEach, join } from 'lodash'
 
 //CONSTANTS
 export const ACTION = {
@@ -12,11 +12,10 @@ export const ACTION = {
 
 //REQUESTS
 export function handleError(e){
-  let response = get(e.response, 'data', null)
-  response = response || e.message
-  if(response.details) response = response.details.replace('Details:','').replace('Error:','').trim()
-  if(typeof(response)==='object') response = response.message
-  throw new Error(response)
+  let message = get(e,'response.data', null) 
+  if(isObject(message)) message = message.raw  
+  if(!message) message = e.message
+  throw new Error(message)
 }
 
 export function handleRequestDownload(filename, text) {
@@ -34,8 +33,8 @@ export function handleRequestQuery(data){
   for(let key in data){
     if(key==='activePage') params.skip = (data.activePage<=1 ? 0 : ((data.activePage-1)*data.pageSize))
     else if(key==='pageSize') params.limit = data.pageSize
-    else if(key==='populate') params.populate = data.populate
-    else if(key==='select') params.select = data.select
+    else if(key==='populate') params.populate = join(data.populate,',')
+    else if(key==='select') params.select = join(data.select,',')
     else if(key==='sort') params.sort = data.sort
     else if(key==='where') params.where = forEach(data.where, (value, key) => data.where[key] = defaultTo(data.where[key], ''))
     else params[key] = data[key]

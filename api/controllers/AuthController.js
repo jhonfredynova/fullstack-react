@@ -14,24 +14,24 @@ module.exports = {
   login: async (req, res, next) => {
     try{
       let provider = 'bearer'
-      let user = await sails.models.user.findOne({ $or: [ {email: new RegExp(`^${req.body.username}$`, 'i')}, {username: new RegExp(`^${req.body.username}$`, 'i')} ] }).populateAll()
+      let user = await sails.models.user.findOne({ or: [{email: req.body.username}, {username: req.body.username}] }).populateAll()
       if (!user){
-        throw new Error(intlService.__('usernameNotFound'))
+        throw intlService.i18n('usernameNotFound')
       }
       let passport = _.find(user.passports, { provider: provider })
       if (!passport) {
-        throw new Error(intlService.__('userNotHaveLocalPassport'))  
+        throw intlService.i18n('userNotHaveLocalPassport')
       }
-      if (!cipherService.comparePassword(req.body.password, user.password)){
-        throw new Error(intlService.__('passwordIncorrect'))
+      if (!encryptionService.comparePassword(req.body.password, user.password)){
+        throw intlService.i18n('passwordIncorrect')
       }
       if (!user.active) {
-        throw new Error(intlService.__('userInactive'))
+        throw intlService.i18n('userInactive')
       }
       user.currentPassport = passport
       res.json(user)
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
@@ -43,7 +43,7 @@ module.exports = {
       user.currentPassport = _.find(user.passports, { provider: 'bearer' })
       res.json(user)
     }catch(e){
-      res.negotiate(e)
+      res.badRequest(e)
     }
   },
 
