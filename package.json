@@ -41,8 +41,7 @@
     "sails-hook-dotenv": "^0.1.1"
   },
   "scripts": {
-    "postinstall": "cd assets && npm i",
-    "build": "cd assets && npm run build",
+    "postinstall": "cd assets && npm i && npm run build",
     "debug": "concurrently \"node --inspect app\" \"cd assets && npm run start\"",
     "start": "node app"
   }
