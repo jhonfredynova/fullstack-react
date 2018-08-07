@@ -45,7 +45,7 @@ export function createSubscription(data) {
 
 export function updateCreditCard(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${data.subscriptionId}/${data.clientCode}/${data.creditCardId}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${data.subscriptionId}/${data.clientCode}/${data.creditCardId}`, data)
     .then(response => dispatch({type: PAYMENT.UPDATE_CREDITCARD, payload: response.data}))
     .catch(err => handleError(err) )
   }
@@ -53,7 +53,7 @@ export function updateCreditCard(data) {
 
 export function updateSubscription(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${data.subscriptionId}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${data.subscriptionId}`, data)
     .then(response => dispatch({type: PAYMENT.UPDATE_SUBSCRIPTION, payload: response.data}))
     .catch(err => handleError(err) )
   }
@@ -62,7 +62,7 @@ export function updateSubscription(data) {
 
 export function deleteSubscription(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${data.subscriptionId}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${data.subscriptionId}`, data)
     .then(response => dispatch({type: PAYMENT.DELETE_SUBSCRIPTION, payload: response.data}))
     .catch(err => handleError(err) )
   }

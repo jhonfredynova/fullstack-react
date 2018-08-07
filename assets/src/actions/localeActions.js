@@ -26,7 +26,7 @@ export function saveLocale(data) {
 
 export function updateLocale(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/locale/${data.id}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/locale/${data.id}`, data)
     .then(response => dispatch({type: LOCALE.UPDATE, payload: response.data}) )
     .catch(err => handleError(err) )
   }

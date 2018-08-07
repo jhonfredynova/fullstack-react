@@ -63,6 +63,7 @@ render((
             {/* CONFIGURATION */}
             <Route path="/admin/configuration/catalog" exact component={Authorization(AdminCatalog, [1], true)}/>
             <Route path="/admin/configuration/catalog/new" component={Authorization(AdminCatalogSave, [1], true)}/>
+            <Route path="/admin/configuration/catalog/:id/children" component={Authorization(AdminCatalog, [1], true)}/> 
             <Route path="/admin/configuration/catalog/:id" component={Authorization(AdminCatalogSave, [1], true)}/> 
             <Route path="/admin/configuration/locale" exact component={Authorization(AdminLocale, [1], true)}/>
             <Route path="/admin/configuration/locale/new" component={Authorization(AdminLocaleSave, [1], true)}/>

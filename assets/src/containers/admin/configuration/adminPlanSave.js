@@ -21,12 +21,11 @@ class AdminPlanSave extends Component {
       },
       plans: [],
       model: {
-        id: null,
+        id: undefined,
         name: '',
         description: '',
         paymentType: '',
         planCode: '',
-        planInfo: null,
         transactionValue: null,
         order: ''
       }
@@ -36,7 +35,7 @@ class AdminPlanSave extends Component {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getPlan({ select: keys(this.state.model), where: { id: this.props.match.params.id } }))
+      await this.props.dispatch(getPlan({ populate: false, select: keys(this.state.model), where: { id: this.props.match.params.id } }))
       await this.setState({ model: defaults(this.props.plan.temp, this.state.model) })
       await this.props.dispatch(getSubscriptionPlan({ sort: [{name: 'ASC'}] }))
       await this.setState({ plans: this.props.payment.temp })

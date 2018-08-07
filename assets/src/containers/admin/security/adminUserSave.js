@@ -15,7 +15,7 @@ class AdminUserSave extends Component {
         model: {}
       },
       model: {
-        id: null,
+        id: undefined,
         firstname: '',
         lastname: '',
         username: '',

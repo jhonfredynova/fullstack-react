@@ -26,7 +26,7 @@ export function saveCatalog(data) {
 
 export function updateCatalog(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/catalog/${data.id}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/catalog/${data.id}`, data)
     .then(response => dispatch({type: CATALOG.UPDATE, payload: response.data}) )
     .catch(err => handleError(err) )
   }

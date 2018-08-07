@@ -1,4 +1,4 @@
-import { assignWith, defaultTo, difference, hasIn, isArray, isEmpty, isObject, trim, get, set } from 'lodash'
+import { compact, difference, isArray, isEmpty, isObject, trim } from 'lodash'
 //COMMANDS
 const supportedCommands = ['copy']
 Object.defineProperty(document, 'queryCommandSupported', {
@@ -18,22 +18,14 @@ Object.cleanDeep = (object, value) => {
   return object
 }
 
-Object.compactDeep = (object) => {
-  for(let key in object) {
-    if(Object.isEmpty(object[key])) delete object[key]
-    if(isObject(object[key])){
-      object[key] = Object.compactDeep(object[key])
-      if(Object.isEmpty(object[key])) delete object[key]
-    }
+Object.compactDeep = (object, customizer) => {
+  customizer = customizer || ((item) => Object.isEmpty(item))
+  for(let key in object){
+    if(isArray(object[key])) object[key] = compact(Object.compactDeep(object[key]), customizer)
+    if(isObject(object[key])) object[key] = Object.compactDeep(object[key], customizer)
+    if(customizer(object[key], key)) delete object[key]
   }
   return object
-}
-
-Object.defaultComponentTo = (objSource, objDefault) => {
-  if (!isArray(objSource) && isObject(objSource)){
-    return assignWith(objSource, objDefault, (sourceItem, defaultItem) => Object.isEmpty(get(sourceItem, 'props.children')) ? defaultTo(defaultItem, null) : defaultTo(sourceItem, null))
-  }
-  return defaultTo(get(objSource, 'props.children'), objDefault)
 }
 
 Object.includes = (objSource, objSearch, mustHaveAll) => {
@@ -60,10 +52,11 @@ Object.isHtml = (value) => {
   return false
 }
 
-Object.setDeep = (object, property, value) => {
+Object.setDeep = (object, property, customizer) => {
+  customizer = customizer || ((item) => item)
   for(let key in object) {
-    if(hasIn(object[key], property)) object[key] = set(object[key], property, value)
-    else if(isObject(object[key])) object[key] = Object.setDeep(object[key], property, value)
+    if(isObject(object[key])) object[key] = Object.setDeep(object[key], property, customizer)
+    if(key===property) object[key] = customizer(object[key], key)
   }
   return object
 }

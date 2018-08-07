@@ -37,7 +37,7 @@ class AdminUserRolSave extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(getRol({ select: ['id','name'] }))
-      await this.props.dispatch(getUser({ where: { id: this.props.match.params.id }, select: ['id','firstname','lastname','username'] }))    
+      await this.props.dispatch(getUser({ where: { id: this.props.match.params.id }, select: ['id','firstname','lastname','email'] }))    
       await this.setState({ user: this.props.user.temp })
       await this.setState({ model: Object.assign(this.state.model, { user: this.state.user.id }) })
       this.props.dispatch(hideLoading())
@@ -94,7 +94,7 @@ class AdminUserRolSave extends Component {
           </div>
           <div className="form-group col-md-6">
             <label>Rol <span>*</span></label>
-            <Select options={this.state.roles} valueKey='id' labelKey='name' value={this.state.model.rol} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.rol', value.id)} />
+            <Select options={this.state.roles} valueKey='id' labelKey='name' value={this.state.model.rol} clearable={false} autosize={false} onChange={value => this.handleChangeState('model.rol', value.id)} />
             <p className="text-danger">{this.state.errors.model.rol}</p>
           </div>
           <button type="submit" className="hide" />

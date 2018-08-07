@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import classnames from 'classnames'
+import { defaultTo } from 'lodash'
 import './navigationBar.css'
 
 class NavigationBar extends Component {
@@ -7,10 +8,10 @@ class NavigationBar extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      title: Object.defaultComponentTo(this.props.data.title, null),
-      btnLeft: Object.defaultComponentTo(this.props.data.btnLeft, null),
-      btnRight: Object.defaultComponentTo(this.props.data.btnRight, null),
-      subTitle: Object.defaultComponentTo(this.props.data.subTitle, null)
+      title: defaultTo(this.props.data.title, null),
+      btnLeft: defaultTo(this.props.data.btnLeft, null),
+      btnRight: defaultTo(this.props.data.btnRight, null),
+      subTitle: defaultTo(this.props.data.subTitle, null)
     }
   }
 

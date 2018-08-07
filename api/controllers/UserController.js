@@ -12,17 +12,17 @@ module.exports = {
 
 	forgot: async (req, res, next) => {
     try{
-      let user = await sails.models.user.findOne({ $or: [{email: req.body.username}, {username: req.body.username}] }).populateAll()
+      let user = await sails.models.user.findOne({ or: [{email: req.body.username}, {username: req.body.username}] })
       if (!user) {
         throw intlService.i18n('usernameNotFound')
       }
-      let passport = _.find(user.passports, { provider: 'bearer' })
+      let passport = await sails.models.passport.findOne({ user: user.id, provider: 'bearer' })
       if (!passport) {
         throw intlService.i18n('userNotHaveLocalPassport')
       }
-      user.passwordResetExpiration = new Date(Date.now()+3600000)//Valid for 1 hour
+      user.passwordResetExpiration = Date.now()+3600000, //Valid for 1 hour
       user.passwordResetToken = crypto.randomBytes(20).toString('hex')
-      await user.save()
+      await sails.models.user.update({ id: user.id }, user)
       //notification
       let responseEmail = await mailService.sendEmail({
         fromName: sails.config.app.appName,
@@ -42,7 +42,7 @@ module.exports = {
 
   reset: async (req, res, next) => {
     try{
-      let user = await sails.models.user.findOne({ passwordResetToken: req.params.token, passwordResetExpiration: { $gt: new Date(Date.now()) } })
+      let user = await sails.models.user.findOne({ passwordResetToken: req.params.token, passwordResetExpiration: { '>': Date.now() } })
       if (!user){ 
         throw intlService.i18n('userResetError')
       }
@@ -52,7 +52,7 @@ module.exports = {
       user.password = req.body.password
       user.passwordResetExpiration = null
       user.passwordResetToken = null
-      user = await user.save()
+      await sails.models.user.update({ id: user.id }, user)
       res.json({ message: intlService.i18n('userResetSuccess') })
     }catch(e){
       res.badRequest(e)
@@ -65,8 +65,7 @@ module.exports = {
       if (!user) {
         throw intlService.i18n('userValidateEmailError')
       }
-      user.emailConfirmed = true
-      await user.save()
+      await sails.models.user.update({ id: user.id }, { emailConfirmed: true })
       res.json({ message: intlService.i18n('userValidateEmailSuccess') })
     }catch(e){
       res.badRequest(e)

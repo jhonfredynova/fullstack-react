@@ -26,7 +26,7 @@ export function saveRol(data) {
 
 export function updateRol(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/rol/${data.id}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/rol/${data.id}`, data)
     .then(response => { dispatch({type: ROL.UPDATE, payload: response.data}) })
     .catch(err => handleError(err) )
   }

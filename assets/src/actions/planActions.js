@@ -26,7 +26,7 @@ export function savePlan(data) {
 
 export function updatePlan(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/plan/${data.id}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/plan/${data.id}`, data)
     .then(response => dispatch({type: PLAN.UPDATE, payload: response.data}) )
     .catch(err => handleError(err) )
   }
@@ -65,7 +65,7 @@ export function savePlanFeature(data) {
 
 export function updatePlanFeature(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/planFeature/${data.id}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/planFeature/${data.id}`, data)
     .then(response => dispatch({type: PLAN_FEATURE.UPDATE, payload: response.data}) )
     .catch(err => handleError(err) )
   }

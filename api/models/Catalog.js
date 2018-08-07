@@ -20,13 +20,18 @@ module.exports = {
       required: true
     },
     order: {
-      type: 'number'
+      type: 'number',
+      required: true
     },
     thumbnail: {
       type: 'string'
     },
     parent: {
-      model: 'Catalog'
+      model: 'catalog'
+    },
+    children: {
+      collection: 'catalog',
+      via: 'parent'
     }
   },
   beforeCreate: async (values, next) => {

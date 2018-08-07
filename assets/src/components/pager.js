@@ -34,9 +34,9 @@ class Pager extends Component {
   }
 
   async handleChangeKeyword(value){
+    if(value.indexOf('%')===-1) value = `%${value}%`
     let where = this.state.where
-    where = Object.setDeep(where, 'contains', value)
-    where = Object.setDeep(where, 'like', value)
+    where = Object.setDeep(where, 'like', item => value)
     await this.setState(set(this.state, 'where', where))
   }
 

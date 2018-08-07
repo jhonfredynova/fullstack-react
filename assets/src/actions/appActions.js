@@ -98,7 +98,7 @@ export function setPreference(data) {
       if(changedPreferences && session) {
         let user = pick(session, ['id','preferences'])
         user.preferences = appPreferences
-        await axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/user/${user.id}`, user)
+        await axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/user/${user.id}`, user)
       }
       if(changedPreferences) dispatch({ type: APP.SET_PREFERENCE, payload: data })    
     }catch(e){

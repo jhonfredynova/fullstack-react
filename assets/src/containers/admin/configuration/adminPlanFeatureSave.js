@@ -21,7 +21,7 @@ class AdminPlanFeatureSave extends Component {
       plan: {},
       planFeatures: this.props.catalog.catalogs.records,
       model: {
-        id: null,
+        id: undefined,
         plan: null,
         feature: null,
         quantity: '',
@@ -41,11 +41,11 @@ class AdminPlanFeatureSave extends Component {
       this.props.dispatch(showLoading())
       const { config } = this.props.app
       const { id: idPlan, idFeature } = this.props.match.params
-      await this.props.dispatch(getPlan({ where: { id: idPlan }, select: ['id','name'] }))
+      await this.props.dispatch(getPlan({ select: ['id','name'], where: { id: idPlan } }))
       await this.setState({ plan: this.props.plan.temp })
       await this.setState({ model: Object.assign(this.state.model, { plan: this.state.plan.id }) })
-      await this.props.dispatch(getCatalog({ where: { 'parent': config.catalogs.planFeatures }, select: ['id','name'] }))
-      await this.props.dispatch(getPlanFeature({ where: { id: idFeature }, select: keys(this.state.model) }))
+      await this.props.dispatch(getCatalog({ select: ['id','name'], where: { 'parent': config.catalogs.planFeatures } }))
+      await this.props.dispatch(getPlanFeature({ populate: false, select: keys(this.state.model), where: { id: idFeature } }))
       await this.setState({ model: defaults(this.props.plan.temp, this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){

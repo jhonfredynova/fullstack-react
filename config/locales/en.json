@@ -160,5 +160,5 @@
   "authStrategyNotAvailable": "Authentication startegy not available.",
   "authStrategyNotProvided": "Authentication strategy not provided.",
   "authStrategyFailed": "We are sorry, no users were found with that authentication strategy.",
-  "mail": "<h1><img src=\"{{appLogo}}\" width=\"35\"> {{appName}}</h1><hr><h1>{{title}}</h1><p>{{message}}</p><hr><p>Sincerily,</p><p><a href=\"{{appUrl}}\" target=\"_blank\">{{appUrl}}</a></p>"
+  "mail": "<h1><img src=\"{{appLogo}}\" width=\"35\" style=\"vertical-align:middle;\"> {{appName}}</h1><hr><h1>{{title}}</h1><p>{{message}}</p><hr><p>Sincerily,</p><p><a href=\"{{appUrl}}\" target=\"_blank\">{{appUrl}}</a></p>"
 }

@@ -85,6 +85,10 @@ module.exports.policies = {
     create: ['isAuthenticated', authorization([1], true)],
     update: ['isAuthenticated', authorization([1,2,3,4], false)],
     destroy: ['isAuthenticated', authorization([1], true)],
+    populate: ['isAuthenticated', authorization([1], true)],
+    add: ['isAuthenticated', authorization([1], true)],
+    replace: ['isAuthenticated', authorization([1], true)],
+    remove: ['isAuthenticated', authorization([1], true)],
     forgot: true,
     reset: true,
     validate: true

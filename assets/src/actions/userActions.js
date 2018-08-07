@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { omit } from 'lodash'
 import { handleError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
 export const USER = {
@@ -29,7 +30,7 @@ export function saveUser(data) {
 
 export function updateUser(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.id}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.id}`, data)
     .then(response => { dispatch({type: USER.UPDATE, payload: response.data}) })
     .catch(err => handleError(err) )
   }
@@ -76,7 +77,7 @@ export const USER_ROL = {
 
 export function getUserRol(parameters) {
   return dispatch  => {
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/user/${parameters.association.user}/roles?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/user/${parameters.where.user}/roles?${handleRequestQuery(omit(parameters,['where.user']))}`)
     .then(response => { dispatch({type: USER_ROL.GET, payload: handleResponseQuery(response) }) })
     .catch(err => handleError(err) )
   }
@@ -84,7 +85,7 @@ export function getUserRol(parameters) {
 
 export function saveUserRol(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`, data)
+    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`, data)
     .then(response => { dispatch({type: USER_ROL.SAVE, payload: response.data}) })
     .catch(err => handleError(err) )
   }

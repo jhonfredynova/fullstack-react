@@ -39,11 +39,12 @@ module.exports = {
       type: 'string'
     },
     passwordResetExpiration: {
-      type: 'string',
-      columnType: 'datetime'
+      type: 'number',
+      allowNull: true
     },
     passwordResetToken: {
-      type: 'string'
+      type: 'string',
+      allowNull: true
     },
     photo: {
       type: 'string',
@@ -68,13 +69,8 @@ module.exports = {
       via: 'users'
     }
   },
-  afterFind: async (values, next) => {
-    try{
-      values = _.omit(values, ['password','passwordResetExpiration','passwordResetToken'])
-      next()
-    }catch(e){
-      next(e)
-    }
+  customToJSON: function() {
+    return _.omit(this, ['password','passwordResetExpiration','passwordResetToken'])
   },
   beforeCreate: async (values, next) => {
     try{      

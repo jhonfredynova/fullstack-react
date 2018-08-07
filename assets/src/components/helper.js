@@ -1,4 +1,4 @@
-import { get, defaultTo, isObject, forEach, join } from 'lodash'
+import { cloneDeep, get, isNull, isArray, isObject, isString, join } from 'lodash'
 
 //CONSTANTS
 export const ACTION = {
@@ -12,31 +12,25 @@ export const ACTION = {
 
 //REQUESTS
 export function handleError(e){
-  let message = get(e,'response.data', null) 
-  if(isObject(message)) message = message.raw  
+  let message = null
+  let messageDetail = get(e,'response.data', null) 
+  if(isString(messageDetail) && !message) message = messageDetail
+  if(isObject(messageDetail) && !message) message = get(messageDetail, 'raw', null)
+  if(isObject(messageDetail) && !message) message = get(messageDetail, 'details', null)  
   if(!message) message = e.message
   throw new Error(message)
 }
 
-export function handleRequestDownload(filename, text) {
-  let element = document.createElement('a')
-  element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text))
-  element.setAttribute('download', filename)
-  element.style.display = 'none'
-  document.body.appendChild(element)
-  element.click()
-  document.body.removeChild(element)
-}
-
 export function handleRequestQuery(data){
+  data = Object.compactDeep(cloneDeep(data), item => !isNull(item) && Object.isEmpty(item))
   let params = {}
   for(let key in data){
     if(key==='activePage') params.skip = (data.activePage<=1 ? 0 : ((data.activePage-1)*data.pageSize))
     else if(key==='pageSize') params.limit = data.pageSize
-    else if(key==='populate') params.populate = join(data.populate,',')
+    else if(key==='populate') params.populate = isArray(data.populate) ? join(data.populate,',') : data.populate
     else if(key==='select') params.select = join(data.select,',')
     else if(key==='sort') params.sort = data.sort
-    else if(key==='where') params.where = forEach(data.where, (value, key) => data.where[key] = defaultTo(data.where[key], ''))
+    else if(key==='where') params.where = data.where
     else params[key] = data[key]
   }
   let queryString = []

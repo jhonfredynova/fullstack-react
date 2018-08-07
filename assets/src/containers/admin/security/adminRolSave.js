@@ -15,7 +15,7 @@ class AdminRolSave extends Component {
         model: {}
       },
       model: {
-        id: null,
+        id: undefined,
         name: '',
         description: ''
       }

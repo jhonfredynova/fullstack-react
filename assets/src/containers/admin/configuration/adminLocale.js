@@ -25,7 +25,7 @@ class AdminLocale extends Component {
         ],
         where: {
           active: true,
-          name: { contains: '' }
+          name: { like: '' }
         }
       }
     }
@@ -80,8 +80,7 @@ class AdminLocale extends Component {
   async handleRestoreData(item){
     try{
       this.props.dispatch(showLoading())
-      item.active = true
-      await this.props.dispatch(updateLocale(item))
+      await this.props.dispatch(updateLocale({ id: item.id, active: true }))
       await this.props.dispatch(getLocale(this.state.localesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){

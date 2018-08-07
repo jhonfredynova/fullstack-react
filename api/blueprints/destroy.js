@@ -56,10 +56,17 @@ module.exports = function destroyOneRecord (req, res) {
     // integrating with the blueprint API out of the box.  If we didn't need
     // or care about that, we could just use `.meta({fetch: true})` when calling
     // `.destroy()`.
+
+    /*****************************************************
+    // START PATCH
+    ******************************************************/
     record = _.pick(record, ['id'])
     record.active = false
     Model.update(_.cloneDeep(criteria), record).exec(function destroyedRecord (err) {
-    //Model.destroy(_.cloneDeep(criteria)).exec(function destroyedRecord (err) {
+    /*****************************************************
+    // END PATCH
+    ******************************************************/
+    // Model.destroy(_.cloneDeep(criteria)).exec(function destroyedRecord (err) {
       if (err) {
         switch (err.name) {
           case 'UsageError': return res.badRequest(formatUsageError(err, req));

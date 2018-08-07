@@ -51,26 +51,32 @@ module.exports = function findRecords (req, res) {
       });
     }//>-
 
-    // Custom script yo paginate frontend 
-    // Get total records when the query does not have id criteria
-    Model.find(_.pick(_.cloneDeep(queryOptions.criteria), ['where']), queryOptions.populates).meta(queryOptions.meta)
-    .exec(function found(err, totalRecords) {
-      // Find if query does not have ID
-      // FindOne if query was have ID
+    /*****************************************************
+    // START PATCH
+    ******************************************************/
+    Model.find(_.pick(queryOptions.criteria, ['where'])).meta(queryOptions.meta)
+    .exec(function found(err, matchingTotalRecords) {
+      if(err){
+        sails.log.verbose('In `populate` blueprint action: an error ocurred consulting the total of records.')
+        return res.notFound()
+      }
       if(!_.get(queryOptions.criteria, 'where.id')){
         res.set('Access-Control-Expose-Headers', 'Content-Records')
-        res.set('Content-Records', totalRecords.length)
+        res.set('Content-Records', matchingTotalRecords.length)
       }else{
         matchingRecords = _.first(matchingRecords)
       }
-      // Custom lifecycle callback 
-      // After find records
       let afterFindCallback = sails.models[Model.tableName].afterFind || ((values, next) => next())
       afterFindCallback(matchingRecords, function(values){
-        res.ok(matchingRecords)
+        return res.ok(matchingRecords)
       })
     })
+    /*****************************************************
+    // END PATCH
+    ******************************************************/
+    // return res.ok(matchingRecords);
 
   });//</ .find().exec() >
 
 };
+

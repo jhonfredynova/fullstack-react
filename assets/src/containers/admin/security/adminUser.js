@@ -21,11 +21,12 @@ class AdminUser extends Component {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','createdAt','updatedAt','firstname','lastname','email'],
         sort: [
-          { name: 'ASC' }
+          { firstname: 'ASC' },
+          { lastname: 'ASC' },
         ],
         where: {
           active: true,
-          email: { contains: '' }
+          email: { like: '' }
         }
       }
     }
@@ -80,8 +81,7 @@ class AdminUser extends Component {
   async handleRestoreData(item){
     try{
       this.props.dispatch(showLoading())
-      item.active = true
-      await this.props.dispatch(updateUser(item))
+      await this.props.dispatch(updateUser({ id: item.id, active: true }))
       await this.props.dispatch(getUser(this.state.usersQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -118,7 +118,7 @@ class AdminUser extends Component {
                   <tr key={index}>
                     <td>{moment(item.createdAt).format('DD/MM/YYYY')}</td>
                     <td>{moment(item.updatedAt).format('DD/MM/YYYY')}</td>
-                    <td>{item.firstname}</td>
+                    <td>{`${item.firstname} ${item.lastname}`}</td>
                     <td>{item.email}</td>
                     <td className="text-center">
                       {

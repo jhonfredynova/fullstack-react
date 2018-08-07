@@ -19,13 +19,13 @@ class AdminRol extends Component {
       roles: this.props.rol.roles,
       rolesQuery: {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
-        select: ['id','active','createdAt','updatedAt','parent','name'],
+        select: ['id','active','createdAt','updatedAt','name'],
         sort: [
           { name: 'ASC' }
         ],
         where: {
           active: true,
-          name: { contains: '' }
+          name: { like: '' }
         }
       }
     }
@@ -80,8 +80,7 @@ class AdminRol extends Component {
   async handleRestoreData(item){
     try{
       this.props.dispatch(showLoading())
-      item.active = true
-      await this.props.dispatch(updateRol(item))
+      await this.props.dispatch(updateRol({ id: item.id, active: true }))
       await this.props.dispatch(getRol(this.state.rolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -107,7 +106,6 @@ class AdminRol extends Component {
               <tr>
                 <th>Created</th>
                 <th>Modified</th>
-                <th>Parent</th>
                 <th>Name</th>
                 <th className="text-center">Options</th>
               </tr>
@@ -118,7 +116,6 @@ class AdminRol extends Component {
                   <tr key={index}>
                     <td>{moment(item.createdAt).format('DD/MM/YYYY')}</td>
                     <td>{moment(item.updatedAt).format('DD/MM/YYYY')}</td>
-                    <td>{item.parent ? item.parent.name : '-'}</td>
                     <td>{item.name}</td>
                     <td className="text-center">
                       {

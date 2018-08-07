@@ -18,7 +18,7 @@ export default class Multilanguage extends Component {
     this.state = {
       isHtml: defaultTo(this.props.data.type, false),
       languages: defaultTo(this.props.data.languages, []),
-      value: defaultTo(this.props.data.value, '')
+      value: defaultTo(this.props.data.value, {})
     }
   }
 

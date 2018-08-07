@@ -40,11 +40,11 @@ let callbackProviderStrategy = async (token, refreshToken, profile, next) => {
         user: user.id,
         token: token
       }
-      passport = await sails.models.passport.create(passport)
+      await sails.models.passport.create(passport)
     }
     //response
     user = await sails.models.user.findOne({ id: user.id })
-    passport = await sails.models.passport.findOne({ provider: 'bearer' })
+    passport = await sails.models.passport.findOne({ user: user.id, provider: 'bearer' })
     user.currentPassport = passport
     next(null, user)
   }catch(e){

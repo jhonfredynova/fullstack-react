@@ -17,7 +17,7 @@ class AdminLocaleSave extends Component {
       },
       locales: this.props.locale.locales.records,
       model: {
-        id: null,
+        id: undefined,
         name: '',
         value: {}
       }
@@ -48,11 +48,12 @@ class AdminLocaleSave extends Component {
   }
 
   async handleValidate(path) {
+    const { appLanguages } = this.props.app.config
     let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
     if(Object.isEmpty(this.state.model.name)) {
       errors.model.name = "Enter name."
     }
-    if(Object.isEmpty(this.state.model.value)) {
+    if(appLanguages.find(key => Object.isEmpty(this.state.model.value[key]))) {
       errors.model.value = "Enter values."
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))

@@ -18,7 +18,7 @@ class Profile extends Component {
       },
       changePassword: false,
       model: {
-        id: null,
+        id: undefined,
         firstname: '',
         lastname: '',
         username: '',
@@ -35,7 +35,7 @@ class Profile extends Component {
     try{
       this.props.dispatch(showLoading())
       const { session } = this.props.auth
-      await this.props.dispatch(getUser({ where:{ id: session.id }, select: keys(omit(this.state.model,['passwordConfirmation'])) }))
+      await this.props.dispatch(getUser({ populate: false, select: keys(omit(this.state.model,['passwordConfirmation'])), where:{ id: session.id } }))
       await this.setState({ model: defaults(this.props.user.temp, this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -45,6 +45,9 @@ class Profile extends Component {
   }
 
   async handleChangeState(path, value) {
+    if(path==='model.username'){
+      value = value.replace(/\s/g, '')
+    }
     await this.setState(set(this.state, path, value))
     await this.handleValidate(path)
   }
@@ -59,9 +62,6 @@ class Profile extends Component {
     }
      if(Object.isEmpty(this.state.model.username)) {
       errors.model.username = this.context.t('enterUsername')
-    }
-    if(Object.isEmpty(this.state.model.email)) {
-      errors.model.email = this.context.t('enterEmail')
     }
     if (!Object.isEmpty(this.state.model.email) && !Object.isEmail(this.state.model.email)) {
       errors.model.email = this.context.t('enterEmailFormat')
@@ -90,7 +90,7 @@ class Profile extends Component {
       //execute
       this.props.dispatch(showLoading())
       if (!this.state.changePassword) this.state.model = omit(this.state.model, ['password', 'passwordConfirmation'])
-      await this.props.dispatch(updateUser(this.state.model))  
+      await this.props.dispatch(updateUser(omit(this.state.model, ['email'])))  
       this.setState({
         changePassword: false,
         model: Object.assign(this.state.model, {
@@ -140,7 +140,7 @@ class Profile extends Component {
                     <i className={classnames({'glyphicon glyphicon-remove text-danger': !this.state.model.emailConfirmed, 'glyphicon glyphicon-ok text-success': this.state.model.emailConfirmed})} />
                   </OverlayTrigger>
                 </span>
-                <input type="text" className="form-control" value={this.state.model.email} onChange={e => this.handleChangeState('model.email', e.target.value)} />
+                <label className="form-control">{this.state.model.email}</label>
               </div>
               <span className="text-danger">{this.state.errors.model.email}</span>
             </div>

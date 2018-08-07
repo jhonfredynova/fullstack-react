@@ -26,7 +26,7 @@ class AdminPlan extends Component {
         ],
         where: {
           active: true,
-          name: { contains: '' }
+          name: { like: '' }
         }
       }
     }
@@ -81,8 +81,7 @@ class AdminPlan extends Component {
   async handleRestoreData(item){
     try{
       this.props.dispatch(showLoading())
-      item.active = true
-      await this.props.dispatch(updatePlan(item))
+      await this.props.dispatch(updatePlan({ id: item.id, active: true }))
       await this.props.dispatch(getPlan(this.state.plansQuery))
       this.props.dispatch(hideLoading())
     }catch(e){

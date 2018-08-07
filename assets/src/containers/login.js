@@ -44,7 +44,7 @@ class Login extends Component {
   }
 
   async handleChangeState(path, value) {
-     if (path==='model.username') {
+    if(path==='model.username'){
       value = value.replace(/\s/g, '')
     }
     await this.setState(set(this.state, path, value))

@@ -19,8 +19,8 @@ class AdminCatalogSave extends Component {
         model: {}
       },
       model: {
-        id: null,
-        parent: '',
+        id: undefined,
+        parent: null,
         name: '',
         value: {},
         thumbnail: '',
@@ -38,9 +38,9 @@ class AdminCatalogSave extends Component {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getCatalog({ select: keys(this.state.model), where: {id: this.props.match.params.id} }))
+      await this.props.dispatch(getCatalog({ select: keys(this.state.model), sort: [{name: 'ASC'}], where: { active: true } }))
+      await this.props.dispatch(getCatalog({ populate: false, select: keys(this.state.model), where: {id: this.props.match.params.id} }))
       await this.setState({ model: defaults(this.props.catalog.temp, this.state.model) })
-      await this.props.dispatch(getCatalog({ select: keys(this.state.model), sort: [{name: 'ASC'}], where: {active: true, parent: null} }))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -54,11 +54,15 @@ class AdminCatalogSave extends Component {
   }
 
   async handleValidate(path) {
+    const { appLanguages } = this.props.app.config
     let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
     if(Object.isEmpty(this.state.model.name)) {
       errors.model.name = "Enter name."
     }
-    if(Object.isEmpty(this.state.model.value)) {
+    if(Object.isEmpty(this.state.model.order)) {
+      errors.model.order = "Enter order."
+    }
+    if(appLanguages.find(key => Object.isEmpty(this.state.model.value[key]))) {
       errors.model.value = "Enter values."
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -75,14 +79,14 @@ class AdminCatalogSave extends Component {
         return
       }
       //execute
-      this.props.dispatch(showLoading())
+      this.props.dispatch(showLoading())      
       if(this.state.model.id){
         await this.props.dispatch(updateCatalog(this.state.model))  
       }else{
         await this.props.dispatch(saveCatalog(this.state.model))
       }
       this.props.dispatch(hideLoading())
-      this.props.history.push('/admin/configuration/catalog')
+      this.props.history.goBack()
       this.props.dispatch(setMessage({ type: 'success', message: this.context.t('successfulOperation') }))
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -92,17 +96,17 @@ class AdminCatalogSave extends Component {
 
   render() {    
     const { config } = this.props.app
-    const parentCatalogs = this.state.catalogs.map((item, index) => {
+    const parentCatalogs = this.state.catalogs.filter(item => item.id!==this.props.match.params.id).map((item, index) => {
       return { label: item.name, id: item.id }
     })
     return (
       <div id="adminCatalogSave">
-        <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update Catalog' : 'New Catalog'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/catalog')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
+        <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update Catalog' : 'New Catalog'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.goBack()}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
           <div className="form-group col-md-6">
             <label>Parent Catalog</label>
-            <Select className="form-control" options={parentCatalogs} valueKey='id' value={this.state.model.parent} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.parent', value)} />
+            <Select className="form-control" options={parentCatalogs} valueKey='id' value={this.state.model.parent} simpleValue={true} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.parent', value)} />
             <span className="text-danger">{this.state.errors.model.parent}</span>
           </div>
           <div className="form-group col-md-6">
@@ -116,7 +120,7 @@ class AdminCatalogSave extends Component {
             <span className="text-danger">{this.state.errors.model.thumbnail}</span>
           </div>
           <div className="form-group col-md-6">
-            <label>Order</label>
+            <label>Order *</label>
             <Counter data={{ value: this.state.model.order, min: 0, max: 100 }} onChange={value => this.handleChangeState('model.order', value)} />
             <span className="text-danger">{this.state.errors.model.order}</span>
           </div>

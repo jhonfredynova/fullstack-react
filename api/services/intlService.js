@@ -1,5 +1,6 @@
 // packages
 let axios = require('axios')
+let he = require('he')
 let fs = require('fs')
 let path = require('path')
 const CACHE = {
@@ -10,8 +11,9 @@ const CACHE = {
 
 module.exports = {
 
-  i18n: (phrase, args) => {
-    return sails.__({ phrase: phrase, locale: sails.config.i18n.defaultLocale }, args)
+  i18n: (locale, args) => {
+    locale = sails.__({ phrase: locale, locale: sails.config.i18n.defaultLocale }, args)
+    return he.decode(locale)
   },
   
   getIntl: async (args) => {

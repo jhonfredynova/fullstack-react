@@ -21,13 +21,10 @@ class AdminPlanFeature extends Component {
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','plan','feature','order','quantity'],
         sort: [
-          { parent: 'ASC' },
-          { order: 'ASC' },
-          { name: 'ASC' }
+          { order: 'ASC' }
         ],
         where: {
           active: true,
-          'feature.name': { contains: '' },
           plan: this.props.match.params.id
         }
       }
@@ -85,8 +82,7 @@ class AdminPlanFeature extends Component {
   async handleRestoreData(item){
     try{
       this.props.dispatch(showLoading())
-      item.active = true
-      await this.props.dispatch(updatePlanFeature(item))
+      await this.props.dispatch(updatePlanFeature({ id: item.id, active: true }))
       await this.props.dispatch(getPlanFeature(this.state.planFeaturesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){

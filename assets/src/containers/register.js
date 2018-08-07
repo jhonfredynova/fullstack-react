@@ -28,7 +28,7 @@ class Register extends Component {
   }
 
   async handleChangeState(path, value) {
-    if (path==='model.email' || path==='model.username') {
+    if(path==='model.email' || path==='model.username'){
       value = value.replace(/\s/g, '')
     }
     await this.setState(set(this.state, path, value))
