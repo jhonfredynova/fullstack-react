@@ -1,25 +1,26 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, flow, get, set } from 'lodash'
+import { cloneDeep, flow, get, set, range } from 'lodash'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
+import { createSubscription } from 'actions/paymentActions'
 import { getPlan } from 'actions/planActions'
-import DatePicker from 'components/datePicker'
 import NavigationBar from 'components/navigationBar'
 import Numeric from 'components/numeric'
-import NotFound from 'components/notFound'
 import Seo from 'components/seo'
 
-class Buy extends Component {
+class BuySubscription extends Component {
 
-  constructor(props) {
+  constructor(props) { 
     super(props)
     this.state = {
       errors: {
-        model: { client:{}, creditCard:{}, plan: {} }
+        model: { client:{}, creditCard:{ expiration: {} }, plan: {} }
       },
       plan: {},
+      acceptTerms: false,
       model: {
         client: {
           fullname: '',
@@ -45,7 +46,18 @@ class Buy extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(getPlan({ select: ['id', 'name','description','planCode'] }))
-      await this.setState({ plan: this.props.plan.plans.records.find(item => Object.toUrl(item.name)===this.props.match.params.idPlan) })
+      const plan = this.props.plan.plans.records.find(item => Object.toUrl(item.name)===this.props.match.params.idPlan)
+      if(!plan || plan.paymentType==='transaction'){
+        this.props.history.push('/')
+        this.props.dispatch(setMessage({ type: 'error', message: this.context.t('planNotFound') }))
+        return
+      }
+      if(plan.id===this.props.app.config.plans.free){
+        this.props.history.push('/register')
+        return 
+      }
+      await this.setState({ plan: plan })
+      await this.setState({ model: set(this.state.model, 'plan.planCode', plan.planCode) })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -81,8 +93,11 @@ class Buy extends Component {
     if(Object.isEmpty(this.state.model.creditCard.holder)) {
       errors.model.creditCard.holder = this.context.t('enterCreditCardHolder')
     }
-    if(Object.isEmpty(this.state.model.creditCard.expiration.month) || Object.isEmpty(this.state.model.creditCard.expiration.year)) {
-      errors.model.creditCard.expiration = this.context.t('enterExpirationDate')
+    if(Object.isEmpty(this.state.model.creditCard.expiration.month)) {
+      errors.model.creditCard.expiration.month = this.context.t('enterExpirationMonth')
+    }
+    if(Object.isEmpty(this.state.model.creditCard.expiration.year)) {
+      errors.model.creditCard.expiration.year = this.context.t('enterExpirationYear')
     }
     if(Object.isEmpty(this.state.model.creditCard.securityCode)) {
       errors.model.creditCard.securityCode = this.context.t('enterSecurityCode')
@@ -100,31 +115,36 @@ class Buy extends Component {
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
+      if(!this.state.acceptTerms){
+        this.props.dispatch(setMessage({ type: 'error', message: this.context.t('mustAcceptTerms') }))
+        return
+      }
       //execute
       this.props.dispatch(showLoading())
+      await this.props.dispatch(createSubscription(this.state.model))
+      this.props.history.push('/login')
+      this.props.dispatch(setMessage({ type: 'success', message: this.props.payment.temp }))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())
     }
-    
   }
 
   render() {
+    const currentYear = (new Date()).getFullYear()
     const { isLoading, config } = this.props.app
     const { appIntl } = this.props.app.config
-    const { currency: planCurrency, value: planValue } = get(this.state.plan, 'planInfo.price', {})
+    const planPrice = get(this.state.plan.subscriptionInfo, 'price', {})
     const tooltipPayment = (
       <Tooltip id="tooltipPayment">
         {this.context.t('securePaymentInfo')}
       </Tooltip>
     )
-    if (isLoading) return null
-    if (Object.isEmpty(this.state.plan)) return <NotFound /> 
     return (
       <div id="buy">
         <Seo data={{ title: this.context.t('buyTitle', {planName: this.state.plan.name}), description: this.context.t('buyDescription'), siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.context.t('buyTitle', {planName: this.state.plan.name})}</h1>, subTitle: <h2>{this.context.t('buyDescription')}</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/price')}><i className="glyphicon glyphicon-arrow-left" /></button> }} />
+        <NavigationBar data={{ title: <h1>{this.context.t('buyTitle', {planName: this.state.plan.name})}</h1>, subTitle: <h2>{this.context.t('buyDescription')}</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.goBack()}><i className="glyphicon glyphicon-arrow-left" /></button> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form onSubmit={this.handleBuy.bind(this)}>
           <div className="panel panel-default">
@@ -143,12 +163,12 @@ class Buy extends Component {
                 </div>
                 <div className="form-group col-md-6">
                   <label>{this.context.t('password')} <span>*</span></label>
-                  <input type="text" className="form-control" value={this.state.model.client.password} onChange={event => this.handleChangeState('model.client.password', event.target.value)} />
+                  <input type="password" className="form-control" value={this.state.model.client.password} onChange={event => this.handleChangeState('model.client.password', event.target.value)} />
                   <p className="text-danger">{this.state.errors.model.client.password}</p>
                 </div>
                 <div className="form-group col-md-6">
-                  <label>{this.context.t('passwordConfirmation')} <span>*</span></label>
-                  <input type="text" className="form-control" value={this.state.model.client.passwordConfirmation} onChange={event => this.handleChangeState('model.client.passwordConfirmation', event.target.value)} />
+                  <label>{this.context.t('passwordConfirm')} <span>*</span></label>
+                  <input type="password" className="form-control" value={this.state.model.client.passwordConfirmation} onChange={event => this.handleChangeState('model.client.passwordConfirmation', event.target.value)} />
                   <p className="text-danger">{this.state.errors.model.client.passwordConfirmation}</p>
                 </div>
               </div>  
@@ -160,7 +180,7 @@ class Buy extends Component {
               <div className="row">
                 <div className="form-group col-md-6">
                   <label>{this.context.t('creditCardNumber')} <span>*</span></label>
-                  <input type="text" className="form-control" value={this.state.model.creditCard.number} onChange={event => this.handleChangeState('model.creditCard.number', event.target.value)} />
+                  <Numeric data={{ amount: this.state.model.creditCard.number, display: 'input', format: '#### #### #### ####' }} className="form-control" onChange={value => this.handleChangeState('model.creditCard.number', value)} />
                   <p className="text-danger">{this.state.errors.model.creditCard.number}</p>
                 </div>
                 <div className="form-group col-md-6">
@@ -170,14 +190,36 @@ class Buy extends Component {
                 </div>
                 <div className="form-group col-md-6">
                   <label>{this.context.t('expirationDate')} <span>*</span></label>
-                  <DatePicker data={this.state.model.creditCard.expiration} onChange={value => this.handleChangeState('model.creditCard.expiration', value)}  />
-                  <p className="text-danger">{this.state.errors.model.creditCard.expiration}</p>
+                  <div className="row">
+                    <div className="col-sm-6">
+                      <select className="form-control" value={this.state.model.creditCard.expiration.month} onChange={event => this.handleChangeState('model.creditCard.expiration.month', event.target.value)}>
+                        <option>{this.context.t('month')}</option>
+                        {
+                          range(1,13).map(item => 
+                            <option key={item} value={item}>{item}</option>
+                          )
+                        }
+                      </select>
+                      <p className="text-danger">{this.state.errors.model.creditCard.expiration.month}</p>
+                    </div>
+                    <div className="col-sm-6">
+                      <select className="form-control" value={this.state.model.creditCard.expiration.year} onChange={event => this.handleChangeState('model.creditCard.expiration.year', event.target.value)}>
+                        <option>{this.context.t('year')}</option>
+                        {
+                          range(currentYear,currentYear+11).map(item => 
+                            <option key={item} value={item}>{item}</option>
+                          )
+                        }
+                      </select>
+                      <p className="text-danger">{this.state.errors.model.creditCard.expiration.year}</p>
+                    </div>
+                  </div>                  
                 </div>
                 <div className="form-group col-md-6">
                   <label>{this.context.t('securityCode')} <span>*</span></label>
                   <div className="row">
                     <div className="col-sm-7">
-                      <input type="text" className="form-control" value={this.state.model.creditCard.securityCode} onChange={event => this.handleChangeState('model.creditCard.securityCode', event.target.value)} />
+                      <Numeric data={{ amount: this.state.model.creditCard.securityCode, display: 'input', format: '###' }} className="form-control" onChange={value => this.handleChangeState('model.creditCard.securityCode', value)} />
                     </div>
                     <div className="col-sm-5">
                       <div className="vcenter">
@@ -192,11 +234,11 @@ class Buy extends Component {
           </div>
           <div className="form-group text-right">
             <label className="checkbox-inline text-left">
-              <input type="checkbox" /> <span dangerouslySetInnerHTML={{__html: this.context.t('acceptTerms', { url: "/terms" }) }} />
+              <input type="checkbox" defaultChecked={this.state.acceptTerms} onClick={e => this.handleChangeState('acceptTerms', !this.state.acceptTerms)} /> <span dangerouslySetInnerHTML={{__html: this.context.t('acceptTerms', { url: "/terms" }) }} />
             </label>
             <div dangerouslySetInnerHTML={{__html: this.context.t('subscriptionWarnings') }} />
-            <h3 className="d-inline paddingRight">
-              <span className="label label-default"><Numeric data={{ amount: planValue, display: 'text', decimalScale: 2, from: config.appPreferences.currency, to: planCurrency, prefix: '$', currencyConversion: appIntl.currencyConversion, suffix: ` ${config.appPreferences.currency.toUpperCase()}` }} /></span>
+            <h3 className={classnames({"d-inline paddingRight": true, 'hide': isLoading})}>
+              <span className="label label-default"><Numeric data={{ amount: planPrice.value, display: 'text', decimalScale: 2, from: config.appPreferences.currency, to: planPrice.currency, prefix: '$', currencyConversion: appIntl.currencyConversion, suffix: ` ${config.appPreferences.currency.toUpperCase()}`, thousandSeparator: ',' }} /></span>
             </h3> 
             <OverlayTrigger placement="top" overlay={tooltipPayment}>
               <button type="submit" className="btn btn-success btn-lg d-inline">
@@ -210,7 +252,7 @@ class Buy extends Component {
   }
 }
 
-Buy.contextTypes = {
+BuySubscription.contextTypes = {
   t: PropTypes.func.isRequired
 }
 
@@ -222,4 +264,4 @@ function mapStateToProps(state, props) {
   }
 }
 
-export default connect(mapStateToProps)(Buy)
+export default connect(mapStateToProps)(BuySubscription)

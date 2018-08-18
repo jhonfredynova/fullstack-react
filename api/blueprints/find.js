@@ -54,18 +54,13 @@ module.exports = function findRecords (req, res) {
     /*****************************************************
     // START PATCH
     ******************************************************/
-    Model.find(_.pick(queryOptions.criteria, ['where'])).meta(queryOptions.meta)
-    .exec(function found(err, matchingTotalRecords) {
+    Model.count(_.pick(queryOptions.criteria, ['where'])).meta(queryOptions.meta)
+    .exec(function found(err, totalRecords) {
       if(err){
         sails.log.verbose('In `populate` blueprint action: an error ocurred consulting the total of records.')
         return res.notFound()
       }
-      if(!_.get(queryOptions.criteria, 'where.id')){
-        res.set('Access-Control-Expose-Headers', 'Content-Records')
-        res.set('Content-Records', matchingTotalRecords.length)
-      }else{
-        matchingRecords = _.first(matchingRecords)
-      }
+      matchingRecords = requestService.applyPagination(res, queryOptions.criteria, matchingRecords, totalRecords)
       let afterFindCallback = sails.models[Model.tableName].afterFind || ((values, next) => next())
       afterFindCallback(matchingRecords, function(values){
         return res.ok(matchingRecords)

@@ -33,12 +33,6 @@ export default function reducer(
         config: handleResponseAction(ACTION.TEMP, state.config, action.payload) 
       }
 
-    case APP.GET_PREFERENCE:
-      return { 
-        ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
-      }
-
     case APP.SET_MESSAGE:
       return { 
         ...state, 
@@ -46,7 +40,10 @@ export default function reducer(
       }
         
     case APP.SET_PREFERENCE:
-      return state
+      return { 
+        ...state, 
+        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+      }
 
     case APP.DELETE_MESSAGE:
       return { 

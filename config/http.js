@@ -32,7 +32,6 @@ module.exports.http = {
     order: [
       'forceDomain',
       'forceIntl',
-      'forceLanguage',
       'cookieParser',
       'session',
       'bodyParser',
@@ -61,16 +60,12 @@ module.exports.http = {
 
     forceIntl: async (req, res, next) => {
       const { app } = sails.config
+      app.appPreferences.currency = _.get(req.headers, 'accept-currency', 'usd')
+      app.appPreferences.language = _.get(req.headers, 'accept-language', 'en')      
       app.appDisabled = JSON.parse(process.env.LOCAL_APP_DISABLED)
-      app.appIntl = await intlService.getIntl(req.query)
+      app.appIntl = await intlService.getIntl()
       next()
     },
-
-    forceLanguage: async (req, res, next) => {
-      let language = req.headers['accept-language']
-      if(language) sails.config.i18n.defaultLocale = language
-      next()
-    },    
 
     // bodyParser: (function _configureBodyParser(){
     //   var skipper = require('skipper');

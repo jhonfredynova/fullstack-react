@@ -23,7 +23,7 @@ module.exports = {
   beforeCreate: async (values, next) => {
     try{
       let errors = []
-      let data = await sails.models.locale.findOne({ where: { id: { '!=': values.id }, name: values.name } })
+      let data = await sails.models.locale.findOne({ id: { '!=': values.id }, name: values.name })
       if(data){
         errors.push(intlService.i18n('localeNameAlreadyExist'))
       }

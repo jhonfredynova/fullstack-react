@@ -39,6 +39,19 @@ class Price extends Component {
     const { appPreferences } = config
     const plans = this.state.plans.map(item => {
       item.mostPopular = item.id===config.plans.standard
+      if(item.paymentType==='subscription'){
+        item.buyText = this.context.t('buy')
+        item.buyUrl = `/buy/subscription/${Object.toUrl(item.name)}`
+        item.price = item.subscriptionInfo.price
+      }else if(item.paymentType==='transaction'){
+        item.buyText = this.context.t('buy')
+        item.buyUrl = `/buy/transaction/${Object.toUrl(item.name)}`
+        item.price = item.transactionValue
+      }else{
+        item.buyText = this.context.t('try')
+        item.buyUrl = '/register'
+        item.price = {}
+      }
       return item
     })
     return (

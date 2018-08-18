@@ -15,8 +15,8 @@ class Header extends Component {
   async handleChangeCurrency(currency) {
     try{
       this.context.store.dispatch(showLoading())
-      await this.context.store.dispatch(getConfig({ baseCurrency: currency }))
       await this.context.store.dispatch(setPreference({ [PREFERENCE.CURRENCY]: currency }))
+      await this.context.store.dispatch(getConfig())
       this.context.store.dispatch(hideLoading())
     }catch(e){
       this.context.store.dispatch(setMessage({ type: 'error', message: e.message }))

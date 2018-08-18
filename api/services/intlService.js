@@ -12,12 +12,14 @@ const CACHE = {
 module.exports = {
 
   i18n: (locale, args) => {
-    locale = sails.__({ phrase: locale, locale: sails.config.i18n.defaultLocale }, args)
+    const { appPreferences } = sails.config.app
+    locale = sails.__({ phrase: locale, locale: appPreferences.language }, args)
     return he.decode(locale)
   },
   
-  getIntl: async (args) => {
+  getIntl: async () => {
     try{
+      const { appPreferences } = sails.config.app
       let intl = sails.config.app.appIntl
       //INTL
       let responseIntl = cacheService.get(CACHE.INTL)
@@ -36,7 +38,7 @@ module.exports = {
             })
           })
         })
-        responseIntl.callingCodes = _.sortBy(_.uniq(responseIntl.callingCodes, 'value'), 'id')
+        responseIntl.callingCodes = _.sortBy(responseIntl.callingCodes, 'id')
         //CURRENCIES
         _.forEach(sourceIntl, item => {
           _.forEach(_.filter(item.currencies, item => (item.code && item.code!=='(none)')), currency => {
@@ -77,10 +79,10 @@ module.exports = {
       }
       intl.locales = responseLocales
       //RATES
-      let baseCurrency = args.baseCurrency ? args.baseCurrency.toUpperCase() : args.baseCurrency
+      let baseCurrency = appPreferences.currency.toUpperCase()
       let responseRates = cacheService.get(CACHE.RATES) 
-      if(!responseRates || (baseCurrency && responseRates[baseCurrency]!==1)){
-        responseRates = await axios.get(`${process.env.RATE_API_URL}?access_key=${process.env.RATE_API_KEY}&base=${baseCurrency || 'USD'}`)
+      if(!responseRates || responseRates[baseCurrency]!==1){
+        responseRates = await axios.get(`${process.env.RATE_API_URL}?access_key=${process.env.RATE_API_KEY}&base=${baseCurrency}`)
         responseRates = responseRates.data.rates
         cacheService.set(CACHE.RATES, responseRates, 1500)      
       }

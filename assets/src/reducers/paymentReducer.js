@@ -3,6 +3,7 @@ import { ACTION, handleResponseAction } from 'components/helper'
 
 export default function reducer(
   state={
+    billing: { records: [], recordsTotal: 0 },
     temp: null
   }, 
   action={}) 
@@ -15,7 +16,8 @@ export default function reducer(
     case PAYMENT.GET_BILLING:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        billing: handleResponseAction(ACTION.GET, state.billing, action.payload.find || state.billing),
+        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload.findOne)
       }
 
     case PAYMENT.GET_SUBSCRIPTION:

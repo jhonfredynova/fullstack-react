@@ -32,7 +32,7 @@ module.exports = {
   beforeCreate: async function (values, next) {
     try{
       let errors = []
-      let data = await PlanFeature.findOne({ where: { id: { '!=': values.id }, plan: values.plan, feature: values.feature } })
+      let data = await PlanFeature.findOne({ id: { '!=': values.id }, plan: values.plan, feature: values.feature })
       if(data){
         errors.push(intlService.i18n('planFeatureAlreadyExist'))
       }

@@ -11,12 +11,13 @@ class Numeric extends Component {
       decimalScale: defaultTo(this.props.data.decimalScale, 0),
       decimalSeparator: defaultTo(this.props.data.decimalSeparator, '.'),
       display: defaultTo(this.props.data.display, 'input'),
+      format: defaultTo(this.props.data.format, null),
       from: defaultTo(this.props.data.from, null),
       placeholder: defaultTo(this.props.data.placeholder, ''),
       prefix: defaultTo(this.props.data.prefix, ''),
       currencyConversion: defaultTo(this.props.data.currencyConversion, []),
       suffix: defaultTo(this.props.data.suffix, ''),
-      thousandSeparator: defaultTo(this.props.data.thousandSeparator, ','),
+      thousandSeparator: defaultTo(this.props.data.thousandSeparator, ''),
       to: defaultTo(this.props.data.to, null)
     }
   }
@@ -32,12 +33,12 @@ class Numeric extends Component {
 
   render() {
     let amount = this.state.amount
-    if(!Object.isEmpty(this.state.currencyConversion)){
+    if(!Object.isEmpty(this.state.currencyConversion) && this.state.to){
       amount = this.state.amount/this.state.currencyConversion[this.state.to.toUpperCase()]
       amount = isNaN(amount) ? this.state.amount : amount
     }
     return (
-      <NumberFormat className={this.props.className} decimalScale={this.state.decimalScale} placeholder={this.state.placeholder} allowEmptyFormatting={false} value={amount} displayType={this.state.display} prefix={this.state.prefix} suffix={this.state.suffix} thousandSeparator={this.state.thousandSeparator} decimalSeparator={this.state.decimalSeparator} onValueChange={value => this.handleChangeState('amount', (isNaN(value.floatValue) ? '' : value.floatValue))} />
+      <NumberFormat className={this.props.className} decimalScale={this.state.decimalScale} format={this.state.format} placeholder={this.state.placeholder} allowEmptyFormatting={false} value={amount} displayType={this.state.display} prefix={this.state.prefix} suffix={this.state.suffix} thousandSeparator={this.state.thousandSeparator} decimalSeparator={this.state.decimalSeparator} onValueChange={value => this.handleChangeState('amount', (isNaN(value.floatValue) ? '' : value.floatValue))} />
     )
   }
 }

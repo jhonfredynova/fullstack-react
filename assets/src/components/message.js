@@ -24,8 +24,9 @@ class Message extends React.Component {
 
   render() {
     const messages = this.state.messages
+    const { isLoading } = this.props.data
     return (
-      <div id="message" className={classnames({'hide': messages.length===0})}>
+      <div id="message" className={classnames({'hide': (isLoading || messages.length===0)})}>
         {
           messages.map(item =>
             <div key={item.id} className={classnames({ 'alert': true, 'alert-success': item.type==='success', 'alert-danger': item.type==='error', 'alert-warning': item.type==='warning' })}>

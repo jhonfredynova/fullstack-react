@@ -1,4 +1,20 @@
-/*structure*/
+/* tags */
+#main table tbody td .btn{
+  margin-left: 4px;
+}
+#main img{
+  font-size: 0px;
+}
+/* structure */
+#main .d-inline{
+  display: inline;
+}
+#main .noPaddingLeft{
+  padding-left: 0px;
+}
+#main .noPaddingRight{
+  padding-right: 0px;
+}
 #main .overlay{
   background: white;
   cursor: not-allowed;
@@ -8,14 +24,17 @@
   width: 100%;
   z-index: 999;
 }
-#main table tbody td .btn{
-  margin-left: 4px;
+#main .paddingLeft{
+  padding-left: 5px
 }
-#main img{
-  font-size: 0px;
+#main .paddingRight{
+  padding-right: 5px
 }
-#main .d-inline{
-  display: inline!important;
+#main .form-group.col-md-6:nth-child(2n+1){
+  clear: left
+}
+#main .form-group p{
+  margin-bottom: 0px;
 }
 #main .vcenter{
   align-items: center;
@@ -28,18 +47,6 @@
   margin:0; 
   padding:0; 
   height:20px; 
-}
-#main .noPaddingLeft{
-  padding-left: 0px;
-}
-#main .noPaddingRight{
-  padding-right: 0px;
-}
-#main .paddingLeft{
-  padding-left: 5px
-}
-#main .paddingRight{
-  padding-right: 5px
 }
 /* buttons */
 #main .btn{
@@ -64,7 +71,7 @@
 }
 /*react-select*/
 #main .Select .Select-menu-outer {
-  z-index: 999 !important;
+  z-index: 999!important;
 }
 #main .Select img{
   width: 18px;

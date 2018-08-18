@@ -28,7 +28,7 @@ module.exports = {
   beforeCreate: async (values, next) => {
     try{
       let errors = []
-      let data = await sails.models.rol.findOne({ where: { id: { '!=': values.id }, name: values.name } })
+      let data = await sails.models.rol.findOne({ id: { '!=': values.id }, name: values.name })
       if(data){
         errors.push(intlService.i18n('rolNameAlreadyExist'))
       }

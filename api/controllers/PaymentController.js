@@ -13,14 +13,14 @@ module.exports = {
       users = users.toObject()
       for (let user of users)
       {
-        if (user.clientCode) {
+        if(user.clientCode) {
           let infoPayu = await paymentService.executeApiPayu('GET', `/customers/${user.clientCode}`)
           user.planDetails.customerPayu = infoPayu
         }
         // next billing
         let currentBilling = null
         let nextBilling = null
-        if (user.clientCode) {
+        if(user.clientCode) {
           let customerPayu = user.planDetails.customerPayu
           let subscriptionId = customerPayu.subscriptions ? customerPayu.subscriptions[0].id : null
           let recurringBills = []
@@ -32,7 +32,7 @@ module.exports = {
           let nextBilling = _.sortByOrder(recurringBills, ['dateCharge'], ['desc'])[0]
         }
         // cancel subscription
-        if (user.planDetails.plan!==sails.config.app.plans.free && (!currentBilling || (currentBilling && currentBilling.state==='NOT_PAID' || currentBilling.state==='CANCELLED'))) {
+        if(user.planDetails.plan!==sails.config.app.plans.free && (!currentBilling || (currentBilling && currentBilling.state==='NOT_PAID' || currentBilling.state==='CANCELLED'))) {
           user.process = 'CANCEL_SUBSCRIPTION'
           user.planDetails.subscriptionId = currentBilling.subscriptionId
           user.planDetails.plan = sails.config.app.plans.free
@@ -40,7 +40,7 @@ module.exports = {
         }
         // change subscription
         let isLastDayPlan = nextBilling ? (nextBilling.dateCharge-Date.now())/36e5 <= 4 : true //remain4hours
-        if ((user.changePlan && user.changePlan.plan) && isLastDayPlan){
+        if((user.changePlan && user.changePlan.plan) && isLastDayPlan){
           user.process = 'CHANGE_SUBSCRIPTION'
           user.planDetails.subscriptionId = nextBilling.subscriptionId
           user.planDetails.plan = user.changePlan.plan
@@ -49,7 +49,7 @@ module.exports = {
           user.changePlan = {}
         }
         // update user
-        if (user.planDetails.plan===sails.config.app.plans.free) {
+        if(user.planDetails.plan===sails.config.app.plans.free) {
           user.planDetails.payuPlanCode = '';
           continue
         }
@@ -69,29 +69,13 @@ module.exports = {
 
   getBilling: async (req, res) => {
     try{
-      let dataQueryPayu = null
-      let planCode = null
-      let transactionDetail = null
-      let recurringBills = await paymentService.executeApiPayu('GET', `/recurringBill?customerId=${req.param('clientCode')}`, null)
+      let criteria = requestService.parseCriteria(req)
+      let recurringBills = await paymentService.executeApiPayu('GET', `/recurringBill?customerId=${criteria.where.clientCode}`, null)
       recurringBills = _.filter(recurringBills.recurringBillList, item => { return item.state==='PAID' })
-      for (let item of recurringBills){
-        dataQueryPayu = {
-          test: false,
-          language: req.getLocale(),
-          command: "ORDER_DETAIL",
-          details: { orderId: item.orderId }
-        }
-        transactionDetail = await paymentService.executeApiPayuQuery('POST', dataQueryPayu)
-        planCode = transactionDetail.result.payload.description.split(' - ')[0]
-        item.amount = transactionDetail.result.payload.additionalValues.TX_VALUE.value
-        item.plan = planCode.replace(new RegExp('-', 'g'),' ').toUpperCase()
-        item.creditCard = {
-          brand: transactionDetail.result.payload.transactions[0].paymentMethod,
-          number: transactionDetail.result.payload.transactions[0].creditCard.maskedNumber
-        }
-      }
-      recurringBills = _.sortBy(recurringBills, 'dateCharge').reverse()
-      res.json(recurringBills)
+      // pagination
+      let records = requestService.applyFilter(criteria, recurringBills)
+      let recordsTotal = requestService.applyFilter(_.pick(criteria, ['where']), recurringBills)
+      res.ok(requestService.applyPagination(res, criteria, records, recordsTotal.length))
     }catch(e){
       res.badRequest(e)
     } 
@@ -119,115 +103,80 @@ module.exports = {
     }
   },
 
-	createSubscription: async (req, res) => {
-    try{
-      // init data
+  createSubscription: async (req, res) => {
+    try{ 
+      // initializing
       let data = req.body
       let client = null
-      let clientPayu = null
-      let creditCard = null
-      let subscription = null
-      // validate data
-      if (!data.plan.planCode){
-        throw intlService.i18n('subscriptionCreatedErrorPlan')
-      }
-      if (!data.creditCard.token) {
-        creditCard = await paymentService.checkCreditCard(data.creditCard)
-        data.creditCard.type = creditCard.card.brand.toUpperCase()
-      }
-      // create user
-      let clientListPayu = await paymentService.executeApiPayu('GET', `/customers`)
-      clientListPayu = clientListPayu ? clientListPayu.customerList : []
-      clientPayu = _.find(clientListPayu, item => { 
-        return item.email===data.client.email || item.id===data.client.clientCode
-      })
-      if (!clientPayu) {
+      if(!data.plan.planCode) throw intlService.i18n('subscriptionCreatedErrorPlan')
+      // create client
+      let clientList = await paymentService.executeApiPayu('GET', `/customers`)
+      client = _.get(clientList, 'customerList', []).find(item => item.email.toLowerCase()===data.client.email.toLowerCase() || item.id===data.client.clientCode)
+      data.client.clientCode = _.get(client, 'id')
+      if(!data.client.clientCode) {
         let dataClient = {
-          fullName: data.client.fullName,
+          fullName: data.client.fullname,
           email: data.client.email
         }
-        client = await paymentService.executeApiPayu('POST', `/customers`, dataClient)
-        clientPayu = client
-        data.client.clientCode = client.id
+        data.client.clientCode = (await paymentService.executeApiPayu('POST', `/customers`, dataClient)).id
       }
+      client = await paymentService.executeApiPayu('GET', `/customers/${data.client.clientCode}`)
       // create creditcard
-      if (!data.creditCard.token) {
-        if (data.client.clientCode) {
-          if (clientPayu.creditCards) {
-            await paymentService.executeApiPayu('DELETE', `/customers/${data.client.clientCode}/creditCards/${clientPayu.creditCards[0].token}`, null)
+      client.creditCards = _.get(client, 'creditCards', [])
+      if(!data.creditCard.token){
+        if(client.creditCards.length>0){
+          for(let creditCard of client.creditCards){
+            await paymentService.executeApiPayu('DELETE', `/customers/${data.client.clientCode}/creditCards/${creditCard.token}`)
           }
         }
         let dataCreditCard = {
-          name: data.client.fullName,
+          name: data.creditCard.holder,
           number: data.creditCard.number,
-          expMonth: data.creditCard.expMonth,
-          expYear: data.creditCard.expYear,
-          type: data.creditCard.type
+          expMonth: data.creditCard.expiration.month,
+          expYear: data.creditCard.expiration.year,
+          type: (await paymentService.getCreditCardBrand(data.creditCard)).card.brand.toUpperCase()
         }
-        creditCard = await paymentService.executeApiPayu('POST', `/customers/${data.client.clientCode}/creditCards`, dataCreditCard)
-        data.creditCard.token = creditCard.token
+        data.creditCard.token = (await paymentService.executeApiPayu('POST', `/customers/${data.client.clientCode}/creditCards`, dataCreditCard)).token
       }
       // create subscription
-      let planListPayu = await paymentService.executeApiPayu('GET', `/plans`)
-      planListPayu = planListPayu ? planListPayu.subscriptionPlanList : []
-      subscription = _.find(clientPayu.subscriptions, item => {
-        return _.find(planListPayu, { planCode: item.plan.planCode })
-      })
-      if (!subscription) {
-        let dataSubscription = {
-          quantity: 1,
-          installments: 1,
-          trialDays: data.plan.trialDays,
-          immediatePayment: true,
-          customer: {
-            id: data.client.clientCode,
-            creditCards: [{
-              token: data.creditCard.token
-            }]
-          },
-          plan: {
-            planCode: data.plan.planCode
-          }
-        }
-        subscription = await paymentService.executeApiPayu('POST', `/subscriptions`, dataSbuscription)
-      }
-      // check transaction (it will wait until 2 minutes)
-      let timeoutTransaction = 0
-      let recurringBills = null
-      let nextBilling = {}
-      while (!nextBilling.orderId){
-        try{
-          recurringBills = await paymentService.executeApiPayu('GET', `/recurringBill?subscriptionId=${subscription.id}`)
-          nextBilling = _.sortByOrder(recurringBills.recurringBillList, ['dateCharge'], ['asc'])[0]
-        }catch(e){
-          console.error('Payu transaction is not executed yet...')
-          nextBilling = {}
-        }
-        await new Promise(resolve => setTimeout(resolve, 5000))
-        timeoutTransaction += 5
-        if (timeoutTransaction>=120) {
-          await paymentService.executeApiPayu('DELETE', `/subscriptions/${subscription.id}`)
-          throw intlService.i18n('subscriptionCreatedError')
-          break
+      client.subscriptions = _.get(client, 'subscriptions', [])
+      if(client.subscriptions.length>0) throw intlService.i18n('subscriptionAlreadyExist')
+      let dataSubscription = {
+        quantity: 1,
+        installments: 1,
+        trialDays: data.plan.trialDays,
+        immediatePayment: true,
+        customer: {
+          id: data.client.clientCode,
+          creditCards: [{
+            token: data.creditCard.token
+          }]
+        },
+        plan: {
+          planCode: data.plan.planCode
         }
       }
-      if (nextBilling.state==='NOT_PAID' || nextBilling.state==='CANCELLED') {
-        throw intlService.i18n('subscriptionCreatedErrorCard')
+      data.subscription = await paymentService.executeApiPayu('POST', `/subscriptions`, dataSubscription)
+      // create user
+      let user = await sails.models.user.findOne({ email: data.client.email })
+      if(!user){
+        await sails.models.user.create(data.client)
       }
       // send notification
-      let responseEmail = await mailService.sendEmail({
-        fromName: sails.config.app.appName,
-        fromEmail: sails.config.app.emails.noreply,
-        toEmail: data.client.email,
-        subject: intlService.i18n('mailSubscriptionCreatedSubject', { appName: sails.config.appName }),
-        message: intlService.i18n('mailSubscriptionCreatedMessage', { appName: sails.config.appName, startDate: subscription.currentPeriodStart })
-      })
-      if (!responseEmail){
-        console.error(intlService.i18n('emailError'))
+      try{
+        await mailService.sendEmail({
+          fromName: sails.config.app.appName,
+          fromEmail: sails.config.app.emails.noreply,
+          toEmail: data.client.email,
+          subject: intlService.i18n('mailSubscriptionCreatedSubject', { appName: sails.config.app.appName }),
+          message: intlService.i18n('mailSubscriptionCreatedMessage', { appName: sails.config.app.appName, startDate: new Date(data.subscription.currentPeriodStart).toLocaleDateString() })
+        })
+      }catch(e){
+        console.warn(ntlService.i18n('emailError'))
       }
       res.json({ message: intlService.i18n('subscriptionCreatedSuccess') })
     }catch(e){
-      res.badRequest(e)
+      res.badRequest(intlService.i18n('subscriptionCreatedErrorCard'))
     }
   },
 
@@ -237,7 +186,7 @@ module.exports = {
         throw 'Subscription id not valid'
       }
       let creditCard = req.body
-      let data = await paymentService.checkCreditCard(creditCard.number, creditCard.expMonth, creditCard.expYear, creditCard.cvc)
+      let data = await paymentService.checkCreditCard(creditCard.number, creditCard.expiration.month, creditCard.expiration.year, creditCard.cvc)
       creditCard.type = data.card.brand.toUpperCase()
       await paymentService.executeApiPayu('DELETE', `/customers/${req.param('clientCode')}/creditCards/${req.param('creditCardId')}`, null)
       creditCard.cvc = null

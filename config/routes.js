@@ -55,10 +55,10 @@ module.exports.routes = {
   'get    /api/auth/:provider/callback': 'AuthController.providerCallback',
   //PAYMENT
   'get    /api/payment/subscription/control': 'PaymentController.controlSubscriptions',
-  'get    /api/payment/subscription/billing/:clientCode': 'PaymentController.getBilling',
+  'get    /api/payment/subscription/billing': 'PaymentController.getBilling',
   'get    /api/payment/subscription/plan': 'PaymentController.getSubscriptionPlan',
-  'get    /api/payment/subscription/:subscriptionId': 'PaymentController.getSubscription',
   'post   /api/payment/subscription': 'PaymentController.createSubscription',
+  'get    /api/payment/subscription/:subscriptionId': 'PaymentController.getSubscription',
   'put    /api/payment/subscription/:subscriptionId/:clientCode/:creditCardId': 'PaymentController.updateCreditCard',
   'put    /api/payment/subscription/:subscriptionId': 'PaymentController.updateSubscription',
   'delete /api/payment/subscription/:subscriptionId': 'PaymentController.deleteSubscription',

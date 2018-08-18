@@ -137,7 +137,7 @@
   "subscriptionDeletedSuccess": "Se eliminó la suscripción correctamente",
   "mailSubscriptionCreatedSubject": "Tu suscripción a {{appName}} ha iniciado",
   "mailSubscriptionCreatedMessage": "<p>Tu pago de suscripción mensual ha sido exitoso y estará activo desde el día {{startDate}}.</p><p>Gracias por ser parte de {{appName}}, Recuerda que esta suscripción hace cobros automáticos a tu tarjeta. Podrás suspender la suscripción y ver el historial de tus pagos en cualquier momento desde nuestra aplicación web.</p>",
-  "subscriptionCreatedSuccess": "Se realizó la compra correctamente",
+  "subscriptionCreatedSuccess": "Se realizó la compra correctamente, ahora puedes ingresar con tus credenciales y disfrutar de tus servicios.",
   "subscriptionCreatedErrorPlan": "No se encontró plan asociado a la suscripción",
   "subscriptionCreatedError": "Lo sentimos, no se pudo ejecutar la transacción en este momento, por favor intente más tarde",
   "subscriptionCreatedErrorCard": "Tu tarjeta ha sido rechazada, comunícate con tu banco para obtener más información.",
@@ -160,5 +160,17 @@
   "authStrategyNotAvailable": "La estrategia de autenticación no esta disponible.",
   "authStrategyNotProvided": "No se especificó strategia de autenticación.",
   "authStrategyFailed": "Lo sentimos, no se econtrarón usuarios con esa estrategia de authenticación.",
-  "mail": "<h1><img src=\"{{appLogo}}\" width=\"35\" style=\"vertical-align:middle;\"> {{appName}}</h1><hr><h1>{{title}}</h1><p>{{message}}</p><p><br></p><p><br></p><hr><p>Cordialmente,</p><p><a href=\"{{appUrl}}\" target=\"_blank\">{{appUrl}}</a></p>"
+  "mail": "<h1><img src=\"{{appLogo}}\" width=\"35\" style=\"vertical-align:middle;\"> {{appName}}</h1><hr><h1>{{title}}</h1><p>{{message}}</p><p><br></p><p><br></p><hr><p>Cordialmente,</p><p><a href=\"{{appUrl}}\" target=\"_blank\">{{appUrl}}</a></p>",
+  "planNotFound": "Lo sentimos el plan no fue encontrado o no esta disponible para comprar.",
+  "mustAcceptTerms": "Debes aceptar los términos y condiciones",
+  "subscriptionAlreadyExist": "Lo sentimos, ya tienes una suscripción activa.",
+  "enterExpirationMonth": "Selecciones mes de expiración",
+  "enterExpirationYear": "Seleccione año de expiración",
+  "date": "Fecha",
+  "plan": "Plan",
+  "paymentMethod": "Metodo de pago",
+  "status": "Estado",
+  "options": "Opciones",
+  "referenceId": "Número de referencia",
+  "amount": "Importe"
 }

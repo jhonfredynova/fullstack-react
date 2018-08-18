@@ -1,5 +1,6 @@
 let fs = require('fs'),
 axios = require('axios'),
+stripe = require('stripe')('sk_test_il3JEQDOub8nhujeD25BiGfB'),
 headersApiPayu = {
   url: process.env.PAYU_API_URL,
   headers: {
@@ -10,18 +11,19 @@ headersApiPayu = {
 
 module.exports = {
 
-  checkCreditCard: async (data) => {
+  getCreditCardBrand: async (data) => {
     try{
-      return await stripe.tokens.create({
+      let response = await stripe.tokens.create({
         card: {
           "number": data.number,
-          "exp_month": data.expMonth,
-          "exp_year": data.expYear,
-          "cvc": data.cvc
+          "exp_month": data.expiration.month,
+          "exp_year": data.expiration.year,
+          "cvc": data.securityCode
         }
       })
+      return response
     }catch(e){
-      return new Error(errorMessagesStripe[e.code])
+      throw e
     }
   },
 

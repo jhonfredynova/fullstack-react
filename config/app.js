@@ -16,7 +16,7 @@ module.exports.app = {
     currency: 'usd',
     language: 'en'
   },
-  appUrl: 'https://tucode.herokuapp.com',
+  appUrl: process.env.LOCAL_APP_URL,
   //CATALOGS
   catalogs: {
     planFeatures: '5b4ccb5e0af99032b213489b',

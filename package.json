@@ -34,7 +34,8 @@
     "sails-hook-orm": "^2.0.0-16",
     "sails-hook-sockets": "^1.4.0",
     "sails-mongo": "^1.0.1",
-    "sendgrid": "^5.2.3"
+    "sendgrid": "^5.2.3",
+    "stripe": "^6.7.0"
   },
   "devDependencies": {
     "@sailshq/eslint": "^4.19.3",

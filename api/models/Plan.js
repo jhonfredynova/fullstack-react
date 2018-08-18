@@ -45,9 +45,9 @@ module.exports = {
       let planFeatures = await sails.models.planfeature.find().populateAll()
       for(let plan of values){
         plan.features = _.filter(planFeatures, item => item.plan.id===plan.id)
-        plan.planInfo = _.find(subscriptionPlans.subscriptionPlanList, { planCode: plan.planCode })
-        if (plan.planInfo) {
-          plan.planInfo.price = _.find(plan.planInfo.additionalValues, { name:'PLAN_VALUE' })
+        plan.subscriptionInfo = _.find(subscriptionPlans.subscriptionPlanList, { planCode: plan.planCode })
+        if (plan.subscriptionInfo) {
+          plan.subscriptionInfo.price = _.find(plan.subscriptionInfo.additionalValues, { name:'PLAN_VALUE' })
         }
       } 
       next()
@@ -59,7 +59,7 @@ module.exports = {
     try{
       //validations
       let errors = []
-      let data = await Plan.findOne({ where: { id: { '!=': values.id }, name: values.name } })
+      let data = await Plan.findOne({ id: { '!=': values.id }, name: values.name })
       if(data){
         errors.push(intlService.i18n('planNameAlreadyExist'))
       }

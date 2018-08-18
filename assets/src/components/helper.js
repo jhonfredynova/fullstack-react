@@ -15,6 +15,7 @@ export function handleError(e){
   let message = null
   let messageDetail = get(e,'response.data', null) 
   if(isString(messageDetail) && !message) message = messageDetail
+  if(isObject(messageDetail) && !message) message = get(messageDetail, 'message', null)
   if(isObject(messageDetail) && !message) message = get(messageDetail, 'raw', null)
   if(isObject(messageDetail) && !message) message = get(messageDetail, 'details', null)  
   if(!message) message = e.message

@@ -22,30 +22,23 @@ class PlanBox extends Component {
   }
 
   render() {
-    const plan = this.state.info
-    const { isLoading} = this.props.data
-    let planPrice = { currency: this.state.currentCurrency, value: 0 }
-    if(plan.paymentType==='subscription') planPrice = plan.planInfo.price
-    if(plan.paymentType==='transaction') planPrice = plan.transactionValue
+    const { isLoading } = this.props.data
+    const { info: planInfo } = this.state
     return (
-      <div id="planBox" className={classnames({'mostPopular': plan.mostPopular, 'hide': isLoading})}>
+      <div id="planBox" className={classnames({'mostPopular': planInfo.mostPopular, 'hide': isLoading})}>
         <div className="panel panel-default">
           <div className="panel-heading text-center">
-            <div id="tag" className={classnames({'hide': !plan.mostPopular})}>
+            <div id="tag" className={classnames({'hide': !planInfo.mostPopular})}>
               <i className="glyphicon glyphicon-star"></i> {this.context.t('mostPopular')}
             </div>
-            <h2>{plan.name}</h2>
-            <Numeric data={{ amount: planPrice.value, display: 'text', decimalScale: 2, from: this.state.currentCurrency, to: planPrice.currency, prefix: '$', currencyConversion: this.state.currencyConversion }} /> {this.state.currentCurrency.toUpperCase()} <small>{this.context.t('perMonth')}</small><br/>
-            {
-              planPrice.value>0
-              ? <Link className="btn btn-success" to={`/buy/${Object.toUrl(plan.name)}`}>{this.context.t('buy')}</Link> 
-              : <Link className="btn btn-success" to="/register">{this.context.t('try')}</Link>
-            }
+            <h2>{planInfo.name}</h2>
+            <Numeric data={{ amount: planInfo.price.value, display: 'text', decimalScale: 2, from: this.state.currentCurrency, to: planInfo.price.currency, prefix: '$', currencyConversion: this.state.currencyConversion, thousandSeparator: true }} /> {this.state.currentCurrency.toUpperCase()} <small>{this.context.t('perMonth')}</small><br/>
+            <Link className="btn btn-success" to={planInfo.buyUrl}>{planInfo.buyText}</Link> 
           </div>
           <div className="panel-body">
             <ul className="list-unstyled">
               {
-                sortBy(plan.features, ['order']).map(item => 
+                sortBy(planInfo.features, ['order']).map(item => 
                   <li key={item.id} className={classnames({'text-deleted text-danger': item.quantity===0})}>
                     <i className={item.feature.icon} /> {item.feature.name}
                   </li>

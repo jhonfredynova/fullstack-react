@@ -37,7 +37,8 @@ import Billing from 'containers/app/user/billing'
 //HOME-CONTAINERS
 import Main from 'containers/main'
 import Authorization from 'containers/authorization'
-import Buy from 'containers/buy'
+import BuySubscription from 'containers/buySubscription'
+import BuyTransaction from 'containers/buyTransaction'
 import Contact from 'containers/contact'
 import ComingSoon from 'containers/comingSoon'
 import Docs from 'containers/docs'
@@ -91,7 +92,8 @@ render((
             <Route path="/app/user/billing" component={Authorization(Billing, [1,2,3,4], false)}/>
             {/* HOME */}
             <Route path="/" exact component={Home}/>
-            <Route path="/buy/:idPlan" exact component={Buy}/>
+            <Route path="/buy/subscription/:idPlan" exact component={BuySubscription}/>
+            <Route path="/buy/transaction/:idPlan" exact component={BuyTransaction}/>
             <Route path="/contact" component={Contact}/>
             <Route path="/coming-soon" component={ComingSoon}/>
             <Route path="/docs" component={Docs}/>

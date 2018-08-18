@@ -76,11 +76,11 @@ module.exports = {
     try{      
       //validations
       let errors = []
-      let data = await sails.models.user.findOne({ where: { id: { '!=': values.id }, email: values.email } })
+      let data = await sails.models.user.findOne({ id: { '!=': values.id }, email: values.email })
       if(data){
         errors.push(intlService.i18n('userEmailAlreadyExist'))
       }
-      data = await sails.models.user.findOne({ where: { id: { '!=': values.id }, username: values.username } })
+      data = await sails.models.user.findOne({ id: { '!=': values.id }, username: values.username })
       if(data){
         errors.push(intlService.i18n('usernameAlreadyExist'))
       }

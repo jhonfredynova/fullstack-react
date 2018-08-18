@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { handleError, handleRequestQuery } from 'components/helper'
+import { handleError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
 export const PAYMENT = {
   GET_BILLING: 'GET_BILLING',
@@ -13,8 +13,8 @@ export const PAYMENT = {
 
 export function getBilling(parameters) {
   return dispatch => {
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/billing/${parameters.clientCode}`)
-    .then(response => dispatch({type: PAYMENT.GET_BILLING, payload: response.data}))
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/billing?${handleRequestQuery(parameters)}`)
+    .then(response => dispatch({type: PAYMENT.GET_BILLING, payload: handleResponseQuery(response)}))
     .catch(err => handleError(err) )
   }
 }

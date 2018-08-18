@@ -37,7 +37,7 @@ module.exports = {
   beforeCreate: async (values, next) => {
     try{
       let errors = []
-      let data = await sails.models.catalog.findOne({ where: { id: { '!=': values.id }, parent: values.parent, name: values.name } })
+      let data = await sails.models.catalog.findOne({ id: { '!=': values.id }, parent: values.parent, name: values.name })
       if(data){
         errors.push(intlService.i18n('catalogNameAlreadyExist'))
       }
