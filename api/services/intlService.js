@@ -49,7 +49,7 @@ module.exports = {
             })
           })
         })
-        responseIntl.currencies = _.sortBy(_.uniq(responseIntl.currencies, 'value'), 'value')
+        responseIntl.currencies = _.sortBy(_.uniqBy(responseIntl.currencies, 'value'), 'value')
         //LANGUAGES
         _.forEach(sourceIntl, item => {
           _.forEach(_.filter(item.languages, item => item.iso639_1), language => {
@@ -60,7 +60,7 @@ module.exports = {
             })
           })
         })
-        responseIntl.languages = _.sortBy(_.uniq(responseIntl.languages, 'value'), 'value')
+        responseIntl.languages = _.sortBy(_.uniqBy(responseIntl.languages, 'value'), 'value')
         cacheService.set(CACHE.INTL, responseIntl, 1500)
       }
       intl.callingCodes = responseIntl.callingCodes

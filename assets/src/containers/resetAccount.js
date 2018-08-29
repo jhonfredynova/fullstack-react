@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, flow, get, set } from 'lodash'
+import { cloneDeep, clean, compact, flow, isEmpty, isEmail, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { resetUser } from 'actions/userActions'
@@ -29,11 +29,11 @@ class ResetAccount extends Component {
   }
 
   async handleValidate(path){
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if(Object.isEmail(this.state.model.password) || Object.keys(this.state.model.password.trim()).length<6) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if(isEmail(this.state.model.password) || Object.keys(this.state.model.password.trim()).length<6) {
       errors.model.password = this.context.t('enterPasswordMin5Char')
     }
-    if (!Object.isEmail(this.state.model.password) && this.state.model.password!==this.state.model.passwordConfirmation) {
+    if (!isEmail(this.state.model.password) && this.state.model.password!==this.state.model.passwordConfirmation) {
       errors.model.passwordConfirmation = this.context.t('enterPasswordNotMatch')
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -45,7 +45,7 @@ class ResetAccount extends Component {
       e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -69,17 +69,17 @@ class ResetAccount extends Component {
         <NavigationBar data={{ title: <h1>{this.context.t('resetAccountTitle')}</h1>, subTitle: <h2>{this.context.t('resetAccountDescription')}</h2> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleForgot.bind(this)}>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-6 col-xs-12">
               <label>{this.context.t('password')} *</label>
               <input type="password" className="form-control" onChange={e => this.handleChangeState('model.password', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.password}</span>
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-6 col-xs-12">
               <label>{this.context.t('passwordConfirm')} *</label>
               <input type="password" className="form-control" onChange={e => this.handleChangeState('model.passwordConfirmation', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.passwordConfirmation}</span>
             </div>
-            <div className="form-group col-md-12 text-right">
+            <div className="form-group col-md-12 col-xs-12 text-right">
               <button type="submit" className="btn btn-success">
                 {this.context.t('savePassword')}
               </button>

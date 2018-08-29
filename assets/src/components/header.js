@@ -37,10 +37,10 @@ class Header extends Component {
   }
 
   render() {
-    const { appLoaded } = this.props.data
+    const { isLoading } = this.props.data
     const { config } = this.props.data.app
     const { isAuthenticated } = this.props.data.auth
-    const { appPreferences } = config
+    const { appDisabled, appPreferences } = config
     const currencies = get(config.appIntl, 'currencies', [])
     const languages = filter(get(config.appIntl, 'languages', []), item => config.appLanguages.indexOf(item.value)>-1)
     const popoverMessages = (
@@ -76,9 +76,9 @@ class Header extends Component {
               </Link>
             </Navbar.Brand> 
             {/* TOGGLE */}
-            <Navbar.Toggle className={classnames({'hide': (!appLoaded || config.appDisabled) })} />
+            <Navbar.Toggle className={classnames({'hide': (isLoading || appDisabled) })} />
             {/* OPTIONS */}
-            <ul className={classnames({'navbar-btn navbar-right navbar-options': true, 'hide': (!appLoaded || config.appDisabled) })}>
+            <ul className={classnames({'navbar-btn navbar-right navbar-options': true, 'hide': (isLoading || appDisabled) })}>
               <MenuItem>
                 <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={popoverNotifications}>
                   <Button className="btn btn-success btn-block"><i className="glyphicon glyphicon-bell"></i></Button>
@@ -98,7 +98,9 @@ class Header extends Component {
           </div>
           {/* MENU */}
           <Navbar.Collapse>
-            <Menu className={classnames({'hide': (!appLoaded || config.appDisabled) })} data={{ app: this.props.data.app, auth: this.props.data.auth }} />
+            {
+              appDisabled ? null : <Menu data={{ app: this.props.data.app, auth: this.props.data.auth }} />
+            }
           </Navbar.Collapse>
         </Navbar>
       </header>

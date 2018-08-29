@@ -70,7 +70,7 @@ module.exports = {
       if(criteria.where) data = data.filter(requestService.applyConstrains(criteria.where))
       if(criteria.select) data = _.map(data, item => _.pick(item, criteria.select))
       if(criteria.omit) data = _.map(data, item => _.omit(item, criteria.omit))
-      if(criteria.sort) data = _.sortByOrder(data, criteria.sort.map(item => Object.keys(item)[0]), criteria.sort.map(item => _.values(item)[0].toLowerCase()))
+      if(criteria.sort) data = _.orderBy(data, criteria.sort.map(item => Object.keys(item)[0]), criteria.sort.map(item => _.values(item)[0].toLowerCase()))
       if(criteria.limit) data = data.slice(criteria.skip, (criteria.skip+criteria.limit))
       return data
     }catch(e){
@@ -91,7 +91,7 @@ module.exports = {
 
   parseCriteria: (req) => {
     try{
-      return Object.compactDeep({
+      return _.compact({
         limit: actionUtil.parseLimit(req),
         skip: actionUtil.parseSkip(req),
         sort: actionUtil.parseSort(req),

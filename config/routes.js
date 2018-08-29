@@ -59,9 +59,11 @@ module.exports.routes = {
   'get    /api/payment/subscription/plan': 'PaymentController.getSubscriptionPlan',
   'post   /api/payment/subscription': 'PaymentController.createSubscription',
   'get    /api/payment/subscription/:subscriptionId': 'PaymentController.getSubscription',
-  'put    /api/payment/subscription/:subscriptionId/:clientCode/:creditCardId': 'PaymentController.updateCreditCard',
-  'put    /api/payment/subscription/:subscriptionId': 'PaymentController.updateSubscription',
+  'patch  /api/payment/subscription/creditCard/:clientCode': 'PaymentController.updateCreditCard',
+  'patch  /api/payment/subscription/:subscriptionId': 'PaymentController.updateSubscription',
   'delete /api/payment/subscription/:subscriptionId': 'PaymentController.deleteSubscription',
+  'post   /api/payment/transaction': 'PaymentController.createTransaction',
+  'post   /api/payment/transaction/confirmation': 'PaymentController.getTransaction',
   //USER
   'post   /api/user/forgot': 'UserController.forgot',
   'post   /api/user/forgot': 'UserController.forgot',

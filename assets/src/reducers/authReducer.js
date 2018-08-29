@@ -1,9 +1,10 @@
 import { AUTH } from 'actions/authActions'
 import { ACTION, handleResponseAction } from 'components/helper'
+import { isEmpty } from 'lodash'
 
 export default function reducer(
   state={
-    isAuthenticated: false,
+    isAuthenticated: null,
     session: null,
     temp: null,
     token: null
@@ -18,7 +19,7 @@ export default function reducer(
     case AUTH.GET:
       return { 
         ...state, 
-        isAuthenticated: !Object.isEmpty(action.payload),
+        isAuthenticated: !isEmpty(action.payload),
         session: handleResponseAction(ACTION.TEMP, state.session, action.payload)
       }
 

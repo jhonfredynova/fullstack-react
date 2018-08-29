@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import NumberFormat from 'react-number-format'
-import { defaultTo, set } from 'lodash'
+import { defaultTo, set, isEmpty } from 'lodash'
 
 class Counter extends Component {
 
@@ -24,7 +24,7 @@ class Counter extends Component {
   
   async handleIncreaseValue() {
     if (this.state.value<this.state.max) {
-      this.state.value = Object.isEmpty(this.state.value) ? this.state.min : this.state.value+1
+      this.state.value = isEmpty(this.state.value) ? this.state.min : this.state.value+1
       await this.setState({ value: parseInt(this.state.value, 10) })
       this.props.onChange(this.state.value)
     }
@@ -32,7 +32,7 @@ class Counter extends Component {
   
   async handleDecreaseValue() {
     if (this.state.value>this.state.min) {
-      this.state.value = Object.isEmpty(this.state.value) ? this.state.min : this.state.value-1
+      this.state.value = isEmpty(this.state.value) ? this.state.min : this.state.value-1
       await this.setState({ value: parseInt(this.state.value, 10) })
       this.props.onChange(this.state.value)
     }

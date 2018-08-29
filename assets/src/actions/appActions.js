@@ -49,6 +49,8 @@ export function getConfig(parameters) {
         for(let key in response.appPreferences){
           response.appPreferences[key] = localStorage.getItem(key) || response.appPreferences[key]
         }
+        state().i18nState.translations = response.appIntl.locales
+        state().i18nState.lang = response.appPreferences.language
         dispatch({type: APP.GET_CONFIG, payload: response }) 
       }catch(e){
         handleError(e)

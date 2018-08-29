@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import NumberFormat from 'react-number-format'
-import { defaultTo, set } from 'lodash'
+import { defaultTo, set, isEmpty } from 'lodash'
 
 class Numeric extends Component {
 
@@ -33,7 +33,7 @@ class Numeric extends Component {
 
   render() {
     let amount = this.state.amount
-    if(!Object.isEmpty(this.state.currencyConversion) && this.state.to){
+    if(!isEmpty(this.state.currencyConversion) && this.state.to){
       amount = this.state.amount/this.state.currencyConversion[this.state.to.toUpperCase()]
       amount = isNaN(amount) ? this.state.amount : amount
     }

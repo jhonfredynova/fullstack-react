@@ -1,6 +1,7 @@
 import  React, { Component } from 'react'
 import { LinkContainer } from 'react-router-bootstrap'
 import { Button, Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap'
+import { includes } from 'lodash'
 import PropTypes from 'prop-types'
 import { setMessage } from 'actions/appActions'
 import { logout } from 'actions/authActions'
@@ -44,7 +45,7 @@ class Menu extends Component {
         }
         {/* ADMIN */}
         {
-          isAuthenticated && Object.includes([1], session.permissions, true) ? 
+          isAuthenticated && includes([1], session.permissions, true) ? 
           <Nav pullRight>   
             <NavDropdown id="navAdmin" title="Admin">
               <MenuItem header><i className="fa fa-cogs"></i> CONFIGURATION</MenuItem>
@@ -71,7 +72,7 @@ class Menu extends Component {
         }
         {/* APP */}
         {
-          isAuthenticated && Object.includes([2,3,4], session.permissions, false) ? 
+          isAuthenticated && includes([2,3,4], session.permissions, false) ? 
           <Nav pullRight>
             <LinkContainer exact to="/">
               <NavItem>{this.context.t('home')}</NavItem>
@@ -86,7 +87,7 @@ class Menu extends Component {
         }
         {/* HOME */}
         {
-          !isAuthenticated ?
+          isAuthenticated===false ?
           <Navbar.Form pullRight>
             <LinkContainer to="/login">
               <Button className="btn btn-default">{this.context.t('login')}</Button>
@@ -98,7 +99,7 @@ class Menu extends Component {
           : null
         }
         {
-          !isAuthenticated ? 
+          isAuthenticated===false ? 
           <Nav pullRight> 
             <LinkContainer exact to="/">
               <NavItem>{this.context.t('home')}</NavItem>

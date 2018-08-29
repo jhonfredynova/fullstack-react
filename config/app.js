@@ -39,7 +39,8 @@ module.exports.app = {
   plans: {
     free: '5b4cce080af99032b21348a8',
     premium: '5b4cce650af99032b21348aa',
-    standard: '5b4cce380af99032b21348a9'
+    standard: '5b4cce380af99032b21348a9',
+    subscriptions: ['tucode-plan-standard','tucode-plan.premium']
   },
   //ROLES
   roles: {

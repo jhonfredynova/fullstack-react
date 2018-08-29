@@ -23,7 +23,7 @@ class AdminUserRol extends Component {
           { name: 'ASC' }
         ],
         where: {
-          name: { like: '' },
+          name: { like: '%' },
           user: this.props.match.params.id
         }
       }

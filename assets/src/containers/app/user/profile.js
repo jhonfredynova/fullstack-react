@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import { cloneDeep, defaults, flow, keys, get, set, omit } from 'lodash'
+import { cloneDeep, clean, compact, defaults, flow, isEmail, keys, get, set, omit, isEmpty } from 'lodash'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getUser, updateUser } from 'actions/userActions'
 import NavigationBar from 'components/navigationBar'
@@ -53,21 +53,21 @@ class Profile extends Component {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if(Object.isEmpty(this.state.model.firstname)) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if(isEmpty(this.state.model.firstname)) {
       errors.model.firstname = this.context.t('enterFirstname')
     }
-    if(Object.isEmpty(this.state.model.lastname)) {
+    if(isEmpty(this.state.model.lastname)) {
       errors.model.lastname = this.context.t('enterLastname')
     }
-     if(Object.isEmpty(this.state.model.username)) {
+     if(isEmpty(this.state.model.username)) {
       errors.model.username = this.context.t('enterUsername')
     }
-    if (!Object.isEmpty(this.state.model.email) && !Object.isEmail(this.state.model.email)) {
+    if (!isEmpty(this.state.model.email) && !isEmail(this.state.model.email)) {
       errors.model.email = this.context.t('enterEmailFormat')
     }
     if (this.state.changePassword) {
-      if(Object.isEmpty(this.state.model.password) || Object.keys(this.state.model.password).length<6) {
+      if(isEmpty(this.state.model.password) || Object.keys(this.state.model.password).length<6) {
         errors.model.password = this.context.t('enterPasswordMin5Char')
       }
       if(this.state.model.password!==this.state.model.passwordConfirmation) {
@@ -83,7 +83,7 @@ class Profile extends Component {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -117,22 +117,22 @@ class Profile extends Component {
         <NavigationBar data={{ title: <h1>{this.context.t('profileTitle')}</h1>, subTitle: <h2>{this.context.t('profileDescription')}</h2>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
           <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
           <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-6 col-xs-12">
               <label>{this.context.t('firstname')} *</label>
               <input type="text" className="form-control" value={this.state.model.firstname} onChange={e => this.handleChangeState('model.firstname', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.firstname}</span>
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-6 col-xs-12">
               <label>{this.context.t('lastname')} *</label>
               <input type="text" className="form-control" value={this.state.model.lastname} onChange={e => this.handleChangeState('model.lastname', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.lastname}</span>
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-6 col-xs-12">
               <label>{this.context.t('username')} *</label>
               <input type="text" className="form-control" value={this.state.model.username} onChange={e => this.handleChangeState('model.username', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.username}</span>
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group col-md-6 col-xs-12">
               <label>{this.context.t('email')} *</label>
               <div className="input-group">
                 <span className="input-group-addon">
@@ -144,17 +144,17 @@ class Profile extends Component {
               </div>
               <span className="text-danger">{this.state.errors.model.email}</span>
             </div>
-            <div className="form-group col-md-12">
+            <div className="form-group col-md-12 col-xs-12">
               <div className="alert alert-warning">
                 <input type="checkbox" checked={this.state.changePassword} onChange={e => this.handleChangeState('changePassword', !this.state.changePassword)} /> Do you want to change your password?
               </div>
             </div>
-            <div className={classnames({"form-group col-md-6": true, "hide": !this.state.changePassword})}>
+            <div className={classnames({"form-group col-md-6 col-xs-12": true, "hide": !this.state.changePassword})}>
               <label>{this.context.t('password')} *</label>
               <input type="password" className="form-control" value={this.state.model.password} onChange={e => this.handleChangeState('model.password', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.password}</span>
             </div>
-            <div className={classnames({"form-group col-md-6": true, "hide": !this.state.changePassword})}>
+            <div className={classnames({"form-group col-md-6 col-xs-12": true, "hide": !this.state.changePassword})}>
               <label>{this.context.t('passwordConfirm')} *</label>
               <input type="password" className="form-control" value={this.state.model.passwordConfirmation} onChange={e => this.handleChangeState('model.passwordConfirmation', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.passwordConfirmation}</span>

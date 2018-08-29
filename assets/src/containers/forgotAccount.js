@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, flow, get, set } from 'lodash'
+import { cloneDeep, clean, compact, flow, isEmpty, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { forgotUser } from 'actions/userActions'
@@ -27,8 +27,8 @@ class ForgotAccount extends Component {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if (Object.isEmpty(this.state.model.username)) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if (isEmpty(this.state.model.username)) {
       errors.model.username = this.context.t('enterUsernameOrEmail')
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -40,7 +40,7 @@ class ForgotAccount extends Component {
       e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -58,21 +58,21 @@ class ForgotAccount extends Component {
 
   render() {
     return (
-    	<div>
+      <div>
         <Seo data={{ title: this.context.t('forgotAccountTitle'), description: this.context.t('forgotAccountDescription'), siteName: this.context.t('siteName') }} />
         <NavigationBar data={{ title: <h1>{this.context.t('forgotAccountTitle')}</h1>, subTitle: <h2>{this.context.t('forgotAccountDescription')}</h2> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
-		    <form className="row" onSubmit={this.handleForgot.bind(this)}>
-	    		<div className="form-group col-md-12">
-				    <label>{this.context.t('emailOrUsername')} *</label>
-					  <input type="text" className="form-control" onChange={e => this.handleChangeState('model.username', e.target.value)} />
+        <form className="row" onSubmit={this.handleForgot.bind(this)}>
+          <div className="form-group col-md-12 col-xs-12">
+            <label>{this.context.t('emailOrUsername')} *</label>
+            <input type="text" className="form-control" onChange={e => this.handleChangeState('model.username', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.username}</span>
-				  </div>
-          <div className="form-group col-md-12 text-right">
+          </div>
+          <div className="form-group col-md-12 col-xs-12 text-right">
             <button type="submit" className="btn btn-success">{this.context.t('sendEmail')}</button>
           </div>
-				</form>
-			</div>
+        </form>
+      </div>
     )
   }
 }

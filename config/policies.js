@@ -10,7 +10,7 @@
 
 let authorization = (requiredLevels, mustHaveAll) => {
   return (req, res, next) => {
-    if(!Object.includes(requiredLevels, req.user.permissions, mustHaveAll)){
+    if(!_.includes(requiredLevels, req.user.permissions, mustHaveAll)){
       return res.forbidden()
     }
     next()
@@ -57,7 +57,9 @@ module.exports.policies = {
     getBilling: ['isAuthenticated', authorization([1,2,3,4], false)],
     getSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
     getSubscriptionPlan: ['isAuthenticated', authorization([1,2,3,4], false)],
-    createSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
+    getTransaction: true,
+    createSubscription: true,
+    createTransaction: true,
     updateCreditCard: ['isAuthenticated', authorization([1,2,3,4], false)],
     updateSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
     deleteSubscription: ['isAuthenticated', authorization([1,2,3,4], false)]

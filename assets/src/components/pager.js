@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { DropdownButton, MenuItem, Pagination } from 'react-bootstrap'
-import { defaultTo, set } from 'lodash'
+import { defaultTo, isObject, set } from 'lodash'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import './pager.css'
@@ -36,7 +36,14 @@ class Pager extends Component {
   async handleChangeKeyword(value){
     if(value.indexOf('%')===-1) value = `%${value}%`
     let where = this.state.where
-    where = Object.setDeep(where, 'like', item => value)
+    let setKeyword = (object, property, value) => {
+      for(let key in object) {
+        if(isObject(object[key])) object[key] = setKeyword(object[key], property, value)
+        if(key===property) object[key] = value
+      }
+      return object
+    }
+    where = setKeyword(where, 'like', value)
     await this.setState(set(this.state, 'where', where))
   }
 
@@ -50,7 +57,7 @@ class Pager extends Component {
     const thereIsData = records.length>0
     return (
       <div id="pager" className={this.props.className}>
-        <div className="vspace"></div>
+        <div className="help-block"></div>
         <form onSubmit={this.handleChangeSearch.bind(this)}> 
           <div className='form-group input-group'>
             <input type="text" className="form-control" placeholder="Search" onChange={e => this.handleChangeKeyword(e.target.value)} onKeyPress={this.handleKeyPressKeyword.bind(this)} />
@@ -72,7 +79,6 @@ class Pager extends Component {
             <Pagination bsClass="pagination" bsSize="medium" prev next ellipsis boundaryLinks maxButtons={3} items={Math.ceil(recordsTotal/this.state.pageSize)} activePage={this.state.activePage} onSelect={value => this.handleChangeState('activePage', value)} />
           </div>
         </section>
-        <hr />
       </div>
     )
   }

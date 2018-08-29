@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
-import { cloneDeep, defaults, flow, keys, get, set } from 'lodash'
+import { cloneDeep, clean, compact, defaults, flow, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import Counter from 'components/counter'
@@ -60,14 +60,14 @@ class AdminPlanFeatureSave extends Component {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if(Object.isEmpty(this.state.model.feature)) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if(isEmpty(this.state.model.feature)) {
       errors.model.feature = "Select a feature."
     }
-    if(Object.isEmpty(this.state.model.quantity)) {
+    if(isEmpty(this.state.model.quantity)) {
       errors.model.quantity = "Enter quantity."
     }
-    if(Object.isEmpty(this.state.model.order)) {
+    if(isEmpty(this.state.model.order)) {
       errors.model.order = "Enter order."
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -79,7 +79,7 @@ class AdminPlanFeatureSave extends Component {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -105,20 +105,20 @@ class AdminPlanFeatureSave extends Component {
         <NavigationBar data={{ title: <h1>{this.state.plan.name}</h1>, subTitle: <h2>Feature</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan/${this.props.match.params.id}/feature`)}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Feature <span>*</span></label>
             <Select className="form-control" options={this.state.planFeatures} valueKey='id' labelKey='name' value={this.state.model.feature} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.feature', value.id)} />
-            <p className="text-danger">{this.state.errors.model.feature}</p>
+            <span className="text-danger">{this.state.errors.model.feature}</span>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Quantity <span>*</span></label>
             <Counter data={{ value: this.state.model.quantity, min: -1, max: 100 }} onChange={value => this.handleChangeState('model.quantity', value)} />
-            <p className="text-danger">{this.state.errors.model.quantity}</p>
+            <span className="text-danger">{this.state.errors.model.quantity}</span>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Order <span>*</span></label>
             <Counter data={{ value: this.state.model.order, min: 0, max: 100 }} onChange={value => this.handleChangeState('model.order', value)} />
-            <p className="text-danger">{this.state.errors.model.order}</p>
+            <span className="text-danger">{this.state.errors.model.order}</span>
           </div>
           <button type="submit" className="hide" />
         </form>

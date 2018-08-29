@@ -26,7 +26,7 @@ class Billing extends Component {
         ],
         where: {
           clientCode: session.clientCode,
-          orderId: { like: '' }
+          orderId: { like: '%' }
         }
       }
     }
@@ -67,7 +67,7 @@ class Billing extends Component {
   }
 
   render() {
-    const { isLoading, config } = this.props.app
+    const { isLoading } = this.props.app
     const { records } = this.state.billing
     return (
       <div id="subscription">

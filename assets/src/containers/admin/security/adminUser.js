@@ -26,7 +26,7 @@ class AdminUser extends Component {
         ],
         where: {
           active: true,
-          email: { like: '' }
+          email: { like: '%' }
         }
       }
     }

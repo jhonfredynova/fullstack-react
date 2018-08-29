@@ -5,6 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 
+let crypto = require('crypto')
+
 module.exports = {
 
   controlSubscriptions: async (req, res) => {
@@ -103,12 +105,26 @@ module.exports = {
     }
   },
 
+  getTransaction: async (req, res) => {
+    try{
+      let data = req.body
+      console.log(data)
+      console.log(`referenceSale = ${data.reference_sale}`)
+      let referenceCode = _.get(data, 'reference_sale', '').split('-')
+      console.log(`collectionName = ${referenceCode[0]}, collectionId = ${referenceCode[1]}, collectionDate = ${referenceCode[2]}`)
+      res.ok(data)
+    }catch(e){
+      res.badRequest(e)
+    }
+  },
+
   createSubscription: async (req, res) => {
     try{ 
       // initializing
       let data = req.body
       let client = null
-      if(!data.plan.planCode) throw intlService.i18n('subscriptionCreatedErrorPlan')
+      if(!data.plan.info.planCode) throw intlService.i18n('subscriptionPlanError')
+      if(!data.client.email) throw intlService.i18n('subscriptionClientError')
       // create client
       let clientList = await paymentService.executeApiPayu('GET', `/customers`)
       client = _.get(clientList, 'customerList', []).find(item => item.email.toLowerCase()===data.client.email.toLowerCase() || item.id===data.client.clientCode)
@@ -122,8 +138,8 @@ module.exports = {
       }
       client = await paymentService.executeApiPayu('GET', `/customers/${data.client.clientCode}`)
       // create creditcard
-      client.creditCards = _.get(client, 'creditCards', [])
       if(!data.creditCard.token){
+        client.creditCards = _.get(client, 'creditCards', [])
         if(client.creditCards.length>0){
           for(let creditCard of client.creditCards){
             await paymentService.executeApiPayu('DELETE', `/customers/${data.client.clientCode}/creditCards/${creditCard.token}`)
@@ -140,7 +156,13 @@ module.exports = {
       }
       // create subscription
       client.subscriptions = _.get(client, 'subscriptions', [])
-      if(client.subscriptions.length>0) throw intlService.i18n('subscriptionAlreadyExist')
+      client.subscriptions = client.subscriptions.filter(item => [sails.config.app.plans.subscriptions].includes(data.plan.info.planCode))
+      if(client.subscriptions.length>0){
+        throw intlService.i18n('subscriptionAlreadyExist')
+      }
+      if(data.plan.info.paymentType!=='subscription'){
+        throw intlService.i18n('subsciptionPlanError')
+      }
       let dataSubscription = {
         quantity: 1,
         installments: 1,
@@ -153,14 +175,17 @@ module.exports = {
           }]
         },
         plan: {
-          planCode: data.plan.planCode
+          planCode: data.plan.info.planCode
         }
       }
       data.subscription = await paymentService.executeApiPayu('POST', `/subscriptions`, dataSubscription)
       // create user
       let user = await sails.models.user.findOne({ email: data.client.email })
       if(!user){
+        data.client.plan = data.plan.info.id
         await sails.models.user.create(data.client)
+      }else{
+        await sails.models.user.update({ id: user.id }, { plan: data.plan.info.id })
       }
       // send notification
       try{
@@ -168,31 +193,74 @@ module.exports = {
           fromName: sails.config.app.appName,
           fromEmail: sails.config.app.emails.noreply,
           toEmail: data.client.email,
-          subject: intlService.i18n('mailSubscriptionCreatedSubject', { appName: sails.config.app.appName }),
-          message: intlService.i18n('mailSubscriptionCreatedMessage', { appName: sails.config.app.appName, startDate: new Date(data.subscription.currentPeriodStart).toLocaleDateString() })
+          subject: intlService.i18n('mailSubscriptionCreatedSubject'),
+          message: intlService.i18n('mailSubscriptionCreatedMessage', { appName: sails.config.app.appName })
         })
       }catch(e){
         console.warn(ntlService.i18n('emailError'))
       }
       res.json({ message: intlService.i18n('subscriptionCreatedSuccess') })
     }catch(e){
-      res.badRequest(intlService.i18n('subscriptionCreatedErrorCard'))
+      res.badRequest(e)
+    }
+  },
+
+  createTransaction: async (req, res) => {
+    try{
+      const data = req.body
+      const { appName } = sails.config.app
+      const { id: planId, name: planName, transactionValue } = data.plan.info
+      let referenceCode = `plan-${planId}-${Date.now()}`
+      let signature = `${process.env.PAYU_API_KEY}~${process.env.PAYU_MERCHANT}~${referenceCode}~${transactionValue.value}~${transactionValue.currency.toUpperCase()}`     
+      let response = {
+        merchantId: process.env.PAYU_MERCHANT,
+        accountId: process.env.PAYU_ACCOUNT,
+        description: `${appName} (${planName})`,
+        referenceCode: referenceCode,
+        amount: transactionValue.value,
+        tax: 0,
+        taxReturnBase: 0,
+        currency: transactionValue.currency.toUpperCase(),
+        signature: crypto.createHash('md5').update(signature).digest("hex"),
+        buyerEmail: data.client.email,
+        responseUrl: `${process.env.LOCAL_APP_URL}/buy/response`,
+        confirmationUrl: `${process.env.LOCAL_API_URL}/payment/transaction/confirmation`
+      }
+      res.ok(response)
+    }catch(e){
+      res.badRequest(e)
     }
   },
 
   updateCreditCard: async (req, res) => {
     try{
-      if (!req.param('subscriptionId')) {
-        throw 'Subscription id not valid'
-      }
+      // get client
+      let client = await paymentService.executeApiPayu('GET', `/customers/${req.param('clientCode')}`)
       let creditCard = req.body
-      let data = await paymentService.checkCreditCard(creditCard.number, creditCard.expiration.month, creditCard.expiration.year, creditCard.cvc)
-      creditCard.type = data.card.brand.toUpperCase()
-      await paymentService.executeApiPayu('DELETE', `/customers/${req.param('clientCode')}/creditCards/${req.param('creditCardId')}`, null)
-      creditCard.cvc = null
-      data = await paymentService.executeApiPayu('POST', `/customers/${req.param('clientCode')}/creditCards`, creditCard)
-      await paymentService.executeApiPayu('PUT', `/subscriptions/${req.param('subscriptionId')}`, { creditCardToken: data.token })
-      res.json({ message: 'Se actualizó la tarjeta de crédito de la suscripción correctamente.' })
+      let dataCreditCard = {
+        name: creditCard.holder,
+        number: creditCard.number,
+        expMonth: creditCard.expiration.month,
+        expYear: creditCard.expiration.year,
+        type: (await paymentService.getCreditCardBrand(creditCard)).card.brand.toUpperCase()
+      }
+      // update creditCards
+      client.creditCards = _.get(client, 'creditCards', [])
+      if(client.creditCards.length>0){
+        for(let creditCard of client.creditCards){
+          await paymentService.executeApiPayu('DELETE', `/customers/${req.param('clientCode')}/creditCards/${creditCard.token}`)
+        }
+      }
+      let responseCreditCard = await paymentService.executeApiPayu('POST', `/customers/${req.param('clientCode')}/creditCards`, dataCreditCard)
+      // update subscriptions
+      client.subscriptions = _.get(client, 'subscriptions', [])
+      client.subscriptions = client.subscriptions.filter(item => [sails.config.app.plans.subscriptions].includes(item.plan.planCode))
+      if(client.subscriptions.length>0){
+        for(let subscription of client.subscriptions){
+          await paymentService.executeApiPayu('PUT', `/subscriptions/${subscription.id}`, { creditCardToken: responseCreditCard.token })
+        }
+      }
+      res.json({ message: intlService.i18n('updateCreditCardSuccessful') })
     }catch(e){
       res.badRequest(e)
     }  

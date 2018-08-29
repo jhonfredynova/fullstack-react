@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { chunk, get, sortBy } from 'lodash'
+import { chunk, get, sortBy, toUrl } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan } from 'actions/planActions'
@@ -43,9 +43,10 @@ class Home extends Component {
   render() {
     const { config } = this.props.app
     const { appPreferences } = config
-    const plans = this.state.plans.map(item => {
-      item.mostPopular = item.id===config.plans.standard
-      return item
+    this.state.plans.forEach(item => {
+      item.url = '/register'
+      if(item.paymentType==='subscription') item.url = `/buy/subscription/${toUrl(item.name)}`
+      if(item.paymentType==='transaction') item.url = `/buy/transaction/${toUrl(item.name)}`
     })
     return (
       <div id="home">
@@ -70,9 +71,9 @@ class Home extends Component {
         }
         <div className="row">
           {
-            sortBy(plans, ['order']).map(item =>
-              <div key={item.id} className="col-md-4">
-                <PlanBox data={{ info: item, currentCurrency: appPreferences.currency, currencyConversion: config.appIntl.currencyConversion }} />
+            sortBy(this.state.plans, ['order']).map(item =>
+              <div key={item.id} className="col-md-4 col-xs-12">
+                <PlanBox data={{ app: this.props.app,  info: item, popular: config.plans.standard }} onClick={() => this.props.history.push(item.url)} />
               </div>
             )
           }

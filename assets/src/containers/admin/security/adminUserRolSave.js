@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
-import { cloneDeep, flow, get, set } from 'lodash'
+import { cloneDeep, clean, compact, flow, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import { getRol } from 'actions/rolActions'
@@ -53,8 +53,8 @@ class AdminUserRolSave extends Component {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if(Object.isEmpty(this.state.model.rol)) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if(isEmpty(this.state.model.rol)) {
       errors.model.rol = "Select rol."
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -66,7 +66,7 @@ class AdminUserRolSave extends Component {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -88,14 +88,14 @@ class AdminUserRolSave extends Component {
         <NavigationBar data={{ title: <h1>Add Role</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/security/user/${this.props.match.params.id}/rol`)} ><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>User <span>*</span></label>
             <input type="text" className="form-control" disabled="true" value={`${this.state.user.email}`} />
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Rol <span>*</span></label>
             <Select options={this.state.roles} valueKey='id' labelKey='name' value={this.state.model.rol} clearable={false} autosize={false} onChange={value => this.handleChangeState('model.rol', value.id)} />
-            <p className="text-danger">{this.state.errors.model.rol}</p>
+            <span className="text-danger">{this.state.errors.model.rol}</span>
           </div>
           <button type="submit" className="hide" />
         </form>

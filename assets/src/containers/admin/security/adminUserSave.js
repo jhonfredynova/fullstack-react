@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, defaultTo, flow, keys, get, set } from 'lodash'
+import { cloneDeep, clean, compact, defaultTo, isEmpty, isEmail, flow, keys, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
@@ -42,20 +42,20 @@ class AdminUserSave extends Component {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if(Object.isEmpty(this.state.model.firstname)) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if(isEmpty(this.state.model.firstname)) {
       errors.model.firstname = "Enter firstnames."
     }
-    if(Object.isEmpty(this.state.model.lastname)) {
+    if(isEmpty(this.state.model.lastname)) {
       errors.model.lastname = "Enter lastnames."
     }
-    if(Object.isEmpty(this.state.model.username)) {
+    if(isEmpty(this.state.model.username)) {
       errors.model.username = "Enter username."
     }
-    if(Object.isEmpty(this.state.model.email)) {
+    if(isEmpty(this.state.model.email)) {
       errors.model.email = "Enter email."
     }
-    if(!Object.isEmpty(this.state.model.email) && !Object.isEmail(this.state.model.email)) {
+    if(!isEmpty(this.state.model.email) && !isEmail(this.state.model.email)) {
       errors.model.email = "The written email does not have the correct format."
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -67,7 +67,7 @@ class AdminUserSave extends Component {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -93,25 +93,25 @@ class AdminUserSave extends Component {
         <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update User' : 'New User'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Nombres <span>*</span></label>
             <input type="text" className="form-control" value={this.state.model.firstname} onChange={event => this.handleChangeState('model.firstname', event.target.value)} />
-            <p className="text-danger">{this.state.errors.model.firstname}</p>
+            <span className="text-danger">{this.state.errors.model.firstname}</span>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Apellidos <span>*</span></label>
             <input type="text" className="form-control" value={this.state.model.lastname} onChange={event => this.handleChangeState('model.lastname', event.target.value)} />
-            <p className="text-danger">{this.state.errors.model.lastname}</p>
+            <span className="text-danger">{this.state.errors.model.lastname}</span>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Username <span>*</span></label>
             <input type="text" className="form-control" value={this.state.model.username} onChange={event => this.handleChangeState('model.username', event.target.value)} />
-            <p className="text-danger">{this.state.errors.model.username}</p>
+            <span className="text-danger">{this.state.errors.model.username}</span>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Email <span>*</span></label>
             <input type="text" className="form-control" value={this.state.model.email} onChange={event => this.handleChangeState('model.email', event.target.value)} />
-            <p className="text-danger">{this.state.errors.model.email}</p>
+            <span className="text-danger">{this.state.errors.model.email}</span>
           </div>
           <button type="submit" className="hide" />
         </form>

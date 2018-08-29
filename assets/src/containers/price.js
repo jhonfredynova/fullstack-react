@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { sortBy } from 'lodash'
+import { sortBy, toUrl } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan } from 'actions/planActions'
@@ -36,23 +36,10 @@ class Price extends Component {
 
   render() {
     const { isLoading, config } = this.props.app
-    const { appPreferences } = config
-    const plans = this.state.plans.map(item => {
-      item.mostPopular = item.id===config.plans.standard
-      if(item.paymentType==='subscription'){
-        item.buyText = this.context.t('buy')
-        item.buyUrl = `/buy/subscription/${Object.toUrl(item.name)}`
-        item.price = item.subscriptionInfo.price
-      }else if(item.paymentType==='transaction'){
-        item.buyText = this.context.t('buy')
-        item.buyUrl = `/buy/transaction/${Object.toUrl(item.name)}`
-        item.price = item.transactionValue
-      }else{
-        item.buyText = this.context.t('try')
-        item.buyUrl = '/register'
-        item.price = {}
-      }
-      return item
+    this.state.plans.forEach(item => {
+      item.url = '/register'
+      if(item.paymentType==='subscription') item.url = `/buy/subscription/${toUrl(item.name)}`
+      if(item.paymentType==='transaction') item.url = `/buy/transaction/${toUrl(item.name)}`
     })
     return (
       <div id="price">
@@ -60,9 +47,9 @@ class Price extends Component {
         <NavigationBar data={{ title: <h1>{this.context.t('priceTitle')}</h1>, subTitle: <h2>{this.context.t('priceDescription')}</h2> }} />
         <div className="row">
           {
-            sortBy(plans, ['order']).map(item =>
-              <div key={item.id} className="col-md-4">
-                <PlanBox data={{ isLoading: isLoading, info: item, currentCurrency: appPreferences.currency, currencyConversion: config.appIntl.currencyConversion }} />
+            sortBy(this.state.plans, ['order']).map(item =>
+              <div key={item.id} className="col-md-4 col-xs-12">
+                <PlanBox data={{ isLoading: isLoading, app: this.props.app, info: item, popular: config.plans.standard  }} onClick={() => this.props.history.push(item.url)} />
               </div>
             )
           }

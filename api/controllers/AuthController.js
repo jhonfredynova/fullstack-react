@@ -8,6 +8,9 @@
 module.exports = {
 
   me: async (req, res) => {
+    if(req.user && req.user.clientCode){
+      req.user.clientInfo =  await paymentService.executeApiPayu('GET', `/customers/${req.user.clientCode}`)
+    }
     res.ok(req.user)
   },
 

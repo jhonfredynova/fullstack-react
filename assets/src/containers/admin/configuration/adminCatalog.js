@@ -30,7 +30,7 @@ class AdminCatalog extends Component {
           active: true,
           parent: null,
           or: [
-            { name: { like: '' } }
+            { name: { like: '%' } }
           ]
         }
       }

@@ -26,7 +26,7 @@ class AdminPlan extends Component {
         ],
         where: {
           active: true,
-          name: { like: '' }
+          name: { like: '%' }
         }
       }
     }
@@ -127,7 +127,7 @@ class AdminPlan extends Component {
                       </span>
                       <span className={classnames({'hide': !item.paymentType })}>
                         {item.paymentType}<br/>
-                        {item.planInfo ? `$${get(item, 'planInfo.price.value', 0)} ${get(item, 'planInfo.price.currency', '')}` : `$${get(item, 'transactionValue.value', 0)} ${get(item, 'transactionValue.currency', '')}` }
+                        {item.subscriptionInfo ? `$${get(item, 'subscriptionInfo.price.value', 0)} ${get(item, 'subscriptionInfo.price.currency', '')}` : `$${get(item, 'transactionValue.value', 0)} ${get(item, 'transactionValue.currency', '').toUpperCase()}` }
                       </span>
                     </td>
                     <td className="text-center">

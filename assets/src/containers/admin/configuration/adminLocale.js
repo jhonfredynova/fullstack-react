@@ -25,7 +25,7 @@ class AdminLocale extends Component {
         ],
         where: {
           active: true,
-          name: { like: '' }
+          name: { like: '%' }
         }
       }
     }

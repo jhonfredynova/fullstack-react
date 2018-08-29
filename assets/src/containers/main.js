@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import Loading from 'react-loading-bar'
 import classnames from 'classnames'
-import { defaults, get } from 'lodash'
+import { defaults, get, isEmpty } from 'lodash'
 import moment from 'moment'
 import PropTypes from 'prop-types'
 import { setTranslations, setLanguage } from 'redux-i18n'
@@ -16,13 +16,6 @@ import { getToken, me } from 'actions/authActions'
 import './main.css'
 
 class Main extends Component {
-
-  constructor(props){
-    super(props)
-    this.state = {
-      appLoaded: false
-    }
-  }
 
   async componentWillMount() {
     try{
@@ -38,9 +31,8 @@ class Main extends Component {
       await this.props.dispatch(setTranslations(config.appIntl.locales))
       await this.props.dispatch(setLanguage(config.appPreferences.language))
       await this.props.dispatch(hideLoading())
-      await this.setState({ appLoaded: true })
     }catch(e){
-      this.props.dispatch(setMessage({ type: 'error', message: this.context.t('mainError', { error: e.message}), hideClose: true }))
+      this.props.dispatch(setMessage({ type: 'error', message: e.message, hideClose: true }))
       this.props.dispatch(hideLoading())
     }
   }
@@ -49,10 +41,10 @@ class Main extends Component {
     try{
       const { config, messages } = this.props.app
       ReactDOM.findDOMNode(this).scrollTop = 0
-      if (config.appDisabled && this.props.location.pathname!=='/coming-soon') {
+      if(config.appDisabled && this.props.location.pathname!=='/coming-soon') {
         return this.props.history.push('/coming-soon')
       }
-      if (this.props.location!==prevProps.location && messages.length>0){
+      if(this.props.location!==prevProps.location && messages.length>0){
         return this.props.dispatch(deleteMessage())
       }
     }catch(e){
@@ -61,18 +53,17 @@ class Main extends Component {
   }
 
   render() {
-    const { appLoaded } = this.state
-    const { isLoading, messages } = this.props.app
+    const { isLoading, config, messages } = this.props.app
     return (
       <div id="main">
         <div className={classnames({'overlay': isLoading})} />
         <Loading color="green" show={isLoading} showSpinner={false} />
-        <Header data={{ appLoaded: appLoaded, app: this.props.app, auth: this.props.auth }} />
         <Message data={{ isLoading: isLoading, messages: messages }} />
+        <Header data={{ isLoading: isLoading, app: this.props.app, auth: this.props.auth }} />
         <section className="container-fluid">
-          {appLoaded ? this.props.children : null}
+          { !isEmpty(config) ? this.props.children : null }
         </section>
-        <Footer data={{ appLoaded: appLoaded, app: this.props.app, auth: this.props.auth }} />
+        <Footer data={{ isLoading: isLoading, app: this.props.app }} />
       </div>
     )
   }

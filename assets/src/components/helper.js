@@ -1,4 +1,4 @@
-import { cloneDeep, get, isNull, isArray, isObject, isString, join } from 'lodash'
+import { get, isArray, isObject, isString, join } from 'lodash'
 
 //CONSTANTS
 export const ACTION = {
@@ -23,7 +23,6 @@ export function handleError(e){
 }
 
 export function handleRequestQuery(data){
-  data = Object.compactDeep(cloneDeep(data), item => !isNull(item) && Object.isEmpty(item))
   let params = {}
   for(let key in data){
     if(key==='activePage') params.skip = (data.activePage<=1 ? 0 : ((data.activePage-1)*data.pageSize))

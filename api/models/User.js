@@ -52,13 +52,16 @@ module.exports = {
     },
     preferences: {
       type: 'json',
-      defaultsTo: []
+      defaultsTo: {}
     },
     clientCode: {
       type: 'string'
     },
     plan: {
       model: 'plan'
+    },
+    nextPlan: {
+      type: 'json'
     },
     passports: {
       collection: 'passport',
@@ -70,6 +73,7 @@ module.exports = {
     }
   },
   customToJSON: function() {
+    this.fullname = `${this.firstname} ${this.lastname}`
     return _.omit(this, ['password','passwordResetExpiration','passwordResetToken'])
   },
   beforeCreate: async (values, next) => {
@@ -88,11 +92,11 @@ module.exports = {
         throw errors.join(intlService.i18n('errorSeparator'))
       }
       //others
-      if(!Object.isEmpty(values.email)) values.email = values.email.toLowerCase()
-      if(!Object.isEmpty(values.username)) values.username = values.username.toLowerCase()
-      if(Object.isEmpty(values.password)) values.password = Math.random().toString(36).slice(-8)
-      if(Object.isEmpty(values.plan)) values.plan = sails.config.app.plans.free
-      if(Object.isEmpty(values.roles)) values.roles = [sails.config.app.roles.registered]
+      if(!_.isEmpty(values.email)) values.email = values.email.toLowerCase()
+      if(!_.isEmpty(values.username)) values.username = values.username.toLowerCase()
+      if(_.isEmpty(values.password)) values.password = Math.random().toString(36).slice(-8)
+      if(_.isEmpty(values.plan)) values.plan = sails.config.app.plans.free
+      if(_.isEmpty(values.roles)) values.roles = [sails.config.app.roles.registered]
       sails.temp = values.password
       values.password = encryptionService.hashPassword(values.password)
       next()

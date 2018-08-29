@@ -25,7 +25,7 @@ class AdminRol extends Component {
         ],
         where: {
           active: true,
-          name: { like: '' }
+          name: { like: '%' }
         }
       }
     }

@@ -6,6 +6,7 @@ export const PAYMENT = {
   GET_SUBSCRIPTION: 'GET_SUBSCRIPTION',
   GET_SUBSCRIPTION_PLAN: 'GET_SUBSCRIPTION_PLAN',
   CREATE_SUBSCRIPTION: 'CREATE_SUBSCRIPTION',
+  CREATE_TRANSACTION: 'CREATE_TRANSACTION',
   UPDATE_CREDITCARD: 'UPDATE_CREDITCARD',
   UPDATE_SUBSCRIPTION: 'UPDATE_SUBSCRIPTION',
   DELETE_SUBSCRIPTION: 'DELETE_SUBSCRIPTION'
@@ -43,9 +44,17 @@ export function createSubscription(data) {
   }
 }
 
+export function createTransaction(data) {
+  return dispatch => {
+    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/payment/transaction`, data)
+    .then(response => dispatch({type: PAYMENT.CREATE_TRANSACTION, payload: response.data}))
+    .catch(err => handleError(err) )
+  }
+}
+
 export function updateCreditCard(data) {
   return dispatch => {
-    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${data.subscriptionId}/${data.clientCode}/${data.creditCardId}`, data)
+    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/creditCard/${data.clientCode}`, data)
     .then(response => dispatch({type: PAYMENT.UPDATE_CREDITCARD, payload: response.data}))
     .catch(err => handleError(err) )
   }

@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { cloneDeep, flow, get, set } from 'lodash'
+import { cloneDeep, clean, compact, flow, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import { login, me, setToken } from 'actions/authActions'
 import { hideLoading, showLoading, setMessage, setPreference } from 'actions/appActions'
@@ -52,11 +52,11 @@ class Login extends Component {
   }
 
   async handleValidate(path){
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if (Object.isEmpty(this.state.model.username)) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if(isEmpty(this.state.model.username)) {
       errors.model.username = this.context.t('enterEmailOrUsername')
     }
-    if (Object.isEmpty(this.state.model.password)) {
+    if(isEmpty(this.state.model.password)) {
       errors.model.password = this.context.t('enterPassword')
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -68,7 +68,7 @@ class Login extends Component {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }

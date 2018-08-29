@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
 import classnames from 'classnames'
-import { cloneDeep, defaults, flow, keys, get, set } from 'lodash'
+import { cloneDeep, clean, compact, defaults, flow, isEmpty, keys, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan, savePlan, updatePlan } from 'actions/planActions'
@@ -17,7 +17,7 @@ class AdminPlanSave extends Component {
     super(props)
     this.state = {
       errors: {
-        model: {}
+        model: { transactionValue: {} }
       },
       plans: [],
       model: {
@@ -48,31 +48,31 @@ class AdminPlanSave extends Component {
 
   async handleChangeState(path, value) {
     if(path==='model.paymentType'){
-      if(Object.isEmpty(value) || value==='transaction') this.state.model.planCode = ''
-      if(Object.isEmpty(value) || value==='subscription') this.state.model.transactionValue = null
+      if(isEmpty(value) || value==='transaction') this.state.model.planCode = ''
+      if(isEmpty(value) || value==='subscription') this.state.model.transactionValue = null
     }
     await this.setState(set(this.state, path, value))
     await this.handleValidate(path)
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if(Object.isEmpty(this.state.model.name)) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if(isEmpty(this.state.model.name)) {
       errors.model.name = "Enter name."
     }
-    if(Object.isEmpty(this.state.model.description)) {
+    if(isEmpty(this.state.model.description)) {
       errors.model.description = "Enter description."
     }
-    if (this.state.model.paymentType==='subscription' && Object.isEmpty(this.state.model.planCode)) {
-      errors.model.planCode = "Select payu plan."
+    if (this.state.model.paymentType==='subscription' && isEmpty(this.state.model.planCode)) {
+      errors.model.planCode = "Select plan."
     }
-    if (this.state.model.paymentType==='transaction' && Object.isEmpty(get(this.state.model.transactionValue, 'currency'))) {
+    if (this.state.model.paymentType==='transaction' && isEmpty(get(this.state.model.transactionValue, 'currency'))) {
       set(errors.model.transactionValue, 'currency', 'Select transaction currency.')
     }
-    if (this.state.model.paymentType==='transaction' && Object.isEmpty(get(this.state.model.transactionValue, 'value'))) {
+    if (this.state.model.paymentType==='transaction' && isEmpty(get(this.state.model.transactionValue, 'value'))) {
       set(errors.model.transactionValue, 'value',  'Enter transaction value.')
     }
-    if(Object.isEmpty(this.state.model.order)) {
+    if(isEmpty(this.state.model.order)) {
       errors.model.order = "Enter order."
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -84,7 +84,7 @@ class AdminPlanSave extends Component {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -111,17 +111,17 @@ class AdminPlanSave extends Component {
         <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update Plan' : 'New Plan'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/plan')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Name *</label>
             <input type="text" className="form-control" value={this.state.model.name} onChange={e => this.handleChangeState('model.name', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.name}</span>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Description *</label>
             <input type="text" className="form-control" value={this.state.model.description} onChange={e => this.handleChangeState('model.description', e.target.value)} />
-            <span className="text-danger">{this.state.errors.model.value}</span>
+            <span className="text-danger">{this.state.errors.model.description}</span>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Payment Type</label>
             <select className="form-control" value={this.state.model.paymentType} onChange={e => this.handleChangeState('model.paymentType', e.target.value)}>
               <option value="">Select...</option>
@@ -130,7 +130,7 @@ class AdminPlanSave extends Component {
             </select>
             <span className="text-danger">{this.state.errors.model.paymentType}</span>
           </div>
-          <div className={classnames({'form-group col-md-6': true, 'hide': this.state.model.paymentType!=='subscription'})}>
+          <div className={classnames({'form-group col-md-6 col-xs-12': true, 'hide': this.state.model.paymentType!=='subscription'})}>
             <label>Plan Code *</label>
             <select className="form-control" value={this.state.model.planCode} onChange={e => this.handleChangeState('model.planCode', e.target.value)}>
               <option value=''>Select...</option>
@@ -142,10 +142,10 @@ class AdminPlanSave extends Component {
             </select>
             <span className="text-danger">{this.state.errors.model.planCode}</span>
           </div>
-          <div className={classnames({'form-group col-md-6': true, 'hide': this.state.model.paymentType!=='transaction'})}>
+          <div className={classnames({'form-group col-md-6 col-xs-12': true, 'hide': this.state.model.paymentType!=='transaction'})}>
             <label>Transaction Value *</label>
             <div className="row">
-              <div className="col-xs-4 noPaddingRight">
+              <div className="col-xs-4">
                 <Select placeholder='Select...' className="form-control" options={currencies} optionRenderer={option => option.label} valueRenderer={option => option.label} value={get(this.state.model.transactionValue, 'currency')} simpleValue={true} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.transactionValue.currency', value)} /> 
                 <span className="text-danger">{get(this.state.errors.model.transactionValue, 'currency')}</span>
               </div>
@@ -158,7 +158,7 @@ class AdminPlanSave extends Component {
               </div>
             </div>
           </div>
-          <div className="form-group col-md-6">
+          <div className="form-group col-md-6 col-xs-12">
             <label>Order *</label>
             <Counter data={{ value: this.state.model.order, min: 0, max: 100 }} onChange={value => this.handleChangeState('model.order', value)} />
             <span className="text-danger">{this.state.errors.model.order}</span>

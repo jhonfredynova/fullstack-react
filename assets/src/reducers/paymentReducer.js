@@ -38,6 +38,12 @@ export default function reducer(
         temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
       }
 
+    case PAYMENT.CREATE_TRANSACTION:
+      return { 
+        ...state, 
+        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+      }
+
     case PAYMENT.UPDATE_CREDITCARD:
       return { 
         ...state, 

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, defaults, flow, keys, get, set } from 'lodash'
+import { cloneDeep, clean, compact, defaults, flow, isHtml, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import Multilanguage from 'components/multilanguage'
@@ -49,11 +49,11 @@ class AdminLocaleSave extends Component {
 
   async handleValidate(path) {
     const { appLanguages } = this.props.app.config
-    let errors = flow(cloneDeep, Object.cleanDeep)(this.state.errors)
-    if(Object.isEmpty(this.state.model.name)) {
+    let errors = flow(cloneDeep, clean)(this.state.errors)
+    if(isEmpty(this.state.model.name)) {
       errors.model.name = "Enter name."
     }
-    if(appLanguages.find(key => Object.isEmpty(this.state.model.value[key]))) {
+    if(appLanguages.find(key => isEmpty(this.state.model.value[key]))) {
       errors.model.value = "Enter values."
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -65,7 +65,7 @@ class AdminLocaleSave extends Component {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, Object.compactDeep, Object.isEmpty)(this.state.errors)){
+      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -92,14 +92,14 @@ class AdminLocaleSave extends Component {
         <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update Locale' : 'New Locale'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/locale')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-12">
+          <div className="form-group col-md-12 col-xs-12">
             <label>Name *</label>
             <input type="text" className="form-control" value={this.state.model.name} onChange={e => this.handleChangeState('model.name', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.name}</span>
           </div>
-          <div className="form-group col-md-12">
+          <div className="form-group col-md-12 col-xs-12">
             <label>Value *</label>
-            <Multilanguage data={{ isHtml: Object.isHtml(this.state.model.value.en), languages: config.appLanguages, value: this.state.model.value }} onChange={value => this.handleChangeState('model.value', value)} />
+            <Multilanguage data={{ isHtml: isHtml(this.state.model.value.en), languages: config.appLanguages, value: this.state.model.value }} onChange={value => this.handleChangeState('model.value', value)} />
             <span className="text-danger">{this.state.errors.model.value}</span>
           </div>
           <button type="submit" className="hide" />
