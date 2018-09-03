@@ -1,8 +1,8 @@
 {
-  "name": "test",
+  "name": "fullstack-react",
   "version": "0.0.1",
   "author": "jhonfredynova",
-  "description": "a Sails application",
+  "description": "Fullstack application based on sailsjs and reactjs",
   "keywords": [],
   "license": "",
   "main": "app.js",

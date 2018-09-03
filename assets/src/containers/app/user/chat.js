@@ -9,7 +9,7 @@ import { set } from 'lodash'
 import { hideLoading, showLoading, setMessage, setPreference, PREFERENCE } from 'actions/appActions'
 import { getBilling } from 'actions/paymentActions'
 import 'containers/app/user/chat.css'
-const sidebarMql = window.matchMedia(`(min-width: 768px)`)
+const sidebarMql = true//window.matchMedia(`(min-width: 768px)`)
 
 class Chat extends Component {
 
