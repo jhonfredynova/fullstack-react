@@ -1,8 +1,7 @@
 /*******************************************************
-// load enviroment variables and local configuration
+// local configuration
 *******************************************************/
 try{
-  require('dotenv').load()
   require('./local')
 }catch (e){
   console.warn('Warning: local configuration not found')
