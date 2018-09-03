@@ -305,8 +305,8 @@ class Subscription extends Component {
           </div>
         </div>
         <div className="alert alert-info">
-          <p className={classnames({'hide': isEmpty(subscription)})}>
-            <span>{this.context.t('subscriptionNextPayment', { date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') })}</span>
+          <p>
+            <span className={classnames({'hide': isEmpty(subscription)})}>{this.context.t('subscriptionNextPayment', { date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') })}</span>
             <span className={classnames({'hide': !isEmpty(subscription)})}> {this.context.t('subscriptionNoCharges')}</span>
           </p>
           <p className={classnames({'hide': !session.nextPlan})}>

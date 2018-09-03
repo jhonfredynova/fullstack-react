@@ -47,15 +47,38 @@ module.exports = {
 
   getTransaction: async (req, res) => {
     try{
-      let data = req.body
-      let transaction = await sails.models.transaction.findOne({ referenceCode: data.reference_sale })
+      
+      await sails.models.transaction.create({ referenceCode: 'entry', description: JSON.stringify(req.body) })
+
+
+      const { reference_sale, state_pol } = req.body
+      let transaction = await sails.models.transaction.findOne({ referenceCode: reference_sale })
       if(transaction){
+        // updating transaction
+        let transactionStatus = state_pol.toString()==='4' ? 'approved' : 'rejected'
         sails.models.transaction.update({ id: transaction.id }, {
-          status: data.state_pol.toString()==='4' ? 'approved' : 'rejected'
+          status: transactionStatus
         })
+        // sending notification
+        if(transactionStatus==='approved'){
+          try{
+            await mailService.sendEmail({
+              fromName: sails.config.app.appName,
+              fromEmail: sails.config.app.emails.noreply,
+              toEmail: data.client.email,
+              subject: intlService.i18n('mailSubscriptionCreatedSubject'),
+              message: intlService.i18n('mailSubscriptionCreatedMessage', { appName: sails.config.app.appName })
+            })
+          }catch(e){
+            console.warn(intlService.i18n('emailError'))
+          }
+        }
       }
       res.ok(intlService.i18n('successfulOperation'))
     }catch(e){
+      
+      await sails.models.transaction.create({ referenceCode: 'error', description: JSON.stringify(req.body) })
+
       res.badRequest(e)
     }
   },
@@ -87,40 +110,30 @@ module.exports = {
             await paymentService.executeApiPayu('DELETE', `/customers/${data.client.clientCode}/creditCards/${creditCard.token}`)
           }
         }
-        let dataCreditCard = {
-          name: data.creditCard.holder,
-          number: data.creditCard.number,
-          expMonth: data.creditCard.expiration.month,
-          expYear: data.creditCard.expiration.year,
-          type: (await paymentService.getCreditCardBrand(data.creditCard)).card.brand.toUpperCase()
+        let creditCardData = {
+          clientCode: data.client.clientCode,
+          creditCard: data.creditCard
         }
-        data.creditCard.token = (await paymentService.executeApiPayu('POST', `/customers/${data.client.clientCode}/creditCards`, dataCreditCard)).token
+        data.creditCard = await paymentService.createCreditCard(creditCardData)
       }
       // create subscription
       client.subscriptions = _.get(client, 'subscriptions', [])
-      client.subscriptions = client.subscriptions.filter(item => [sails.config.app.plans.subscriptions].includes(data.plan.info.planCode))
+      client.subscriptions = client.subscriptions.filter(item => sails.config.app.plans.subscriptions.includes(item.plan.planCode))
       if(client.subscriptions.length>0){
         throw intlService.i18n('subscriptionAlreadyExist')
       }
       if(data.plan.info.paymentType!=='subscription'){
         throw intlService.i18n('subsciptionPlanError')
       }
-      let dataSubscription = {
+      let subscriptionData = {
         quantity: 1,
         installments: 1,
         trialDays: data.plan.trialDays,
         immediatePayment: true,
-        customer: {
-          id: data.client.clientCode,
-          creditCards: [{
-            token: data.creditCard.token
-          }]
-        },
-        plan: {
-          planCode: data.plan.info.planCode
-        }
+        customer: { id: data.client.clientCode, creditCards: [data.creditCard] },
+        plan: { planCode: data.plan.info.planCode }
       }
-      data.subscription = await paymentService.executeApiPayu('POST', `/subscriptions`, dataSubscription)
+      data.subscription = await paymentService.createSubscription(subscriptionData)
       // create user
       let user = await sails.models.user.findOne({ email: data.client.email })
       if(!user){
@@ -139,7 +152,7 @@ module.exports = {
           message: intlService.i18n('mailSubscriptionCreatedMessage', { appName: sails.config.app.appName })
         })
       }catch(e){
-        console.warn(ntlService.i18n('emailError'))
+        console.warn(intlService.i18n('emailError'))
       }
       res.json({ message: intlService.i18n('subscriptionCreatedSuccess') })
     }catch(e){

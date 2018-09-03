@@ -207,5 +207,7 @@
   "subscriptionNextPlan": "Proximo a cambiar a {{planName}} ",
   "seeAll": "Ver todo",
   "chatTitle": "Chat",
-  "chatDescription": "Revisa tus mensajes"
+  "chatDescription": "Revisa tus mensajes",
+  "mailSubscriptionChangedSubject": "Tu suscripción ha cambiado",
+  "mailSubscriptionChangedMessage": "<p>Has cambiado tu suscripción a {{planName}}, el pago de suscripción ha sido exitoso.</p><p>Gracias por ser parte de {{appName}}, Recuerda que esta suscripción hace cobros automáticos a tu tarjeta. Podrás suspender la suscripción y ver el historial de tus pagos en cualquier momento desde nuestra aplicación web.</p>"
 }
