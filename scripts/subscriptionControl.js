@@ -33,7 +33,7 @@ module.exports = {
                 installments: 1,
                 trialDays: 0,
                 immediatePayment: true,
-                customer: { id: user.clientCode, creditCards: user.clientInfo.creditCards },
+                customer: { id: user.clientCode, creditCards: user.clientInfo.creditCardsm.map(item => item.token) },
                 plan: { planCode: user.nextPlan.planCode }
               })
             }
@@ -42,6 +42,7 @@ module.exports = {
         }
       }
     }catch(e){
+      
       sails.log('Error running script... (`subscription-control`)')
     }
     return exits.success()
