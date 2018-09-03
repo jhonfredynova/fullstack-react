@@ -201,5 +201,11 @@
   "subscriptionClientError": "No hay una cliente asociado a la suscripción.",
   "subscriptionCanceled": "Tu suscripción ha sido cancelada, dejaremos de hacer cargos a tu tarjeta de crédito",
   "subscriptionPlanError": "El plan seleccionado no está disponible para el pago por suscripción.",
-  "continue": "Continuar"
+  "continue": "Continuar",
+  "subscriptionSchedule": "Su suscripción se renovará a {{planName}} el {{date}}.",
+  "cancel": "Cancelar",
+  "subscriptionNextPlan": "Proximo a cambiar a {{planName}} ",
+  "seeAll": "Ver todo",
+  "chatTitle": "Chat",
+  "chatDescription": "Revisa tus mensajes"
 }

@@ -1,0 +1,29 @@
+#chat{
+  position: relative;
+  min-height: 600px;
+  max-height: 600px;
+}
+#chat .sidebar{
+  position: absolute;
+  background-color: white;
+  max-width: 250px;
+  padding-right: 15px;
+  z-index: 1050!important;
+}
+#chat .sidebarRoot{
+  padding: 15px
+}
+#chat .sidebarContent{
+  overflow-y: hidden!important;
+  padding-left: 15px;
+}
+#chat .sidebarOverlay{
+  z-index: 1040!important;
+}
+
+@media only screen and (max-width: 768px) {
+  #chat .sidebar{
+    position: fixed!important;
+    padding: 15px;
+  }
+}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, clean, compact, flow, isEmpty, isEmail, get, set, toUrl } from 'lodash'
+import { cloneDeep, clean, compact, flow, isEmpty, isEmail, get, set } from 'lodash'
 import { OverlayTrigger, Tooltip } from 'react-bootstrap'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
@@ -41,8 +41,8 @@ class BuyTransaction extends Component {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getPlan({ populate: false, select: ['id', 'name','description','paymentType','planCode','transactionValue'] }))
-      const plan = this.props.plan.plans.records.find(item => toUrl(item.name)===this.props.match.params.idPlan)
+      await this.props.dispatch(getPlan({ select: ['id', 'name','description','planCode','paymentType','transactionValue'], where: { permalink: this.props.match.params.idPlan } }))
+      const plan = this.props.plan.plans.records[0]
       if(!plan || plan.paymentType!=='transaction'){
         this.props.history.push('/')
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('planNotFound') }))

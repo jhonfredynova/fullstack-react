@@ -46,6 +46,8 @@ class Header extends Component {
     const popoverMessages = (
       <Popover id="popover-trigger-click-root-close" title={this.context.t('messages')}>
         <p>{this.context.t('userNotHaveMessages')}</p>
+        <hr/>
+        <div className="text-center"><Link to="/app/user/chat">{this.context.t('seeAll')}</Link></div>
       </Popover>
     )
     const popoverNotifications = (

@@ -46,6 +46,18 @@ module.exports.policies = {
     update: ['isAuthenticated', authorization([1], true)],
     destroy: ['isAuthenticated', authorization([1], true)]
   },
+  ChatController: {
+    find: ['isAuthenticated', authorization([1,2,3,4], false)],
+    create: ['isAuthenticated', authorization([1,2,3,4], false)],
+    update: ['isAuthenticated', authorization([1,2,3,4], false)],
+    destroy: ['isAuthenticated', authorization([1,2,3,4], false)]
+  },
+  ChatMessageController: {
+    find: ['isAuthenticated', authorization([1,2,3,4], false)],
+    create: ['isAuthenticated', authorization([1,2,3,4], false)],
+    update: ['isAuthenticated', authorization([1,2,3,4], false)],
+    destroy: ['isAuthenticated', authorization([1,2,3,4], false)]
+  },
   LocaleController: {
     find: true,
     create: ['isAuthenticated', authorization([1], true)],
@@ -53,7 +65,6 @@ module.exports.policies = {
     destroy: ['isAuthenticated', authorization([1], true)]
   },
   PaymentController: {
-    controlSubscriptions: ['isAuthenticated', authorization([1], true)],
     getBilling: ['isAuthenticated', authorization([1,2,3,4], false)],
     getSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
     getSubscriptionPlan: ['isAuthenticated', authorization([1,2,3,4], false)],

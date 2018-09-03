@@ -5,6 +5,9 @@ hr{
 img{
   font-size: 0px;
 }
+table td{
+  vertical-align: middle!important;
+}
 table tbody td .btn{
   margin-left: 4px;
 }
@@ -25,6 +28,9 @@ table tbody td .btn{
 .align-middle > *{
   margin-right: 5px;
 }
+.d-block{
+  display: block;
+}
 .d-inline{
   display: inline;
   margin-right: 5px;
@@ -32,6 +38,12 @@ table tbody td .btn{
 .row {
   display: flex;
   flex-wrap: wrap;
+}
+.row [class*=col-]{
+  margin-bottom: 15px;
+}
+.row .row [class*=col-]{
+  margin-bottom: 0px;
 }
 .row .row [class*=col-]:not(:last-child){
   padding-right: 0px;
@@ -60,6 +72,11 @@ table tbody td .btn{
 .modal-header {
   background-color: #f5f5f5;
   border-radius: 6px 6px 0px 0px;
+}
+/* react-popover */
+.popover-content hr{
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 /* react-quill */
 .ql-editor p{

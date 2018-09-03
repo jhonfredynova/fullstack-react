@@ -2,6 +2,7 @@ import { combineReducers } from 'redux'
 import app from 'reducers/appReducer'
 import auth from 'reducers/authReducer'
 import catalog from 'reducers/catalogReducer'
+import chat from 'reducers/chatReducer'
 import { i18nState } from 'redux-i18n'
 import locale from 'reducers/localeReducer'
 import payment from 'reducers/paymentReducer'
@@ -13,6 +14,7 @@ export default combineReducers({
   app,
   auth,
   catalog,
+  chat,
   i18nState,
   locale,
   payment,

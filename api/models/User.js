@@ -58,10 +58,11 @@ module.exports = {
       type: 'string'
     },
     plan: {
-      model: 'plan'
+      model: 'plan',
+      required: true
     },
     nextPlan: {
-      type: 'json'
+      model: 'plan'
     },
     passports: {
       collection: 'passport',
@@ -74,7 +75,7 @@ module.exports = {
   },
   customToJSON: function() {
     this.fullname = `${this.firstname} ${this.lastname}`
-    return _.omit(this, ['password','passwordResetExpiration','passwordResetToken'])
+    return _.omit(this, ['password','passwordResetExpiration','passwordResetToken','passports'])
   },
   beforeCreate: async (values, next) => {
     try{      

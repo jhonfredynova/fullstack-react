@@ -97,8 +97,10 @@ export function setPreference(data) {
   }
 }
 
-export function deleteMessage(data) {
+export function deleteMessage() {
   return (dispatch, state) => {
-    dispatch({ type: APP.DELETE_MESSAGE, payload: [] })
+    if(state().app.messages.length>0){
+      dispatch({ type: APP.DELETE_MESSAGE, payload: [] })
+    }
   }
 }

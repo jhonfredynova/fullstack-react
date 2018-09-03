@@ -10,6 +10,7 @@ class Pager extends Component {
   constructor(props) {
     super(props)
     this.state = { 
+      template: defaultTo(this.props.data.template, 'grid'),
       activePage: defaultTo(this.props.data.activePage, 1),
       pageSize: defaultTo(this.props.data.pageSize, 10),
       select: defaultTo(this.props.data.select, null),
@@ -54,6 +55,8 @@ class Pager extends Component {
     
   render() {
     const { records, recordsTotal } = this.props.items
+    const { isLoading } = this.props
+    const { template } = this.state
     const thereIsData = records.length>0
     return (
       <div id="pager" className={this.props.className}>
@@ -72,11 +75,14 @@ class Pager extends Component {
             </span>
           </div>
         </form>
-        <section className={classnames({ 'hide': this.props.isLoading })}>
+        <section>
           { thereIsData ?  this.props.children : null }
-          <div className={classnames({ 'alert alert-warning': true, 'hide': thereIsData })}>{this.context.t('thereIsNotData')}</div>
-          <div className={classnames({ 'text-center': true, 'hide': !thereIsData })}>
+          <div className={classnames({ 'alert alert-warning': true, 'hide': (isLoading || thereIsData) })}>{this.context.t('thereIsNotData')}</div>
+          <div className={classnames({ 'text-center': true, 'hide': (!thereIsData || template==='scroll') })}>
             <Pagination bsClass="pagination" bsSize="medium" prev next ellipsis boundaryLinks maxButtons={3} items={Math.ceil(recordsTotal/this.state.pageSize)} activePage={this.state.activePage} onSelect={value => this.handleChangeState('activePage', value)} />
+          </div>
+          <div className={classnames({ 'text-center': true, 'hide': (!thereIsData || template==='grid') })}>
+            <p onClick={() => this.handleChangeState('pageSize', parseInt(this.state.pageSize+this.state.pageSize,10))}>Load more</p>
           </div>
         </section>
       </div>

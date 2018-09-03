@@ -1,3 +1,16 @@
+/*******************************************************
+// load enviroment variables and local configuration
+*******************************************************/
+try{
+  require('dotenv').load()
+  require('./local')
+}catch (e){
+  console.warn('Warning: local configuration not found')
+}
+
+/*******************************************************
+// app configuration
+*******************************************************/
 module.exports.app = {
   //APP
   appDisabled: false,

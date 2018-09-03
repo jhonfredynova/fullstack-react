@@ -54,7 +54,6 @@ module.exports.routes = {
   'get    /api/auth/:provider': 'AuthController.provider',
   'get    /api/auth/:provider/callback': 'AuthController.providerCallback',
   //PAYMENT
-  'get    /api/payment/subscription/control': 'PaymentController.controlSubscriptions',
   'get    /api/payment/subscription/billing': 'PaymentController.getBilling',
   'get    /api/payment/subscription/plan': 'PaymentController.getSubscriptionPlan',
   'post   /api/payment/subscription': 'PaymentController.createSubscription',

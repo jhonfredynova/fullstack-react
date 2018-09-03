@@ -30,10 +30,11 @@ import AdminUserSave from 'containers/admin/security/adminUserSave'
 import AdminUserRol from 'containers/admin/security/adminUserRol'
 import AdminUserRolSave from 'containers/admin/security/adminUserRolSave'
 //APP-CONTAINERS
+import Billing from 'containers/app/user/billing'
+import Chat from 'containers/app/user/chat'
 import Dashboard from 'containers/app/dashboard'
 import Profile from 'containers/app/user/profile'
 import Subscription from 'containers/app/user/subscription'
-import Billing from 'containers/app/user/billing'
 //HOME-CONTAINERS
 import Main from 'containers/main'
 import Authorization from 'containers/authorization'
@@ -88,9 +89,10 @@ render((
             {/* APP */}
             {/* USER */}
             <Route path="/app/dashboard" component={Authorization(Dashboard, [1,2,3,4], false)}/>
+            <Route path="/app/user/billing" component={Authorization(Billing, [1,2,3,4], false)}/>
+            <Route path="/app/user/chat" component={Authorization(Chat, [1,2,3,4], false)}/>
             <Route path="/app/user/profile" component={Authorization(Profile, [1,2,3,4], false)}/>   
             <Route path="/app/user/subscription" component={Authorization(Subscription, [1,2,3,4], false)}/>
-            <Route path="/app/user/billing" component={Authorization(Billing, [1,2,3,4], false)}/>
             {/* HOME */}
             <Route path="/" exact component={Home}/>
             <Route path="/buy/response" exact component={BuyResponse}/>

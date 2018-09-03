@@ -49,7 +49,7 @@ class PlanBox extends Component {
     }
     return (
       <div id="planBox" className={classnames({'popular': info.popular, 'selected': info.selected, 'hide': isLoading})} onClick={this.handleClick.bind(this)}>
-        <OverlayTrigger trigger={info.id===config.plans.free ? 'hover' : null} placement="top" overlay={tooltipPlanFree}>
+        <OverlayTrigger trigger={info.id===config.plans.free ? ['hover','focus'] : []} placement="top" overlay={tooltipPlanFree}>
           <div className="panel panel-default">
             <div className="panel-heading text-center">
               <div id="popular" className={classnames({'hide': !info.popular})}>

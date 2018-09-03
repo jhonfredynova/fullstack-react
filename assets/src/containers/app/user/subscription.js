@@ -134,6 +134,19 @@ class Subscription extends Component {
     }
   }
 
+  async handleCancelNextSubscription(){
+    try{
+      this.props.dispatch(showLoading())
+      const { session } = this.props.auth
+      await this.props.dispatch(updateUser({ id: session.id, nextPlan: null }))
+      await this.props.dispatch(me())
+      this.props.dispatch(hideLoading())
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
   async handleUpdateSubscription(e){
     try{
       if(e) e.preventDefault()
@@ -148,22 +161,33 @@ class Subscription extends Component {
       const { session } = this.props.auth
       const { free: planFree } = this.props.app.config.plans
       const planSelected = this.state.model.plan.info
-      //cancel or suspend subscription
-      if(planSelected.id===planFree){
-        await this.props.dispatch(updateUser({ id: session.id, plan: planFree }))
-        await this.props.dispatch(me())
-        await this.handleCloseSubscription()
-        this.props.dispatch(setMessage({ type: 'error', message: this.context.t('subscriptionCanceled') }))
-        this.props.dispatch(hideLoading())
-        return
-      }
-      //wrong plan
-      if(planSelected.paymentType!=='subscription'){
+      const subscription = get(session.clientInfo, 'subscriptions[0]', {})
+      //wrong subscription
+      if(planSelected.id!==planFree && planSelected.paymentType!=='subscription'){
+        this.handleCloseSubscription()
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('subscriptionPlanError') }))
         this.props.dispatch(hideLoading())
         return
       }
-      //subscription
+      //change subscription
+      if(!isEmpty(subscription)){
+        await this.props.dispatch(updateUser({ id: session.id, nextPlan: planSelected.id }))
+        await this.props.dispatch(me())
+        await this.handleCloseSubscription()
+        this.props.dispatch(setMessage({ type: 'success', message: this.context.t('subscriptionSchedule', { planName: planSelected.name, date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') }) }))
+        this.props.dispatch(hideLoading())
+        return
+      }
+      //cancel subscription
+      if(planSelected.id===planFree){
+        await this.props.dispatch(updateUser({ id: session.id, plan: planSelected.id }))
+        await this.props.dispatch(me())
+        await this.handleCloseSubscription()
+        this.props.dispatch(setMessage({ type: 'success', message: this.context.t('subscriptionCanceled') }))
+        this.props.dispatch(hideLoading())
+        return
+      }
+      //create subscription
       this.state.model.client.fullname = session.fullname
       this.state.model.client.email = session.email
       this.state.model.creditCard.token = get(session.clientInfo, 'creditCards[0].token')
@@ -185,10 +209,10 @@ class Subscription extends Component {
     const creditCards = get(session.clientInfo, 'creditCards', [])
     const subscription = get(session.clientInfo, 'subscriptions[0]', {})
     const planSelected = this.state.model.plan.info || {}
-    this.state.plans.forEach(item => {
+    const plans = this.state.plans.filter(item => item.paymentType!=='transaction').map(item => {
       item.url = '/register'
       if(item.paymentType==='subscription') item.url = `/buy/subscription/${toUrl(item.name)}`
-      if(item.paymentType==='transaction') item.url = `/buy/transaction/${toUrl(item.name)}`
+      return item
     })
     return (
       <div id="subscription">
@@ -213,7 +237,7 @@ class Subscription extends Component {
               </div>
             </div>
             <Modal show={this.state.showModalCreditCard} onHide={this.handleCloseCreditCard.bind(this)}>
-              <Modal.Header backdrop={true} closeButton>
+              <Modal.Header closeButton>
                 <Modal.Title>{creditCards.length===0 ? this.context.t('createCreditCard') : this.context.t('updateCreditCard')}</Modal.Title>
               </Modal.Header>
               <Modal.Body>
@@ -281,17 +305,16 @@ class Subscription extends Component {
           </div>
         </div>
         <div className="alert alert-info">
-          <p>
-            {this.context.t('subscriptionCurrent', { planName: session.plan.name })}
+          <p className={classnames({'hide': isEmpty(subscription)})}>
+            <span>{this.context.t('subscriptionNextPayment', { date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') })}</span>
             <span className={classnames({'hide': !isEmpty(subscription)})}> {this.context.t('subscriptionNoCharges')}</span>
-            <span className={classnames({'hide': isEmpty(subscription)})}> {this.context.t('subscriptionNextPayment', { date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') })}</span>
           </p>
           <p className={classnames({'hide': !session.nextPlan})}>
-            Proximo a cambiar al (Plan Premium) <button className="btn btn-danger"><i className="fa fa-times" /> Cancelar</button>
+            {this.context.t('subscriptionNextPlan', { planName: get(session.nextPlan, 'name') })} <button className="btn btn-danger" onClick={this.handleCancelNextSubscription.bind(this)}><i className="fa fa-times" /> {this.context.t('cancel')}</button>
           </p>
         </div>
         <Modal show={this.state.showModalSubscription} onHide={this.handleCloseSubscription.bind(this)}>
-          <Modal.Header backdrop={true} closeButton>
+          <Modal.Header closeButton>
             <Modal.Title>{this.context.t('updateSubscription')}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
@@ -307,7 +330,7 @@ class Subscription extends Component {
         </Modal>
         <div className="row">
           {
-            sortBy(this.state.plans, ['order']).map(item =>
+            sortBy(plans, ['order']).map(item =>
               <div key={item.id} className="col-md-4 col-xs-12">
                 <PlanBox data={{ isLoading: isLoading, app: this.props.app, info: item, selected: session.plan.id }} onClick={() => { if(item.id===session.plan.id) return; this.handleChangeState('showModalSubscription', true); this.handleChangeState('model.plan.info', item) }  }/>
               </div>

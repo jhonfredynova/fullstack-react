@@ -9,68 +9,8 @@ let crypto = require('crypto')
 
 module.exports = {
 
-  controlSubscriptions: async (req, res) => {
-    try{
-      let users = await sails.models.user.find({ roles: sails.config.app.roles.registered })
-      users = users.toObject()
-      for (let user of users)
-      {
-        if(user.clientCode) {
-          let infoPayu = await paymentService.executeApiPayu('GET', `/customers/${user.clientCode}`)
-          user.planDetails.customerPayu = infoPayu
-        }
-        // next billing
-        let currentBilling = null
-        let nextBilling = null
-        if(user.clientCode) {
-          let customerPayu = user.planDetails.customerPayu
-          let subscriptionId = customerPayu.subscriptions ? customerPayu.subscriptions[0].id : null
-          let recurringBills = []
-          if (subscriptionId) {
-            recurringBills = await paymentService.executeApiPayu('GET', `/recurringBill?subscriptionId=${subscriptionId}`)
-            recurringBills = recurringBills.recurringBillList
-          }
-          let currentBilling = _.sortByOrder(recurringBills, ['dateCharge'], ['desc'])[1]
-          let nextBilling = _.sortByOrder(recurringBills, ['dateCharge'], ['desc'])[0]
-        }
-        // cancel subscription
-        if(user.planDetails.plan!==sails.config.app.plans.free && (!currentBilling || (currentBilling && currentBilling.state==='NOT_PAID' || currentBilling.state==='CANCELLED'))) {
-          user.process = 'CANCEL_SUBSCRIPTION'
-          user.planDetails.subscriptionId = currentBilling.subscriptionId
-          user.planDetails.plan = sails.config.app.plans.free
-          user.changePlan = {}
-        }
-        // change subscription
-        let isLastDayPlan = nextBilling ? (nextBilling.dateCharge-Date.now())/36e5 <= 4 : true //remain4hours
-        if((user.changePlan && user.changePlan.plan) && isLastDayPlan){
-          user.process = 'CHANGE_SUBSCRIPTION'
-          user.planDetails.subscriptionId = nextBilling.subscriptionId
-          user.planDetails.plan = user.changePlan.plan
-          user.planDetails.quantity = user.changePlan.quantity
-          user.planDetails.trialDays = user.changePlan.trialDays
-          user.changePlan = {}
-        }
-        // update user
-        if(user.planDetails.plan===sails.config.app.plans.free) {
-          user.planDetails.payuPlanCode = '';
-          continue
-        }
-        let planDetail = await sails.models.plan.findOne({ _id: user.planDetails.plan })
-        user.planDetails.payuPlanCode = planDetail.payuPlanCode;
-      }
-      //response
-      users = _.filter(users, user => {
-        return (user.process==='CANCEL_SUBSCRIPTION' || user.process==='CHANGE_SUBSCRIPTION');
-      })
-      res.json(users)
-    }catch(e){
-      console.error(e)
-      res.status(400).send({ message: e.message })
-    }
-  },
-
   getBilling: async (req, res) => {
-    try{
+    try{      
       let criteria = requestService.parseCriteria(req)
       let recurringBills = await paymentService.executeApiPayu('GET', `/recurringBill?customerId=${criteria.where.clientCode}`, null)
       recurringBills = _.filter(recurringBills.recurringBillList, item => { return item.state==='PAID' })
@@ -108,11 +48,13 @@ module.exports = {
   getTransaction: async (req, res) => {
     try{
       let data = req.body
-      console.log(data)
-      console.log(`referenceSale = ${data.reference_sale}`)
-      let referenceCode = _.get(data, 'reference_sale', '').split('-')
-      console.log(`collectionName = ${referenceCode[0]}, collectionId = ${referenceCode[1]}, collectionDate = ${referenceCode[2]}`)
-      res.ok(data)
+      let transaction = await sails.models.transaction.findOne({ referenceCode: data.reference_sale })
+      if(transaction){
+        sails.models.transaction.update({ id: transaction.id }, {
+          status: data.state_pol.toString()==='4' ? 'approved' : 'rejected'
+        })
+      }
+      res.ok(intlService.i18n('successfulOperation'))
     }catch(e){
       res.badRequest(e)
     }
@@ -210,7 +152,7 @@ module.exports = {
       const data = req.body
       const { appName } = sails.config.app
       const { id: planId, name: planName, transactionValue } = data.plan.info
-      let referenceCode = `plan-${planId}-${Date.now()}`
+      let referenceCode = Date.now()
       let signature = `${process.env.PAYU_API_KEY}~${process.env.PAYU_MERCHANT}~${referenceCode}~${transactionValue.value}~${transactionValue.currency.toUpperCase()}`     
       let response = {
         merchantId: process.env.PAYU_MERCHANT,
@@ -226,6 +168,7 @@ module.exports = {
         responseUrl: `${process.env.LOCAL_APP_URL}/buy/response`,
         confirmationUrl: `${process.env.LOCAL_API_URL}/payment/transaction/confirmation`
       }
+      await sails.models.transaction.create({ referenceCode: referenceCode, description: `plan-${planId}` })
       res.ok(response)
     }catch(e){
       res.badRequest(e)

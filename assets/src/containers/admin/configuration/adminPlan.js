@@ -126,7 +126,8 @@ class AdminPlan extends Component {
                         $0
                       </span>
                       <span className={classnames({'hide': !item.paymentType })}>
-                        {item.paymentType}<br/>
+                        <span className="d-block">{item.paymentType}</span>
+                        <small className={classnames({'text-success d-block': true, 'hide': item.paymentType!=='subscription'})}>{item.planCode}</small>
                         {item.subscriptionInfo ? `$${get(item, 'subscriptionInfo.price.value', 0)} ${get(item, 'subscriptionInfo.price.currency', '')}` : `$${get(item, 'transactionValue.value', 0)} ${get(item, 'transactionValue.currency', '').toUpperCase()}` }
                       </span>
                     </td>

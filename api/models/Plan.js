@@ -16,6 +16,10 @@ module.exports = {
       type: 'string',
       required : true
     },
+    permalink: {
+      type: 'string',
+      required: true
+    },
     description: {
       type: 'string',
       required: true

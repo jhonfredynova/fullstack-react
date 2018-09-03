@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
 import classnames from 'classnames'
-import { cloneDeep, clean, compact, defaults, flow, isEmpty, keys, get, set } from 'lodash'
+import { cloneDeep, clean, compact, defaults, flow, isEmpty, keys, get, set, toUrl } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan, savePlan, updatePlan } from 'actions/planActions'
@@ -90,6 +90,7 @@ class AdminPlanSave extends Component {
       }
       //execute
       this.props.dispatch(showLoading())
+      this.state.model.permalink = toUrl(this.state.model.name)
       if(this.state.model.id){
         await this.props.dispatch(updatePlan(this.state.model))  
       }else{

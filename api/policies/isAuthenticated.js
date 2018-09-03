@@ -39,7 +39,7 @@ module.exports = async function (req, res, next) {
       if (err) return next(err)
       if (!user) return res.forbidden()
       if (!user.active) return res.forbidden()
-      user = await sails.models.user.findOne(user.id).populate('plan').populate('roles')
+      user = await sails.models.user.findOne(user.id).populateAll()
       const { plans, roles } = sails.config.app
       let permissions = {
         isPlanFree: user.plan.id===plans.free,

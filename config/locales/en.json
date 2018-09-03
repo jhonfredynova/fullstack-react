@@ -201,5 +201,11 @@
   "subscriptionClientError": "There is no client associated with the subscription.",
   "subscriptionCanceled": "Your subscription has been canceled, we will stop charging your credit card.",
   "subscriptionPlanError": "The selected plan is not available for subscription payment.",
-  "continue": "Continue"
+  "continue": "Continue",
+  "subscriptionSchedule": "Your subscription will be renewed at {{planName}} on {{date}}.\n",
+  "cancel": "Cancel",
+  "subscriptionNextPlan": "Next to change to {{planName}}",
+  "seeAll": "See all",
+  "chatTitle": "Chat",
+  "chatDescription": "Review your messages"
 }
