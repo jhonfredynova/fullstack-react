@@ -87,7 +87,7 @@ class Menu extends Component {
         }
         {/* HOME */}
         {
-          isAuthenticated===false ?
+          !isAuthenticated ?
           <Navbar.Form pullRight>
             <LinkContainer to="/login">
               <Button className="btn btn-default">{this.context.t('login')}</Button>
@@ -99,7 +99,7 @@ class Menu extends Component {
           : null
         }
         {
-          isAuthenticated===false ? 
+          !isAuthenticated ? 
           <Nav pullRight> 
             <LinkContainer exact to="/">
               <NavItem>{this.context.t('home')}</NavItem>

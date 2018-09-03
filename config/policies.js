@@ -94,7 +94,7 @@ module.exports.policies = {
     destroy: ['isAuthenticated', authorization([1], true)]
   },
   UserController: {
-    find: ['isAuthenticated', authorization([1,2,3,4], false)],
+    find: true,
     create: ['isAuthenticated', authorization([1], true)],
     update: ['isAuthenticated', authorization([1,2,3,4], false)],
     destroy: ['isAuthenticated', authorization([1], true)],
