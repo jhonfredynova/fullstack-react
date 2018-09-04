@@ -1,4 +1,11 @@
 import _ from 'lodash'
+import localStorage from 'localStorage'
+import 'matchmedia-polyfill'
+import 'matchmedia-polyfill/matchMedia.addListener'
+
+//WINDOW
+if(!window.localStorage) window.localStorage = localStorage
+if(!window.matchMedia) window.matchMedia = matchMedia
 
 //COMMANDS
 const supportedCommands = ['copy']

@@ -1,31 +1,32 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
-import PropTypes from 'prop-types'
 import classnames from 'classnames'
+import PropTypes from 'prop-types'
 import Sidebar from "react-sidebar"
-import NavigationBar from 'components/navigationBar'
-import Pager from 'components/pager'
+import InfiniteScroll from 'react-infinite-scroll-component'
 import { set } from 'lodash'
-import { hideLoading, showLoading, setMessage, setPreference, PREFERENCE } from 'actions/appActions'
+import ChatNewMessage from 'components/chatNewMessage'
+import NavigationBar from 'components/navigationBar'
+import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getBilling } from 'actions/paymentActions'
 import 'containers/app/user/chat.css'
-const sidebarMql = true//window.matchMedia(`(min-width: 768px)`)
+const sidebarMql = window.matchMedia(`(min-width: 768px)`)
 
 class Chat extends Component {
 
   constructor(props){
     super(props)
     const { session } = this.props.auth
-    const { appPreferences } = this.props.app.config
     this.handleMediaQuery = this.handleMediaQuery.bind(this)
     this.handlePressKey = this.handlePressKey.bind(this);
     this.state = {
       sidebarDocked: sidebarMql.matches,
+      sidebarMql: sidebarMql,
       sidebarOpen: false,
+      showChatNewMessage: false,
       chats: this.props.payment.billing,//this.props.chat.chats,
       chatQuery: {
-        template: 'scroll',
-        pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
+        pageSize: 10,
         //select: ['updatedAt','id','from'],
         sort: [
           { updatedAt: 'DESC' }
@@ -47,7 +48,7 @@ class Chat extends Component {
   async componentWillMount(){
     try{
       this.props.dispatch(showLoading())
-      sidebarMql.addListener(this.handleMediaQuery)
+      this.state.sidebarMql.addListener(this.handleMediaQuery)
       document.addEventListener('keydown', this.handlePressKey, false)
       window.dispatchEvent(new Event('resize'))
       //await this.props.dispatch(getChat(this.state.chatQuery))
@@ -61,7 +62,7 @@ class Chat extends Component {
 
   componentWillUnmount() {
     try{
-      sidebarMql.removeListener(this.handleMediaQuery)
+      this.state.sidebarMql.removeListener(this.handleMediaQuery)
       document.removeEventListener('keydown', this.handlePressKey, false);
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -75,7 +76,7 @@ class Chat extends Component {
 
   async handleMediaQuery(){
     try{
-      this.setState({ sidebarDocked: sidebarMql.matches, sidebarOpen: false });
+      this.setState({ sidebarDocked: this.state.sidebarMql.matches, sidebarOpen: false });
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())
@@ -96,8 +97,7 @@ class Chat extends Component {
   async handleChangeSearch(data){
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(setPreference({ [PREFERENCE.ADMIN_PAGINATION]: data.pageSize }))
-      await this.setState({ chatQuery: Object.assign(this.state.chatQuery, data) })
+      await this.setState({ chatQuery: Object.assign(this.state.chatQuery, { pageSize: this.state.chatQuery.pageSize+5 }) })
       //await this.props.dispatch(getChat(this.state.chatQuery))
       await this.props.dispatch(getBilling(this.state.chatQuery))
       this.props.dispatch(hideLoading())
@@ -108,24 +108,35 @@ class Chat extends Component {
   }
 
   render() {
-    const { isLoading } = this.props.app
-    const { records } = this.state.chats
+    const { records, recordsTotal } = this.state.chats    
+    const chatHasMore = records.length+1<recordsTotal     
+    const chatLoader = (<div className="text-center"><i className="fa fa-spinner fa-spin fa-2x"></i></div>)
     const chatConversations = (
-      <Pager isLoading={isLoading} data={this.state.chatQuery} items={this.state.chats} onChange={this.handleChangeSearch.bind(this)}>
-        {
-          records.map((item, index) => 
-            <p className="alert alert-info">{item.orderId}</p>
-          )
-        }
-      </Pager>
+      <div className="panel panel-default">
+        <div className="panel-heading">
+          <span className="pull-left"><h2>{this.context.t('messages')}</h2></span>
+          <span className="pull-right"><button className="btn btn-success"><i className="glyphicon glyphicon-edit" /></button></span>
+          <span className="clearfix" />
+        </div>
+        <div id="chatBody" className="panel-body">
+          <InfiniteScroll scrollableTarget={'chatBody'} hasMore={chatHasMore} next={this.handleChangeSearch.bind(this)} loader={chatLoader}> 
+            {
+              records.map((item, index) => 
+                <p key={item.id} className="alert alert-info">{item.orderId}</p>
+              )
+            }
+          </InfiniteScroll>
+        </div>
+      </div>
     )
     return (
       <div id="chat">
         <Sidebar rootClassName='sidebarRoot' sidebarClassName='sidebar' contentClassName='sidebarContent' overlayClassName='sidebarOverlay' docked={this.state.sidebarDocked} sidebar={chatConversations} open={this.state.sidebarOpen} onSetOpen={() => this.handleChangeState('sidebarOpen',false)}>
-          <NavigationBar data={{ title: <h1>{this.context.t('chatTitle')}</h1>, subTitle: <h2>{this.context.t('chatDescription')}</h2>, btnLeft: <button className={classnames({"btn btn-success": true, "hide": this.state.sidebarDocked})} onClick={() => this.handleChangeState('sidebarOpen', !this.state.sidebarOpen)}><i className="glyphicon glyphicon-chevron-right" /></button> }} />
+          <NavigationBar data={{ title: <h1>{this.context.t('chatTitle')}</h1>, subTitle: <h2>{this.context.t('chatDescription')}</h2>, btnLeft: (this.state.sidebarDocked ? null : <button className="btn btn-success" onClick={() => this.handleChangeState('sidebarOpen', !this.state.sidebarOpen)}><i className="glyphicon glyphicon-chevron-right" /></button>) }} />
           <div className="text-center">
             <h1><i className="fa fa-comments-o fa-2x" /></h1>
-            <p>{this.context.t('chatEmpty')}</p>
+            <p className={classnames({'hide': !this.state.showChatNewMessage})}>{this.context.t('chatEmpty')}</p>
+            <ChatNewMessage className={classnames({'hide': this.state.showChatNewMessage})} data={{}} />
           </div>
         </Sidebar>
       </div>

@@ -1,5 +1,4 @@
 import axios from 'axios'
-import localStorage from 'localStorage'
 import { handleError } from 'components/helper'
 
 export const AUTH = {

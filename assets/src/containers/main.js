@@ -11,7 +11,7 @@ import { setTranslations, setLanguage } from 'redux-i18n'
 import Header from 'components/header'
 import Footer from 'components/footer'
 import Message from 'components/message'
-import { hideLoading, showLoading, getConfig, setMessage, setPreference, deleteMessage } from 'actions/appActions'
+import { hideLoading, showLoading, getConfig, setMessage, setPreference } from 'actions/appActions'
 import { getToken, me } from 'actions/authActions'
 import './main.css'
 
@@ -39,13 +39,10 @@ class Main extends Component {
 
   async componentWillUpdate(prevProps) {
     try{
-      const { config, messages } = this.props.app
+      const { config } = this.props.app
       ReactDOM.findDOMNode(this).scrollTop = 0
       if(config.appDisabled && this.props.location.pathname!=='/coming-soon') {
         return this.props.history.push('/coming-soon')
-      }
-      if(this.props.location!==prevProps.location && messages.length>0){
-        return this.props.dispatch(deleteMessage())
       }
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))

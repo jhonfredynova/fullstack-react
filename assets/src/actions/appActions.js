@@ -1,6 +1,5 @@
 import axios from 'axios'
 import shortid from 'shortid'
-import localStorage from 'localStorage'
 import { isEqual, mapValues, pick } from 'lodash'
 import { handleError, handleRequestQuery } from 'components/helper'
 

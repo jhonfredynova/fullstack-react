@@ -35,7 +35,7 @@ class BuyResponse extends Component {
           this.setState({ 
             title: this.context.t('transactionExpiredTitle'),
             message: this.context.t('transactionExpiredDescription'), 
-            thumbnail: 'fa fa-window-close-o fa-2x text-danger' 
+            thumbnail: 'fa fa-times fa-2x text-danger' 
           })
           break
         case '6':

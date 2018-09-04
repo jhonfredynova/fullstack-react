@@ -1,5 +1,4 @@
- import axios from 'axios'
-import localStorage from 'localStorage'
+import axios from 'axios'
 
 const setHeader = store => next => action => {
   const appPreferences = store.getState().app.config.appPreferences || localStorage

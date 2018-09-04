@@ -47,38 +47,28 @@ module.exports = {
 
   getTransaction: async (req, res) => {
     try{
-      
-      await sails.models.transaction.create({ referenceCode: 'entry', description: JSON.stringify(req.body) })
-
-
-      const { reference_sale, state_pol } = req.body
+      const { email_buyer, reference_sale, state_pol } = req.body
       let transaction = await sails.models.transaction.findOne({ referenceCode: reference_sale })
-      if(transaction){
-        // updating transaction
-        let transactionStatus = state_pol.toString()==='4' ? 'approved' : 'rejected'
-        sails.models.transaction.update({ id: transaction.id }, {
-          status: transactionStatus
-        })
-        // sending notification
-        if(transactionStatus==='approved'){
-          try{
-            await mailService.sendEmail({
-              fromName: sails.config.app.appName,
-              fromEmail: sails.config.app.emails.noreply,
-              toEmail: data.client.email,
-              subject: intlService.i18n('mailSubscriptionCreatedSubject'),
-              message: intlService.i18n('mailSubscriptionCreatedMessage', { appName: sails.config.app.appName })
-            })
-          }catch(e){
-            console.warn(intlService.i18n('emailError'))
-          }
+      if(!transaction) return res.badRequest(intlService.i18n('transactionNotFound'))
+      // updating transaction
+      let transactionStatus = state_pol.toString()==='4' ? 'approved' : 'rejected'
+      await sails.models.transaction.update({ id: transaction.id }, { status: transactionStatus })
+      // sending notification
+      if(transactionStatus==='approved'){
+        try{
+          await mailService.sendEmail({
+            fromName: sails.config.app.appName,
+            fromEmail: sails.config.app.emails.noreply,
+            toEmail: email_buyer,
+            subject: intlService.i18n('mailTransactionSuccessSubject'),
+            message: intlService.i18n('mailTransactionSuccessMessage')
+          })
+        }catch(e){
+          console.warn(intlService.i18n('emailError'))
         }
       }
       res.ok(intlService.i18n('successfulOperation'))
     }catch(e){
-      
-      await sails.models.transaction.create({ referenceCode: 'error', description: JSON.stringify(req.body) })
-
       res.badRequest(e)
     }
   },
