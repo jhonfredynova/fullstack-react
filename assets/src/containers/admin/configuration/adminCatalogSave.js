@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
 import { cloneDeep, clean, compact, defaults, flow, keys, get, set, isEmpty } from 'lodash'
@@ -9,7 +9,7 @@ import Multilanguage from 'components/multilanguage'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getCatalog, saveCatalog, updateCatalog } from 'actions/catalogActions'
 
-class AdminCatalogSave extends Component {
+class AdminCatalogSave extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -101,32 +101,35 @@ class AdminCatalogSave extends Component {
     })
     return (
       <div id="adminCatalogSave">
-        <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update Catalog' : 'New Catalog'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.goBack()}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
+        <NavigationBar 
+          title={<h1>{this.state.model.id ? 'Update Catalog' : 'New Catalog'}</h1>} 
+          btnLeft={<button className="btn btn-success" onClick={() => this.props.history.goBack()}><i className="fas fa-arrow-left"></i></button>} 
+          btnRight={<button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="fas fa-save"></i></button>} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Parent Catalog</label>
             <Select className="form-control" options={parentCatalogs} valueKey='id' value={this.state.model.parent} simpleValue={true} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.parent', value)} />
             <span className="text-danger">{this.state.errors.model.parent}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Name *</label>
             <input type="text" className="form-control" value={this.state.model.name} onChange={e => this.handleChangeState('model.name', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.name}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Thumbnail</label>
             <input type="text" className="form-control" value={this.state.model.thumbnail} onChange={e => this.handleChangeState('model.thumbnail', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.thumbnail}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Order *</label>
-            <Counter data={{ value: this.state.model.order, min: 0, max: 100 }} onChange={value => this.handleChangeState('model.order', value)} />
+            <Counter value={this.state.model.order} min={0} max={100} onChange={value => this.handleChangeState('model.order', value)} />
             <span className="text-danger">{this.state.errors.model.order}</span>
           </div>
-          <div className="form-group col-md-12 col-xs-12">
+          <div className="form-group col-md-12">
             <label>Value *</label>
-            <Multilanguage data={{languages: config.appLanguages, type: 'html', value: this.state.model.value}} onChange={value => this.handleChangeState('model.value', value)} />
+            <Multilanguage languages={config.appLanguages} type='html' value={this.state.model.value} onChange={value => this.handleChangeState('model.value', value)} />
             <span className="text-danger">{this.state.errors.model.value}</span>
           </div>
           <button type="submit" className="hide" />

@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
-import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Tooltip } from 'reactstrap'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { cloneDeep, clean, compact, defaults, flow, isEmail, keys, get, set, omit, isEmpty } from 'lodash'
@@ -8,7 +8,7 @@ import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getUser, updateUser } from 'actions/userActions'
 import NavigationBar from 'components/navigationBar'
 
-class Profile extends Component {
+class Profile extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -17,6 +17,7 @@ class Profile extends Component {
         model: {}
       },
       changePassword: false,
+      showTooltipEmail: false,
       model: {
         id: undefined,
         firstname: '',
@@ -107,59 +108,59 @@ class Profile extends Component {
   }
 
   render() {    
-    const tooltipEmail = (
-      <Tooltip id="tooltipEmail">
-        { this.state.model.emailConfirmed ? this.context.t('emailConfirmed') : this.context.t('emailUnconfirmed') }
-      </Tooltip>
-    )
     return (
       <div id="profile">
-        <NavigationBar data={{ title: <h1>{this.context.t('profileTitle')}</h1>, subTitle: <h2>{this.context.t('profileDescription')}</h2>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
+        <NavigationBar
+          title={<h1>{this.context.t('profileTitle')}</h1>} 
+          description={<h2>{this.context.t('profileDescription')}</h2>} />
           <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
           <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-            <div className="form-group col-md-6 col-xs-12">
+            <div className="form-group col-md-6">
               <label>{this.context.t('firstname')} *</label>
               <input type="text" className="form-control" value={this.state.model.firstname} onChange={e => this.handleChangeState('model.firstname', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.firstname}</span>
             </div>
-            <div className="form-group col-md-6 col-xs-12">
+            <div className="form-group col-md-6">
               <label>{this.context.t('lastname')} *</label>
               <input type="text" className="form-control" value={this.state.model.lastname} onChange={e => this.handleChangeState('model.lastname', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.lastname}</span>
             </div>
-            <div className="form-group col-md-6 col-xs-12">
+            <div className="form-group col-md-6">
               <label>{this.context.t('username')} *</label>
               <input type="text" className="form-control" value={this.state.model.username} onChange={e => this.handleChangeState('model.username', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.username}</span>
             </div>
-            <div className="form-group col-md-6 col-xs-12">
+            <div className="form-group col-md-6">
               <label>{this.context.t('email')} *</label>
               <div className="input-group">
-                <span className="input-group-addon">
-                  <OverlayTrigger placement="top" overlay={tooltipEmail}>
-                    <i className={classnames({'glyphicon glyphicon-remove text-danger': !this.state.model.emailConfirmed, 'glyphicon glyphicon-ok text-success': this.state.model.emailConfirmed})} />
-                  </OverlayTrigger>
+                <span id="tooltipEmail" className="input-group-addon">
+                  <i className={classnames({'fas fa-remove text-danger': !this.state.model.emailConfirmed, 'fas fa-check text-success': this.state.model.emailConfirmed})} />
                 </span>
+                <Tooltip target="tooltipEmail" placement="top" isOpen={this.state.showTooltipEmail} toggle={() => this.handleChangeState('showTooltipEmail', !this.state.showTooltipEmail)}>
+                  { this.state.model.emailConfirmed ? this.context.t('emailConfirmed') : this.context.t('emailUnconfirmed') }
+                </Tooltip>
                 <label className="form-control">{this.state.model.email}</label>
               </div>
               <span className="text-danger">{this.state.errors.model.email}</span>
             </div>
-            <div className="form-group col-md-12 col-xs-12">
+            <div className="form-group col-md-12">
               <div className="alert alert-warning">
                 <input type="checkbox" checked={this.state.changePassword} onChange={e => this.handleChangeState('changePassword', !this.state.changePassword)} /> Do you want to change your password?
               </div>
             </div>
-            <div className={classnames({"form-group col-md-6 col-xs-12": true, "hide": !this.state.changePassword})}>
+            <div className={classnames({"form-group col-md-6": true, "d-none": !this.state.changePassword})}>
               <label>{this.context.t('password')} *</label>
               <input type="password" className="form-control" value={this.state.model.password} onChange={e => this.handleChangeState('model.password', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.password}</span>
             </div>
-            <div className={classnames({"form-group col-md-6 col-xs-12": true, "hide": !this.state.changePassword})}>
+            <div className={classnames({"form-group col-md-6": true, "d-none": !this.state.changePassword})}>
               <label>{this.context.t('passwordConfirm')} *</label>
               <input type="password" className="form-control" value={this.state.model.passwordConfirmation} onChange={e => this.handleChangeState('model.passwordConfirmation', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.passwordConfirmation}</span>
             </div>
-            <button type="submit" className="hide" />
+            <div className="form-group col-md-12 text-right">
+              <button type="submit" className="btn btn-success btn-lg">{this.context.t('save')}</button>
+            </div>
         </form>
       </div>
     )

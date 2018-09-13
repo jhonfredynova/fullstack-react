@@ -1,10 +1,10 @@
-import { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { validateUser } from 'actions/userActions'
 
-class RegisterConfirm extends Component {
+class RegisterConfirm extends React.PureComponent {
 
   async componentWillMount(){
     try{

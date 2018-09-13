@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { cloneDeep, clean, compact, flow, isEmpty, get, set } from 'lodash'
 import PropTypes from 'prop-types'
@@ -7,7 +7,7 @@ import { forgotUser } from 'actions/userActions'
 import NavigationBar from 'components/navigationBar'
 import Seo from 'components/seo'
 
-class ForgotAccount extends Component {
+class ForgotAccount extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -59,16 +59,18 @@ class ForgotAccount extends Component {
   render() {
     return (
       <div>
-        <Seo data={{ title: this.context.t('forgotAccountTitle'), description: this.context.t('forgotAccountDescription'), siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.context.t('forgotAccountTitle')}</h1>, subTitle: <h2>{this.context.t('forgotAccountDescription')}</h2> }} />
+        <Seo title={this.context.t('forgotAccountTitle')} description={this.context.t('forgotAccountDescription')} siteName={this.context.t('siteName')} />
+        <NavigationBar
+          title={<h1>{this.context.t('forgotAccountTitle')}</h1>} 
+          description={<h2>{this.context.t('forgotAccountDescription')}</h2>} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleForgot.bind(this)}>
-          <div className="form-group col-md-12 col-xs-12">
+          <div className="form-group col-md-12">
             <label>{this.context.t('emailOrUsername')} *</label>
             <input type="text" className="form-control" onChange={e => this.handleChangeState('model.username', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.username}</span>
           </div>
-          <div className="form-group col-md-12 col-xs-12 text-right">
+          <div className="form-group col-md-12 text-right">
             <button type="submit" className="btn btn-success">{this.context.t('sendEmail')}</button>
           </div>
         </form>

@@ -1,11 +1,11 @@
-import React, { Component } from 'react'
+import React from 'react'
 import NavigationBar from 'components/navigationBar'
 
-class Dashboard extends Component {
+class Dashboard extends React.PureComponent {
   render() {
     return (
       <div id="dashboard">
-        <NavigationBar data={{ title: <h1>Dashboard</h1> }} />
+        <NavigationBar title={<h1>Dashboard</h1>} />
       </div>
     )
   }

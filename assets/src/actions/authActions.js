@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { handleError } from 'components/helper'
+import { handleRequestError } from 'components/helper'
 
 export const AUTH = {
   GET: 'GET_SESSION',
@@ -24,7 +24,7 @@ export function login(data) {
   return dispatch => {
     return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/login`, data)
     .then(response => dispatch({type: AUTH.LOGIN, payload: response.data}))
-    .catch(err => handleError(err) )
+    .catch(err => handleRequestError(err) )
   }
 }
 
@@ -39,7 +39,7 @@ export function register(data) {
   return dispatch => {
     return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/register`, data)
     .then(response => dispatch({type: AUTH.REGISTER, payload: response.data}))
-    .catch(err => handleError(err) )
+    .catch(err => handleRequestError(err) )
   }
 }
 

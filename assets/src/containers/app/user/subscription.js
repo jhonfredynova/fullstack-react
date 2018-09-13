@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
-import { Modal } from 'react-bootstrap'
+import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
 import { clean, compact, get, set, sortBy, range, flow, cloneDeep, toUrl, isEmpty } from 'lodash'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
@@ -14,7 +14,7 @@ import NavigationBar from 'components/navigationBar'
 import Numeric from 'components/numeric'
 import PlanBox from 'components/planBox'
 
-class Subscription extends Component {
+class Subscription extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -88,10 +88,12 @@ class Subscription extends Component {
 
   async handleCloseCreditCard(){
     try{
+      await this.handleChangeState('showModalCreditCard', !this.state.showModalCreditCard) 
+      if(this.state.showModalCreditCard) return
       clean(this.state.model.creditCard, '')
       clean(this.state.errors.model.creditCard)
       this.props.dispatch(deleteMessage())
-      this.handleChangeState('showModalCreditCard', false) 
+      
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())
@@ -125,9 +127,10 @@ class Subscription extends Component {
 
   async handleCloseSubscription(){
     try{
+      await this.handleChangeState('showModalSubscription', !this.state.showModalSubscription) 
+      if(this.state.showModalSubscription) return
       this.state.model.plan.info = null
       this.props.dispatch(deleteMessage())
-      this.handleChangeState('showModalSubscription', false) 
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())
@@ -216,47 +219,49 @@ class Subscription extends Component {
     })
     return (
       <div id="subscription">
-        <NavigationBar data={{ title: <h1>{this.context.t('subscriptionTitle')}</h1>, subTitle: <h2>{this.context.t('subscriptionDescription')}</h2> }} />
-        <div className="row">
-          <div className="col-md-12 col-xs-12">
-            <div className="panel panel-default">
-              <div className="panel-heading">{this.context.t('paymentMethods')}</div>
-              <div className="panel-body">
-                <div className={classnames({'hide': creditCards.length>0})}>
+        <NavigationBar 
+          title={<h1>{this.context.t('subscriptionTitle')}</h1>} 
+          description={<h2>{this.context.t('subscriptionDescription')}</h2>} />
+        <div className="row mb-3">
+          <div className="col-md-12">
+            <div className="card">
+              <div className="card-header">{this.context.t('paymentMethods')}</div>
+              <div className="card-body">
+                <div className={classnames({'d-none': creditCards.length>0})}>
                   <p className="alert alert-warning">{this.context.t('noPaymentMethods')}</p>
                   <button className="btn btn-success" onClick={() => this.handleChangeState('showModalCreditCard', true)}>{this.context.t('createCreditCard')}</button>
                 </div>
-                <div className={classnames({'hide': creditCards.length===0})}>
+                <div className={classnames({'d-none': creditCards.length===0})}>
                   {
                     creditCards.map(item => 
-                      <p key={item.token}><i className="glyphicon glyphicon-credit-card" /> {item.number} {item.type}</p>
+                      <p key={item.token}><i className="fas fa-credit-card" /> {item.number} {item.type}</p>
                     )
                   }                  
-                  <button className="btn btn-success" onClick={() => this.handleChangeState('showModalCreditCard', true)}>{this.context.t('updateCreditCard')}</button>
+                  <button className="btn btn-success" onClick={() => this.handleChangeState('showModalCreditCard', !this.state.showModalCreditCard)}>{this.context.t('updateCreditCard')}</button>
                 </div>
               </div>
             </div>
-            <Modal show={this.state.showModalCreditCard} onHide={this.handleCloseCreditCard.bind(this)}>
-              <Modal.Header closeButton>
-                <Modal.Title>{creditCards.length===0 ? this.context.t('createCreditCard') : this.context.t('updateCreditCard')}</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
+            <Modal isOpen={this.state.showModalCreditCard} toggle={this.handleCloseCreditCard.bind(this)}>
+              <ModalHeader toggle={this.handleCloseCreditCard.bind(this)}>
+                {creditCards.length===0 ? this.context.t('createCreditCard') : this.context.t('updateCreditCard')}
+              </ModalHeader>
+              <ModalBody>
                 <form id="formCreditCard" onSubmit={this.handleUpdateCreditCard.bind(this)}>
                   <div className="row">
-                    <div className="form-group col-md-12 col-xs-12">
+                    <div className="form-group col-md-12">
                       <label>{this.context.t('creditCardNumber')} <span>*</span></label>
-                      <Numeric data={{ amount: this.state.model.creditCard.number, display: 'input', format: '#### #### #### ####' }} className="form-control" onChange={value => this.handleChangeState('model.creditCard.number', value)} />
+                      <Numeric amount={this.state.model.creditCard.number} display='input' format='#### #### #### ####' className="form-control" onChange={value => this.handleChangeState('model.creditCard.number', value)} />
                       <span className="text-danger">{this.state.errors.model.creditCard.number}</span>
                     </div>
-                    <div className="form-group col-md-12 col-xs-12">
+                    <div className="form-group col-md-12">
                       <label>{this.context.t('creditCardHolder')} <span>*</span></label>
                       <input type="text" className="form-control" value={this.state.model.creditCard.holder} onChange={event => this.handleChangeState('model.creditCard.holder', event.target.value)} />
                       <span className="text-danger">{this.state.errors.model.creditCard.holder}</span>
                     </div>
-                    <div className="form-group col-md-12 col-xs-12">
+                    <div className="form-group col-md-12">
                       <label>{this.context.t('expirationDate')} <span>*</span></label>
                       <div className="row">
-                        <div className="col-xs-6">
+                        <div className="col-6 pr-0">
                           <select className="form-control" value={this.state.model.creditCard.expiration.month} onChange={event => this.handleChangeState('model.creditCard.expiration.month', event.target.value)}>
                             <option>{this.context.t('month')}</option>
                             {
@@ -267,7 +272,7 @@ class Subscription extends Component {
                           </select>
                           <span className="text-danger">{this.state.errors.model.creditCard.expiration.month}</span>
                         </div>
-                        <div className="col-xs-6">
+                        <div className="col-6">
                           <select className="form-control" value={this.state.model.creditCard.expiration.year} onChange={event => this.handleChangeState('model.creditCard.expiration.year', event.target.value)}>
                             <option>{this.context.t('year')}</option>
                             {
@@ -280,13 +285,13 @@ class Subscription extends Component {
                         </div>
                       </div>                  
                     </div>
-                    <div className="form-group col-md-12 col-xs-12">
+                    <div className="form-group col-md-12">
                       <label>{this.context.t('securityCode')} <span>*</span></label>
                       <div className="row">
-                        <div className="col-sm-7">
-                          <Numeric data={{ amount: this.state.model.creditCard.securityCode, display: 'input', format: '###' }} className="form-control" onChange={value => this.handleChangeState('model.creditCard.securityCode', value)} />
+                        <div className="col-7">
+                          <Numeric amount={this.state.model.creditCard.securityCode} display='input' format='###' className="form-control" onChange={value => this.handleChangeState('model.creditCard.securityCode', value)} />
                         </div>
-                        <div className="col-sm-5">
+                        <div className="col-5">
                           <div className="align-middle">
                             <i className="fa fa-credit-card fa-2x"></i> {this.context.t('creditCardCvc')}
                           </div>
@@ -294,45 +299,45 @@ class Subscription extends Component {
                       </div>
                       <span className="text-danger">{this.state.errors.model.creditCard.securityCode}</span>
                     </div>
-                    <button type="submit" className="hide" />
+                    <button type="submit" className="d-none" />
                   </div>
                 </form>
-              </Modal.Body>
-              <Modal.Footer>
+              </ModalBody>
+              <ModalFooter>
                 <button className="btn btn-success" onClick={this.handleUpdateCreditCard.bind(this)}>{this.context.t('save')}</button>
-              </Modal.Footer>
+              </ModalFooter>
             </Modal>
           </div>
         </div>
         <div className="alert alert-info">
-          <p>
-            <span className={classnames({'hide': isEmpty(subscription)})}>{this.context.t('subscriptionNextPayment', { date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') })}</span>
-            <span className={classnames({'hide': !isEmpty(subscription)})}> {this.context.t('subscriptionNoCharges')}</span>
-          </p>
-          <p className={classnames({'hide': !session.nextPlan})}>
+          <div>
+            <span className={classnames({'d-none': isEmpty(subscription)})}>{this.context.t('subscriptionNextPayment', { date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') })}</span>
+            <span className={classnames({'d-none': !isEmpty(subscription)})}> {this.context.t('subscriptionNoCharges')}</span>
+          </div>
+          <div className={classnames({'d-none': !session.nextPlan})}>
             {this.context.t('subscriptionNextPlan', { planName: get(session.nextPlan, 'name') })} <button className="btn btn-danger" onClick={this.handleCancelNextSubscription.bind(this)}><i className="fa fa-times" /> {this.context.t('cancel')}</button>
-          </p>
+          </div>
         </div>
-        <Modal show={this.state.showModalSubscription} onHide={this.handleCloseSubscription.bind(this)}>
-          <Modal.Header closeButton>
-            <Modal.Title>{this.context.t('updateSubscription')}</Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <p className={classnames({'hide': isEmpty(subscription)})}>{this.context.t('subscriptionChangePlan', { date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') })}</p>
-            <p className={classnames({'hide': !isEmpty(subscription)})}>{this.context.t('subscriptionChangePlanImmediately')}</p>
-            <p className={classnames({'alert alert-warning': true, 'hide': planSelected.id!==config.plans.free })}>{this.context.t('subscriptionPlanFree')}</p>
-            <p className={classnames({'alert alert-warning': true, 'hide': creditCards.length>0})}>{this.context.t('subscriptionNoPaymentMethods')}</p>
-          </Modal.Body>
-          <Modal.Footer>
-            <button className={classnames({'btn btn-success': true, 'hide': creditCards.length>0})} onClick={() => this.handleChangeState('showModalCreditCard', true)}>{this.context.t('createCreditCard')}</button>
-            <button className={classnames({'btn btn-success': true, 'hide': creditCards.length===0})} onClick={this.handleUpdateSubscription.bind(this)}>{this.context.t('continue')}</button>
-          </Modal.Footer>
+        <Modal isOpen={this.state.showModalSubscription} toggle={this.handleCloseSubscription.bind(this)}>
+          <ModalHeader>
+            {this.context.t('updateSubscription')}
+          </ModalHeader>
+          <ModalBody>
+            <p className={classnames({'d-none': isEmpty(subscription)})}>{this.context.t('subscriptionChangePlan', { date: moment(subscription.currentPeriodStart).format('DD/MM/YYYY') })}</p>
+            <p className={classnames({'d-none': !isEmpty(subscription)})}>{this.context.t('subscriptionChangePlanImmediately')}</p>
+            <p className={classnames({'alert alert-warning': true, 'd-none': planSelected.id!==config.plans.free })}>{this.context.t('subscriptionPlanFree')}</p>
+            <p className={classnames({'alert alert-warning': true, 'd-none': creditCards.length>0})}>{this.context.t('subscriptionNoPaymentMethods')}</p>
+          </ModalBody>
+          <ModalFooter>
+            <button className={classnames({'btn btn-success': true, 'd-none': creditCards.length>0})} onClick={() => this.handleChangeState('showModalCreditCard', true)}>{this.context.t('createCreditCard')}</button>
+            <button className={classnames({'btn btn-success': true, 'd-none': creditCards.length===0})} onClick={this.handleUpdateSubscription.bind(this)}>{this.context.t('continue')}</button>
+          </ModalFooter>
         </Modal>
         <div className="row">
           {
             sortBy(plans, ['order']).map(item =>
-              <div key={item.id} className="col-md-4 col-xs-12">
-                <PlanBox data={{ isLoading: isLoading, app: this.props.app, info: item, selected: session.plan.id }} onClick={() => { if(item.id===session.plan.id) return; this.handleChangeState('showModalSubscription', true); this.handleChangeState('model.plan.info', item) }  }/>
+              <div key={item.id} className="col-md-4">
+                <PlanBox isLoading={isLoading} app={this.props.app} info={item} selected={session.plan.id} onClick={() => { if(item.id===session.plan.id) return; this.handleChangeState('showModalSubscription', true); this.handleChangeState('model.plan.info', item) }  }/>
               </div>
             )
           }

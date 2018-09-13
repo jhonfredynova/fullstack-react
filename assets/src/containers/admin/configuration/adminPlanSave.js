@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
 import classnames from 'classnames'
@@ -11,7 +11,7 @@ import Counter from 'components/counter'
 import NavigationBar from 'components/navigationBar'
 import Numeric from 'components/numeric'
 
-class AdminPlanSave extends Component {
+class AdminPlanSave extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -109,20 +109,23 @@ class AdminPlanSave extends Component {
     const { currencies } = this.props.app.config.appIntl
     return (
       <div id="adminPlanSave">
-        <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update Plan' : 'New Plan'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/plan')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
+        <NavigationBar 
+          title={<h1>{this.state.model.id ? 'Update Plan' : 'New Plan'}</h1>} 
+          btnLeft={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/plan')}><i className="fas fa-arrow-left"></i></button>} 
+          btnRight={<button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="fas fa-save"></i></button>} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Name *</label>
             <input type="text" className="form-control" value={this.state.model.name} onChange={e => this.handleChangeState('model.name', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.name}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Description *</label>
             <input type="text" className="form-control" value={this.state.model.description} onChange={e => this.handleChangeState('model.description', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.description}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Payment Type</label>
             <select className="form-control" value={this.state.model.paymentType} onChange={e => this.handleChangeState('model.paymentType', e.target.value)}>
               <option value="">Select...</option>
@@ -131,7 +134,7 @@ class AdminPlanSave extends Component {
             </select>
             <span className="text-danger">{this.state.errors.model.paymentType}</span>
           </div>
-          <div className={classnames({'form-group col-md-6 col-xs-12': true, 'hide': this.state.model.paymentType!=='subscription'})}>
+          <div className={classnames({'form-group col-md-6': true, 'hide': this.state.model.paymentType!=='subscription'})}>
             <label>Plan Code *</label>
             <select className="form-control" value={this.state.model.planCode} onChange={e => this.handleChangeState('model.planCode', e.target.value)}>
               <option value=''>Select...</option>
@@ -143,7 +146,7 @@ class AdminPlanSave extends Component {
             </select>
             <span className="text-danger">{this.state.errors.model.planCode}</span>
           </div>
-          <div className={classnames({'form-group col-md-6 col-xs-12': true, 'hide': this.state.model.paymentType!=='transaction'})}>
+          <div className={classnames({'form-group col-md-6': true, 'hide': this.state.model.paymentType!=='transaction'})}>
             <label>Transaction Value *</label>
             <div className="row">
               <div className="col-xs-4">
@@ -153,15 +156,15 @@ class AdminPlanSave extends Component {
               <div className="col-xs-8">
                 <div className="input-group">
                   <span className="input-group-addon">$</span>
-                  <Numeric className="form-control" data={{currencyConversion:this.state.currencyConversion, amount: get(this.state.model.transactionValue, 'value', ''), from: get(this.state.model.transactionValue, 'currency'), to: get(this.state.model.transactionValue, 'currency')}} onChange={value => this.handleChangeState('model.transactionValue.value', value)} />
+                  <Numeric className="form-control" currencyConversion={this.state.currencyConversion} amount={get(this.state.model.transactionValue, 'value', '')} from={get(this.state.model.transactionValue, 'currency')} to={get(this.state.model.transactionValue, 'currency')} onChange={value => this.handleChangeState('model.transactionValue.value', value)} />
                 </div>
                 <span className="text-danger">{get(this.state.errors.model.transactionValue, 'value')}</span>
               </div>
             </div>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Order *</label>
-            <Counter data={{ value: this.state.model.order, min: 0, max: 100 }} onChange={value => this.handleChangeState('model.order', value)} />
+            <Counter value={this.state.model.order} min={0} max={100} onChange={value => this.handleChangeState('model.order', value)} />
             <span className="text-danger">{this.state.errors.model.order}</span>
           </div>
           <button type='submit' className="hide" />

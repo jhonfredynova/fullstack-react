@@ -1,9 +1,8 @@
 import { CATALOG } from 'actions/catalogActions'
-import { ACTION, handleResponseAction } from 'components/helper'
 
 export default function reducer(
   state={
-    catalogs: { records: [], recordsTotal: 0 },
+    catalogs: { records: [], totalRecords: 0 },
     temp: null
   }, 
   action={}) 
@@ -14,28 +13,42 @@ export default function reducer(
       return state
 
     case CATALOG.GET:
-      return { 
-        ...state, 
-        catalogs: handleResponseAction(ACTION.GET, state.catalogs, action.payload.find || state.catalogs),
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload.findOne)
+      return {
+        ...state,
+        catalogs: {
+          ...state.catalogs,
+          records: action.payload.records,
+          totalRecords: action.payload.totalRecords
+        }
       }
 
     case CATALOG.SAVE:
-      return { 
-        ...state, 
-        catalogs: handleResponseAction(ACTION.SAVE, state.catalogs, action.payload) 
+      return {
+        ...state,
+        catalogs: {
+          ...state.catalogs,
+          records: state.catalogs.records.concat(action.payload),
+          totalRecords: state.catalogs.totalRecords+1
+        }
       }
 
     case CATALOG.UPDATE:
       return { 
         ...state, 
-        catalogs: handleResponseAction(ACTION.UPDATE, state.catalogs, action.payload) 
+        catalogs: {
+          ...state.catalogs,
+          records: state.catalogs.records.map(item => (item.id===action.payload.id) ? action.payload : item)
+        }
       }
 
     case CATALOG.DELETE:
       return { 
         ...state, 
-        catalogs: handleResponseAction(ACTION.DELETE, state.catalogs, action.payload) 
+        catalogs: {
+          ...state.catalogs,
+          records: state.catalogs.records.filter(item => item.id!==action.payload.id),
+          totalRecords: state.catalogs.totalRecords-1
+        }
       }
       
   }

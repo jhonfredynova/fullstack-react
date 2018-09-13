@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { get } from 'lodash'
 import PropTypes from 'prop-types'
@@ -7,7 +7,7 @@ import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import NavigationBar from 'components/navigationBar'
 import Seo from 'components/seo'
 
-class Faq extends Component {
+class Faq extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -32,8 +32,10 @@ class Faq extends Component {
   render() {
     return (
       <div id="faq">
-        <Seo data={{ title: this.context.t('faqTitle'), description: this.context.t('faqDescription'), siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.context.t('faqTitle')}</h1>, subTitle: <h2>{this.context.t('faqDescription')}</h2> }} />
+        <Seo title={this.context.t('faqTitle')} description={this.context.t('faqDescription')} siteName={this.context.t('siteName')} />
+        <NavigationBar
+          title={<h1>{this.context.t('faqTitle')}</h1>} 
+          description={<h2>{this.context.t('faqDescription')}</h2>} />
         <article dangerouslySetInnerHTML={{__html: this.state.txtFaq}} />
       </div>
     )

@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table, Nav, NavItem } from 'react-bootstrap'
+import { Table, Nav, NavItem, NavLink } from 'reactstrap'
 import { set } from 'lodash'
 import moment from 'moment'
 import PropTypes from 'prop-types'
@@ -10,7 +10,7 @@ import Pager from 'components/pager'
 import { hideLoading, showLoading, setPreference, setMessage, PREFERENCE } from 'actions/appActions'
 import { getUser, deleteUser, updateUser } from 'actions/userActions'
 
-class AdminUser extends Component {
+class AdminUser extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -96,12 +96,22 @@ class AdminUser extends Component {
     const { records } = this.state.users
     return (
       <div>
-        <NavigationBar data={{ title: <h1>Users</h1>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user/new')}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('usersQuery.where.active', value===1); this.handleChangeSearch(this.state.usersQuery) } }>
-          <NavItem eventKey={1}>Active</NavItem>
-          <NavItem eventKey={2}>Inactive</NavItem>
+        <NavigationBar 
+          title={<h1>Users</h1>} 
+          btnRight={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user/new')}><i className="fas fa-plus"></i></button>} />
+        <Nav className="mb-4" tabs>
+          <NavItem>
+            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('usersQuery.where.active', true); this.handleChangeSearch(this.state.usersQuery) }}>
+              Active
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('usersQuery.where.active', false); this.handleChangeSearch(this.state.usersQuery) }}>
+              Inactive
+            </NavLink>
+          </NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.usersQuery} items={this.state.users} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} query={this.state.usersQuery} items={this.state.users} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>
@@ -124,12 +134,12 @@ class AdminUser extends Component {
                       {
                         activeTab===1 ?
                         <div>
-                          <Link to={`/admin/security/user/${item.id}`} className="btn btn-success"><i className="glyphicon glyphicon-edit"></i></Link> 
-                          <Link to={`/admin/security/user/${item.id}/rol`} className="btn btn-success"><i className="fa fa-users"></i></Link> 
-                          <button className="btn btn-danger" onClick={() => this.handleDeleteData(item)}><i className="glyphicon glyphicon-minus"></i></button>
+                          <Link to={`/admin/security/user/${item.id}`} className="btn btn-success mr-1"><i className="fas fa-edit"></i></Link> 
+                          <Link to={`/admin/security/user/${item.id}/rol`} className="btn btn-success mr-1"><i className="fa fa-users"></i></Link> 
+                          <button className="btn btn-danger" onClick={() => this.handleDeleteData(item)}><i className="fas fa-minus"></i></button>
                         </div> : 
                         <div>
-                          <button className="btn btn-success" onClick={() => this.handleRestoreData(item)}><i className="glyphicon glyphicon-ok"></i></button>
+                          <button className="btn btn-success" onClick={() => this.handleRestoreData(item)}><i className="fas fa-check"></i></button>
                         </div>
                       }
                     </td>

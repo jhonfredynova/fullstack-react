@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
-import { Table } from 'react-bootstrap'
+import { Table } from 'reactstrap'
 import classnames from 'classnames'
 import { set } from 'lodash'
 import PropTypes from 'prop-types'
@@ -9,7 +9,7 @@ import Pager from 'components/pager'
 import { hideLoading, showLoading, setPreference, setMessage, PREFERENCE } from 'actions/appActions'
 import { getUser, getUserRol, deleteUserRol } from 'actions/userActions'
 
-class AdminUserRol extends Component {
+class AdminUserRol extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -40,7 +40,7 @@ class AdminUserRol extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(getUser({ where: { id: this.props.match.params.id } }))
-      await this.setState({ user: this.props.user.temp })
+      await this.setState({ user: this.props.user.users.records[0] })
       await this.props.dispatch(getUserRol(this.state.userRolesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -83,8 +83,12 @@ class AdminUserRol extends Component {
     const { records } = this.state.userRoles
     return (
       <div className={classnames({'hide': isLoading})}>
-        <NavigationBar data={{ title: <h1>Roles</h1>, subTitle: <h2>{this.state.user.username}</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/security/user/${this.props.match.params.id}/rol/new`)}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Pager isLoading={isLoading} data={this.state.userRolesQuery} items={this.state.userRoles} onChange={this.handleChangeSearch.bind(this)}>
+        <NavigationBar
+          title={<h1>Roles</h1>} 
+          description={<h2>{this.state.user.username}</h2>} 
+          btnLeft={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user')}><i className="fas fa-arrow-left"></i></button>} 
+          btnRight={<button className="btn btn-success" onClick={() => this.props.history.push(`/admin/security/user/${this.props.match.params.id}/rol/new`)}><i className="fas fa-plus"></i></button>} />
+        <Pager isLoading={isLoading} query={this.state.userRolesQuery} items={this.state.userRoles} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>
@@ -98,7 +102,7 @@ class AdminUserRol extends Component {
                   <tr key={index}>
                     <td>{item.name}</td>
                     <td className="text-center">
-                      <button className="btn btn-danger" onClick={() => this.handleDeleteData({ user: this.state.user.id, rol: item.id })}><i className="glyphicon glyphicon-minus"></i></button>
+                      <button className="btn btn-danger" onClick={() => this.handleDeleteData({ user: this.state.user.id, rol: item.id })}><i className="fas fa-minus"></i></button>
                     </td>
                   </tr>
                 )

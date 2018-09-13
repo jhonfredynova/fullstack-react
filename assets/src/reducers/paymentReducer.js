@@ -1,9 +1,8 @@
 import { PAYMENT } from 'actions/paymentActions'
-import { ACTION, handleResponseAction } from 'components/helper'
 
 export default function reducer(
   state={
-    billing: { records: [], recordsTotal: 0 },
+    billing: { records: [], totalRecords: 0 },
     temp: null
   }, 
   action={}) 
@@ -16,50 +15,53 @@ export default function reducer(
     case PAYMENT.GET_BILLING:
       return { 
         ...state, 
-        billing: handleResponseAction(ACTION.GET, state.billing, action.payload.find || state.billing),
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload.findOne)
+        billing: {
+          ...state.billing,
+          records: action.payload.records,
+          totalRecords: action.payload.totalRecords
+        }
       }
 
     case PAYMENT.GET_SUBSCRIPTION:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case PAYMENT.GET_SUBSCRIPTION_PLAN:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case PAYMENT.CREATE_SUBSCRIPTION:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case PAYMENT.CREATE_TRANSACTION:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case PAYMENT.UPDATE_CREDITCARD:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case PAYMENT.UPDATE_SUBSCRIPTION:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case PAYMENT.DELETE_SUBSCRIPTION:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
       
   }

@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { cloneDeep, clean, compact, flow, isEmail, get, set, isEmpty } from 'lodash'
@@ -8,7 +8,7 @@ import { register } from 'actions/authActions'
 import NavigationBar from 'components/navigationBar'
 import Seo from 'components/seo'
 
-class Register extends Component {
+class Register extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -86,17 +86,19 @@ class Register extends Component {
   render() {
     return (
       <div>
-        <Seo data={{ title: this.context.t('registerTitle'), description: this.context.t('registerDescription'), siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.context.t('registerTitle')}</h1>, subTitle: <h2>{this.context.t('registerDescription')}</h2> }} />
+        <Seo title={this.context.t('registerTitle')} description={this.context.t('registerDescription')} siteName={this.context.t('siteName')} />
+        <NavigationBar
+          title={<h1>{this.context.t('registerTitle')}</h1>} 
+          description={<h2>{this.context.t('registerDescription')}</h2>} />
         <div className="alert alert-info">{this.context.t('userAlreadyHasAccount', {loginUrl: <Link to="/login">here</Link>})}</div>
         <div className="row">
           <div className="col-md-6">
             <h2 className="text-center">{this.context.t('loginWithSocialNetworks')}</h2>
             <a href={`${process.env.REACT_APP_LOCAL_API_URL}/auth/facebook/`} className="btn btn-lg btn-block btn-social btn-facebook">
-              <i className="fa fa-facebook-official"></i> {this.context.t('loginWithFacebook')}
+              <i className="fab fa-facebook"></i> {this.context.t('loginWithFacebook')}
             </a>
             <a href={`${process.env.REACT_APP_LOCAL_API_URL}/auth/google/`} className="btn btn-lg btn-block btn-social btn-google">
-              <i className="fa fa-google-plus-square"></i> {this.context.t('loginWithGoogle')}
+              <i className="fab fa-google-plus"></i> {this.context.t('loginWithGoogle')}
             </a>
           </div>
           <div className="col-md-6">

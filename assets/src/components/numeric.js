@@ -1,29 +1,29 @@
-import React, { Component } from 'react'
+import React from 'react'
 import NumberFormat from 'react-number-format'
 import { defaultTo, set, isEmpty } from 'lodash'
 
-class Numeric extends Component {
+class Numeric extends React.PureComponent {
 
   constructor(props) {
     super(props)
     this.state = { 
-      amount: defaultTo(this.props.data.amount, ''),
-      decimalScale: defaultTo(this.props.data.decimalScale, 0),
-      decimalSeparator: defaultTo(this.props.data.decimalSeparator, '.'),
-      display: defaultTo(this.props.data.display, 'input'),
-      format: defaultTo(this.props.data.format, null),
-      from: defaultTo(this.props.data.from, null),
-      placeholder: defaultTo(this.props.data.placeholder, ''),
-      prefix: defaultTo(this.props.data.prefix, ''),
-      currencyConversion: defaultTo(this.props.data.currencyConversion, []),
-      suffix: defaultTo(this.props.data.suffix, ''),
-      thousandSeparator: defaultTo(this.props.data.thousandSeparator, ''),
-      to: defaultTo(this.props.data.to, null)
+      amount: defaultTo(this.props.amount, ''),
+      decimalScale: defaultTo(this.props.decimalScale, 0),
+      decimalSeparator: defaultTo(this.props.decimalSeparator, '.'),
+      display: defaultTo(this.props.display, 'input'),
+      format: defaultTo(this.props.format, null),
+      from: defaultTo(this.props.from, null),
+      placeholder: defaultTo(this.props.placeholder, ''),
+      prefix: defaultTo(this.props.prefix, ''),
+      currencyConversion: defaultTo(this.props.currencyConversion, []),
+      suffix: defaultTo(this.props.suffix, ''),
+      thousandSeparator: defaultTo(this.props.thousandSeparator, ''),
+      to: defaultTo(this.props.to, null)
     }
   }
 
   async componentWillReceiveProps(nextProps) {
-    this.setState(nextProps.data)
+    this.setState(nextProps)
   }
 
   async handleChangeState(path, value){

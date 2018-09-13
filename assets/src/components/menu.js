@@ -1,14 +1,12 @@
-import  React, { Component } from 'react'
-import { LinkContainer } from 'react-router-bootstrap'
-import { Button, Nav, Navbar, NavItem, NavDropdown, MenuItem } from 'react-bootstrap'
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { Nav, Navbar, NavLink, DropdownItem, UncontrolledDropdown, DropdownToggle, DropdownMenu } from 'reactstrap'
 import { includes } from 'lodash'
 import PropTypes from 'prop-types'
 import { setMessage } from 'actions/appActions'
 import { logout } from 'actions/authActions'
-import './menu.css'
 
-
-class Menu extends Component {
+class Menu extends React.PureComponent {
 
   async handleLogout() {
     try {
@@ -21,99 +19,80 @@ class Menu extends Component {
   }
 
   render() {
-    const { isAuthenticated, session } = this.props.data.auth
+    const { isAuthenticated, session } = this.props.auth
+    const currentPath = window.location.pathname
     return (
-      <div id="menu" className={this.props.className}>
-        {/* SESSION */}
+      <Nav className="ml-auto" navbar>        
+        {/* HOME */}
         {
-          isAuthenticated ? 
-          <Nav pullRight>   
-            <NavDropdown className="navItemWithImg" id="navSession" title={<span><img src={session.photo} className="img-circle" height="30" alt={session.username} /> {session.username}</span>}>
-              <LinkContainer to="/app/user/profile">
-                <MenuItem><i className="fa fa-user"></i> {this.context.t('profile')}</MenuItem>
-              </LinkContainer>
-              <LinkContainer to="/app/user/subscription">
-                <MenuItem><i className="fa fa-credit-card"></i> {this.context.t('subscription')}</MenuItem>
-              </LinkContainer>
-              <LinkContainer to="/app/user/billing">
-                <MenuItem><i className="glyphicon glyphicon-time"></i> {this.context.t('billing')}</MenuItem>
-              </LinkContainer>
-              <MenuItem onClick={this.handleLogout.bind(this)}><i className="fa fa-key"></i> {this.context.t('logout')}</MenuItem>
-            </NavDropdown>
-          </Nav>
-          : null
-        }
-        {/* ADMIN */}
-        {
-          isAuthenticated && includes([1], session.permissions, true) ? 
-          <Nav pullRight>   
-            <NavDropdown id="navAdmin" title="Admin">
-              <MenuItem header><i className="fa fa-cogs"></i> CONFIGURATION</MenuItem>
-              <LinkContainer to="/admin/configuration/catalog">
-                <MenuItem>Catalogs</MenuItem>
-              </LinkContainer>
-              <LinkContainer to="/admin/configuration/locale">
-                <MenuItem>Locales</MenuItem>
-              </LinkContainer>
-              <LinkContainer to="/admin/configuration/plan">
-                <MenuItem>Plans</MenuItem>
-              </LinkContainer>
-              <MenuItem divider />
-              <MenuItem header><i className="fa fa-cogs"></i> SECURITY</MenuItem>
-              <LinkContainer to="/admin/security/rol">
-                <MenuItem>Roles</MenuItem>
-              </LinkContainer>
-              <LinkContainer exact to="/admin/security/user">
-                <MenuItem>Users</MenuItem>
-              </LinkContainer>
-            </NavDropdown>
-          </Nav>
-          : null
+          !isAuthenticated &&
+          <Navbar>
+            <NavLink to="/" tag={Link}>{this.context.t('home')}</NavLink>
+            <NavLink to="/price" tag={Link}>{this.context.t('price')}</NavLink>
+            <NavLink to="/contact" tag={Link}>{this.context.t('contact')}</NavLink>
+            <div className="form-inline">
+              <button className="btn btn-outline-success ml-2 mr-2" onClick={() => this.context.router.history.push('/login')}>{this.context.t('login')}</button>
+              <button className="btn btn-success" onClick={() => this.context.router.history.push('/register')}>{this.context.t('register')}</button>
+            </div>
+          </Navbar>
         }
         {/* APP */}
         {
-          isAuthenticated && includes([2,3,4], session.permissions, false) ? 
-          <Nav pullRight>
-            <LinkContainer exact to="/">
-              <NavItem>{this.context.t('home')}</NavItem>
-            </LinkContainer>
-            <NavDropdown id="navApp" title="App">
-              <LinkContainer to="/app/dashboard">
-                <MenuItem>{this.context.t('dashboard')}</MenuItem>
-              </LinkContainer>
-            </NavDropdown>
-          </Nav>
-          : null
+          isAuthenticated && includes([2,3,4], session.permissions, false) && 
+          <Navbar>
+            <UncontrolledDropdown nav inNavbar>
+              <DropdownToggle nav caret>App</DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem active={currentPath==='/app/dashboard'} to="/app/dashboard" tag={Link}>{this.context.t('dashboard')}</DropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+          </Navbar>
         }
-        {/* HOME */}
+        {/* ADMIN */}
         {
-          !isAuthenticated ?
-          <Navbar.Form pullRight>
-            <LinkContainer to="/login">
-              <Button className="btn btn-default">{this.context.t('login')}</Button>
-            </LinkContainer>
-            <LinkContainer to="/register">
-              <Button className="btn btn-success">{this.context.t('register')}</Button>
-            </LinkContainer>
-          </Navbar.Form>
-          : null
+          isAuthenticated && includes([1], session.permissions, true) &&
+          <Navbar>   
+            <UncontrolledDropdown nav inNavbar>
+              <DropdownToggle nav caret>Admin</DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem header><i className="fa fa-cogs"></i> CONFIGURATION</DropdownItem>
+                <DropdownItem active={currentPath==='/admin/configuration/catalog'} to="/admin/configuration/catalog" tag={Link}>Catalogs</DropdownItem>
+                <DropdownItem active={currentPath==='/admin/configuration/locale'} to="/admin/configuration/locale" tag={Link}>Locales</DropdownItem>
+                <DropdownItem active={currentPath==='/admin/configuration/plan'} to="/admin/configuration/plan" tag={Link}>Plans</DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem header><i className="fa fa-cogs"></i> SECURITY</DropdownItem>
+                <DropdownItem active={currentPath==='/admin/security/rol'} to="/admin/security/rol" tag={Link}>Roles</DropdownItem>
+                <DropdownItem active={currentPath==='/admin/security/user'} to="/admin/security/user" tag={Link}>Users</DropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+          </Navbar>
         }
+        {/* SESSION */}
         {
-          !isAuthenticated ? 
-          <Nav pullRight> 
-            <LinkContainer exact to="/">
-              <NavItem>{this.context.t('home')}</NavItem>
-            </LinkContainer>
-            <LinkContainer to="/price">
-              <NavItem>{this.context.t('price')}</NavItem>
-            </LinkContainer>
-            <LinkContainer to="/contact">
-              <NavItem>{this.context.t('contact')}</NavItem>
-            </LinkContainer>
-          </Nav>
-          : null
+          isAuthenticated && 
+          <Navbar>   
+            <UncontrolledDropdown nav inNavbar>
+              <DropdownToggle nav caret>
+                <span><img src={session.photo} className="img-circle" height="30" alt={session.username} /> {session.username}</span>
+              </DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem active={currentPath==='/app/user/profile'} to="/app/user/profile" tag={Link}>
+                  <i className="fa fa-user"></i> {this.context.t('profile')}
+                </DropdownItem>
+                <DropdownItem active={currentPath==='/app/user/subscription'} to="/app/user/subscription" tag={Link}>
+                  <i className="fa fa-credit-card"></i> {this.context.t('subscription')}
+                </DropdownItem>
+                <DropdownItem active={currentPath==='/app/user/billing'} to="/app/user/billing" tag={Link}>
+                  <i className="far fa-clock"></i> {this.context.t('billing')}
+                </DropdownItem>
+                <DropdownItem onClick={this.handleLogout.bind(this)}>
+                  <i className="fa fa-key"></i> {this.context.t('logout')}
+                </DropdownItem>
+              </DropdownMenu>
+            </UncontrolledDropdown>
+          </Navbar>   
         }
-      </div>
+      </Nav>
     )
   }
 }

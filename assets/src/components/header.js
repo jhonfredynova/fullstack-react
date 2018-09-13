@@ -1,16 +1,29 @@
-import React, { Component } from 'react'
+import React from 'react'
 import PropTypes from 'prop-types'
-import { get, filter } from 'lodash'
+import { get, set, filter } from 'lodash'
 import classnames from 'classnames'
-import { Navbar, MenuItem, Popover, OverlayTrigger, Button } from 'react-bootstrap'
+import { Collapse, Navbar, NavbarBrand, NavbarToggler, Popover, PopoverHeader, PopoverBody } from 'reactstrap'
 import { Link } from 'react-router-dom'
 import Select from 'react-select'
 import { setLanguage } from 'redux-i18n'
 import { hideLoading, showLoading, getConfig, setMessage, setPreference, PREFERENCE  } from 'actions/appActions'
 import Menu from 'components/menu'
-import './header.css'
 
-class Header extends Component {
+class Header extends React.PureComponent {
+
+  constructor(props){
+    super(props)
+    this.state = {
+      showMenu: false,
+      showPopoverMessages: false,
+      showPopoverNotifications: false,
+      showPopoverPreferences: false
+    }
+  }
+
+  async handleChangeState(path, value){
+    await this.setState(set(this.state, path, value))
+  }
 
   async handleChangeCurrency(currency) {
     try{
@@ -37,73 +50,59 @@ class Header extends Component {
   }
 
   render() {
-    const { isLoading } = this.props.data
-    const { config } = this.props.data.app
-    const { isAuthenticated } = this.props.data.auth
+    const { isLoading } = this.props
+    const { config } = this.props.app
+    const { isAuthenticated } = this.props.auth
     const { appDisabled, appPreferences } = config
     const currencies = get(config.appIntl, 'currencies', [])
     const languages = filter(get(config.appIntl, 'languages', []), item => config.appLanguages.indexOf(item.value)>-1)
-    const popoverMessages = (
-      <Popover id="popover-trigger-click-root-close" title={this.context.t('messages')}>
-        <p>{this.context.t('userNotHaveMessages')}</p>
-        <hr/>
-        <div className="text-center"><Link to="/app/user/chat">{this.context.t('seeAll')}</Link></div>
-      </Popover>
-    )
-    const popoverNotifications = (
-      <Popover id="popover-trigger-click-root-close" title={this.context.t('notifications')}>
-        <p>{this.context.t('userNotHaveNotifications')}</p>
-      </Popover>
-    )
-    const popoverPreferences = (
-      <Popover id="popover-trigger-click-root-close" title={this.context.t('preferences')}>
-        <div className="form-group">
-          <label>{this.context.t('language')}</label>
-          <Select placeholder='Select...' options={languages} optionRenderer={option => option.label} valueRenderer={option => option.label} simpleValue={true} value={get(appPreferences, 'language', '')} clearable={false} autosize={false} onChange={value => this.handleChangeLanguage(value)} />
-        </div>
-        <div className="form-group">
-          <label>{this.context.t('currency')}</label>
-          <Select placeholder='Select...' options={currencies} optionRenderer={option => option.label} valueRenderer={option => option.label} simpleValue={true} value={get(appPreferences, 'currency', '')} clearable={false} autosize={false} onChange={value => this.handleChangeCurrency(value)} />
-        </div>
-      </Popover>
-    )
     return (
       <header>
-        <Navbar fluid>
-          <div className="navbar-header">
-            {/* BRAND */}
-            <Navbar.Brand>
-              <Link to="/">
-                <img src={config.appLogo} alt={config.appName} /> <span>{config.appName}</span>
-              </Link>
-            </Navbar.Brand> 
-            {/* TOGGLE */}
-            <Navbar.Toggle className={classnames({'hide': (isLoading || appDisabled) })} />
-            {/* OPTIONS */}
-            <ul className={classnames({'navbar-btn navbar-right navbar-options': true, 'hide': (isLoading || appDisabled) })}>
-              <MenuItem>
-                <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={popoverNotifications}>
-                  <Button className="btn btn-success btn-block"><i className="glyphicon glyphicon-bell"></i></Button>
-                </OverlayTrigger>
-              </MenuItem>
-              <MenuItem className={classnames({'hide': !isAuthenticated})}>
-                <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={popoverMessages}>
-                  <Button className="btn btn-success btn-block"><i className="glyphicon glyphicon-comment"></i></Button>
-                </OverlayTrigger>
-              </MenuItem>
-              <MenuItem>
-                <OverlayTrigger trigger="click" rootClose placement="bottom" overlay={popoverPreferences}>
-                  <Button className="btn btn-success btn-block"><i className="glyphicon glyphicon-cog"></i></Button>
-                </OverlayTrigger>
-              </MenuItem>
-            </ul>
-          </div>
-          {/* MENU */}
-          <Navbar.Collapse>
-            {
-              appDisabled ? null : <Menu data={{ app: this.props.data.app, auth: this.props.data.auth }} />
-            }
-          </Navbar.Collapse>
+        <Navbar className="border-bottom" color="light" light expand="md">
+          <NavbarBrand to="/" tag={Link}>
+            <img src={config.appLogo} alt={config.appName} width={35} /> <span>{config.appName}</span>
+          </NavbarBrand> 
+          <Navbar className={classnames({'ml-auto': true, 'hide': (isLoading || appDisabled) })}>
+            <div className="form-inline">
+              {/* PREFERENCES */}
+              <button id="popoverPreferences" className="btn btn-success mr-1" onClick={() => this.handleChangeState('showPopoverPreferences', !this.state.showPopoverPreferences)}><i className="fas fa-cog"></i></button>
+              <Popover target="popoverPreferences" placement="bottom" isOpen={this.state.showPopoverPreferences} toggle={() => this.handleChangeState('showPopoverPreferences', !this.state.showPopoverPreferences)}>
+                <PopoverHeader>{this.context.t('preferences')}</PopoverHeader>
+                <PopoverBody>
+                  <div className="form-group">
+                    <label>{this.context.t('language')}</label>
+                    <Select placeholder='Select...' options={languages} optionRenderer={option => option.label} valueRenderer={option => option.label} simpleValue={true} value={get(appPreferences, 'language', '')} clearable={false} autosize={false} onChange={value => this.handleChangeLanguage(value)} />
+                  </div>
+                  <div className="form-group">
+                    <label>{this.context.t('currency')}</label>
+                    <Select placeholder='Select...' options={currencies} optionRenderer={option => option.label} valueRenderer={option => option.label} simpleValue={true} value={get(appPreferences, 'currency', '')} clearable={false} autosize={false} onChange={value => this.handleChangeCurrency(value)} />
+                  </div>
+                </PopoverBody>
+              </Popover>
+              {/* MESSAGES */}
+              <button id="popoverMessages" className={classnames({"btn btn-success mr-1": true, 'hide': !isAuthenticated})} onClick={() => this.handleChangeState('showPopoverMessages', !this.state.showPopoverMessages)}><i className="fas fa-comment-alt"></i></button>
+              <Popover target="popoverMessages" placement="bottom" isOpen={this.state.showPopoverMessages} toggle={() => this.handleChangeState('showPopoverMessages', !this.state.showPopoverMessages)}>
+                <PopoverHeader>{this.context.t('messages')}</PopoverHeader>
+                <PopoverBody>
+                  <p>{this.context.t('userNotHaveMessages')}</p>
+                  <hr/>
+                  <div className="text-center"><Link to="/app/user/chat">{this.context.t('seeAll')}</Link></div>
+                </PopoverBody>
+              </Popover>
+              {/* NOTIFICATIONS */}
+              <button id="popoverNotifications" className="btn btn-success mr-1" onClick={() => this.handleChangeState('showPopoverNotifications', !this.state.showPopoverNotifications)}><i className="fas fa-bell"></i></button>              
+              <Popover target="popoverNotifications" placement="bottom" isOpen={this.state.showPopoverNotifications} toggle={() => this.handleChangeState('showPopoverNotifications', !this.state.showPopoverNotifications)}>
+                <PopoverHeader>{this.context.t('notifications')}</PopoverHeader>
+                <PopoverBody>
+                  <p>{this.context.t('userNotHaveNotifications')}</p>
+                </PopoverBody>
+              </Popover>
+            </div>
+          </Navbar>
+          <NavbarToggler className={classnames({'hide': (isLoading || appDisabled) })} onClick={() => this.handleChangeState('showMenu',!this.state.showMenu)} />
+          <Collapse isOpen={this.state.showMenu} navbar>
+            { !appDisabled && <Menu app={this.props.app} auth={this.props.auth} /> }
+          </Collapse>
         </Navbar>
       </header>
     )

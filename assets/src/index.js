@@ -7,13 +7,12 @@ import Store from "./store"
 import RegisterServiceWorker from './registerServiceWorker'
 import 'components/polyfill'
 //CSS
-import 'bootstrap/dist/css/bootstrap.css'
+import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-social/bootstrap-social.css'
 import 'react-input-range/lib/bundle/react-input-range.css'
 import 'react-loading-bar/dist/index.css'
 import 'react-select/dist/react-select.css'
 import 'react-quill/dist/quill.snow.css'
-import 'font-awesome/css/font-awesome.css'
 //ADMIN-CONTAINERS
 import AdminCatalog from 'containers/admin/configuration/adminCatalog'
 import AdminCatalogSave from 'containers/admin/configuration/adminCatalogSave'

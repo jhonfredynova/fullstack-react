@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table, Nav, NavItem } from 'react-bootstrap'
+import { Table, Nav, NavItem, NavLink } from 'reactstrap'
 import classnames from 'classnames'
 import { get, set } from 'lodash'
 import PropTypes from 'prop-types'
@@ -11,7 +11,7 @@ import Pager from 'components/pager'
 import { hideLoading, showLoading, setPreference, setMessage, PREFERENCE } from 'actions/appActions'
 import { getPlan, deletePlan, updatePlan } from 'actions/planActions'
 
-class AdminPlan extends Component {
+class AdminPlan extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -96,12 +96,22 @@ class AdminPlan extends Component {
     const { records } = this.state.plans
     return (
       <div>
-        <NavigationBar data= {{ title: <h1>Plans</h1>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/plan/new')}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('plansQuery.where.active', value===1); this.handleChangeSearch(this.state.plansQuery) } }>
-          <NavItem eventKey={1}>Active</NavItem>
-          <NavItem eventKey={2}>Inactive</NavItem>
+        <NavigationBar
+          title={<h1>Plans</h1>} 
+          btnRight={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/plan/new')}><i className="fas fa-check"></i></button>} />
+        <Nav className="mb-4" tabs>
+          <NavItem>
+            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('plansQuery.where.active', true); this.handleChangeSearch(this.state.plansQuery) }}>
+              Active
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('plansQuery.where.active', false); this.handleChangeSearch(this.state.plansQuery) }}>
+              Inactive
+            </NavLink>
+          </NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.plansQuery} items={this.state.plans} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} query={this.state.plansQuery} items={this.state.plans} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>
@@ -135,12 +145,12 @@ class AdminPlan extends Component {
                       {
                         activeTab===1 ?
                         <div>
-                          <Link to={`/admin/configuration/plan/${item.id}`} className="btn btn-success"><i className="glyphicon glyphicon-edit"></i></Link> 
-                          <Link to={`/admin/configuration/plan/${item.id}/feature`} className="btn btn-success"><i className="glyphicon glyphicon-list"></i></Link> 
-                          <button className="btn btn-danger" onClick={() => this.handleDeleteData(item)}><i className="glyphicon glyphicon-minus"></i></button>
+                          <Link to={`/admin/configuration/plan/${item.id}`} className="btn btn-success mr-1"><i className="fas fa-edit"></i></Link> 
+                          <Link to={`/admin/configuration/plan/${item.id}/feature`} className="btn btn-success mr-1"><i className="fas fa-list"></i></Link> 
+                          <button className="btn btn-danger" onClick={() => this.handleDeleteData(item)}><i className="fas fa-minus"></i></button>
                         </div> : 
                         <div>
-                          <button className="btn btn-success" onClick={() => this.handleRestoreData(item)}><i className="glyphicon glyphicon-ok"></i></button>
+                          <button className="btn btn-success" onClick={() => this.handleRestoreData(item)}><i className="fas fa-check"></i></button>
                         </div>
                       }
                     </td>

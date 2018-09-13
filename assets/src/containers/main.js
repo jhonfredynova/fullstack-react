@@ -1,9 +1,8 @@
-import React, { Component } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import Loading from 'react-loading-bar'
-import classnames from 'classnames'
 import { defaults, get, isEmpty } from 'lodash'
 import moment from 'moment'
 import PropTypes from 'prop-types'
@@ -11,11 +10,11 @@ import { setTranslations, setLanguage } from 'redux-i18n'
 import Header from 'components/header'
 import Footer from 'components/footer'
 import Message from 'components/message'
-import { hideLoading, showLoading, getConfig, setMessage, setPreference } from 'actions/appActions'
+import { hideLoading, showLoading, getConfig, setMessage, deleteMessage, setPreference } from 'actions/appActions'
 import { getToken, me } from 'actions/authActions'
-import './main.css'
+import { Style } from 'react-style-tag'
 
-class Main extends Component {
+class Main extends React.PureComponent {
 
   async componentWillMount() {
     try{
@@ -24,7 +23,7 @@ class Main extends Component {
       await this.props.dispatch(getToken())
       await this.props.dispatch(me())
       const { config } = this.props.app
-      const { session } = this.props.auth
+      const { session } = this.props.auth      
       const preferences = defaults(get(session, 'preferences'), config.appPreferences)
       await this.props.dispatch(setPreference(preferences))
       await moment.locale(config.appPreferences.language)      
@@ -49,18 +48,69 @@ class Main extends Component {
     }
   }
 
+  async componentDidUpdate(prevProps) {
+    try{
+      const { messages } = this.props.app
+      if(this.props.location!==prevProps.location){
+        return this.props.dispatch(deleteMessage())
+      }
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+    }
+  }
+
   render() {
     const { isLoading, config, messages } = this.props.app
     return (
       <div id="main">
-        <div className={classnames({'overlay': isLoading})} />
         <Loading color="green" show={isLoading} showSpinner={false} />
-        <Message data={{ isLoading: isLoading, messages: messages }} />
-        <Header data={{ isLoading: isLoading, app: this.props.app, auth: this.props.auth }} />
+        <Message isLoading={isLoading} messages={messages} />
+        <Header isLoading={isLoading} app={this.props.app} auth={this.props.auth} />
         <section className="container-fluid">
-          { !isEmpty(config) ? this.props.children : null }
+          { !isEmpty(config) && this.props.children }
         </section>
-        <Footer data={{ isLoading: isLoading, app: this.props.app }} />
+        <Footer isLoading={isLoading} app={this.props.app} />
+        <Style>
+        {`
+          img{
+            font-size: 0px;
+          }
+          table td{
+            vertical-align: middle!important;
+          }
+          .modal-dialog {
+            top: 15%;
+          }
+          .modal-header {
+            background-color: #f5f5f5;
+            border-radius: 6px 6px 0px 0px;
+          }
+          .nav-tabs .nav-link {
+            cursor: pointer;
+          }
+          .ql-editor p{
+            margin: 0 0 10px;
+          }
+          .Select .Select-menu-outer {
+            z-index: 999!important;
+          }
+          .Select img{
+            width: 18px;
+            margin-right: 2px;
+            margin-bottom: 3px;
+          }
+          .Select.form-control{
+            padding: 0px;
+            border: none;
+          }
+          .Select.form-control .Select-control{
+            height: 34px;
+          }
+          .Select.form-control .Select-input{
+            height: 32px;
+          } 
+        `}
+        </Style>
       </div>
     )
   }

@@ -1,7 +1,6 @@
-import React, { Component } from 'react'
-import { Tabs, Tab } from 'react-bootstrap'
+import React from 'react'
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap'
 import ReactQuill, { Quill } from 'react-quill'
-import shortid from 'shortid'
 import classnames from 'classnames'
 import { defaultTo, get, set } from 'lodash'
 // Editor configuration
@@ -11,19 +10,20 @@ Hr.blotName = 'hr'
 Hr.tagName = 'hr'
 Quill.register({'formats/hr': Hr})
 
-export default class Multilanguage extends Component {
+class Multilanguage extends React.PureComponent {
 
   constructor(props) {
     super(props)
     this.state = {
-      isHtml: defaultTo(this.props.data.type, false),
-      languages: defaultTo(this.props.data.languages, []),
-      value: defaultTo(this.props.data.value, {})
+      activeTab: 'en',
+      isHtml: defaultTo(this.props.type, false),
+      languages: defaultTo(this.props.languages, []),
+      value: defaultTo(this.props.value, {})
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState(nextProps.data)
+    this.setState(nextProps)
   }
 
   async handleChangeState(path, value) {
@@ -44,18 +44,27 @@ export default class Multilanguage extends Component {
     }
     return (
       <div>
-        <Tabs id={shortid.generate()} defaultActiveKey={0}>
+        <Nav tabs>
           {
-            this.state.languages.map((item, index) =>
-              <Tab key={index} eventKey={index} title={item}>
+            this.state.languages.map(item =>
+              <NavItem key={item}>
+                <NavLink active={item===this.state.activeTab} onClick={() => this.setState({ activeTab: item})}>{item}</NavLink>
+              </NavItem>
+            )
+          }
+        </Nav>
+        <TabContent activeTab={this.state.activeTab}>
+           {
+            this.state.languages.map(item =>
+              <TabPane key={item} tabId={item} title={item}>
                 { this.state.isHtml
                   ? <ReactQuill modules={reactQuillModules} value={get(this.state, `value[${item}]`, '')} onChange={value => this.handleChangeState(`value[${item}]`, value)} />
                   : <textarea value={get(this.state, `value[${item}]`, '')} className="form-control" rows="4" onChange={e => this.handleChangeState(`value[${item}]`, e.target.value)} />
                 }
-              </Tab>
+              </TabPane>
             )
           }
-        </Tabs>
+        </TabContent>
         <div className="btn-group">
           <button type="button" className={classnames({'btn btn-default': true}, {'btn-success': !this.state.isHtml} )} onClick={this.handleChangeState.bind(this, 'isHtml', false)}>TEXT</button> 
           <button type="button" className={classnames({'btn btn-default': true}, {'btn-success': this.state.isHtml} )} onClick={this.handleChangeState.bind(this, 'isHtml', true)}>HTML</button> 
@@ -64,3 +73,5 @@ export default class Multilanguage extends Component {
     )
   }
 }
+
+export default Multilanguage

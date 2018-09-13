@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table, Nav, NavItem } from 'react-bootstrap'
+import { Table, Nav, NavItem, NavLink } from 'reactstrap'
 import { set } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
@@ -9,7 +9,7 @@ import Pager from 'components/pager'
 import { hideLoading, showLoading, setPreference, setMessage, PREFERENCE } from 'actions/appActions'
 import { getPlan, getPlanFeature, updatePlanFeature, deletePlanFeature } from 'actions/planActions'
 
-class AdminPlanFeature extends Component {
+class AdminPlanFeature extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -41,7 +41,7 @@ class AdminPlanFeature extends Component {
     try{
       this.props.dispatch(showLoading())
       await this.props.dispatch(getPlan({ select: ['id','name'], where: {id: this.props.match.params.id } }))
-      await this.setState({ plan: this.props.plan.temp })
+      await this.setState({ plan: this.props.plan.plans.records[0] })
       await this.props.dispatch(getPlanFeature(this.state.planFeaturesQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -97,12 +97,24 @@ class AdminPlanFeature extends Component {
     const { records } = this.state.planFeatures
     return (
       <div id="adminPlanFeature">
-        <NavigationBar data={{ title: <h1>{this.state.plan.name}</h1>, subTitle: <h2>Features</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan`)}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan/${this.props.match.params.id}/feature/new`)}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('planFeaturesQuery.where.active', value===1); this.handleChangeSearch(this.state.planFeaturesQuery) } }>
-          <NavItem eventKey={1}>Active</NavItem>
-          <NavItem eventKey={2}>Inactive</NavItem>
+        <NavigationBar
+          title={<h1>{this.state.plan.name}</h1>} 
+          description={<h2>Features</h2>}
+          btnLeft={<button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan`)}><i className="fas fa-arrow-left"></i></button>}  
+          btnRight={<button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan/${this.props.match.params.id}/feature/new`)}><i className="fas fa-plus"></i></button>} />
+        <Nav className="mb-4" tabs>
+          <NavItem>
+            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('planFeaturesQuery.where.active', true); this.handleChangeSearch(this.state.planFeaturesQuery) }}>
+              Active
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('planFeaturesQuery.where.active', false); this.handleChangeSearch(this.state.planFeaturesQuery) }}>
+              Inactive
+            </NavLink>
+          </NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.planFeaturesQuery} items={this.state.planFeatures} onChange={this.handleChangeSearch.bind(this)}>
+        <Pager isLoading={isLoading} query={this.state.planFeaturesQuery} items={this.state.planFeatures} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>
@@ -123,11 +135,11 @@ class AdminPlanFeature extends Component {
                       {
                         activeTab===1 ?
                         <div>
-                          <Link to={`/admin/configuration/plan/${this.state.plan.id}/feature/${item.id}`} className="btn btn-success"><i className="glyphicon glyphicon-edit"></i></Link> 
-                          <button className="btn btn-danger" onClick={() => this.handleDeleteData({ feature: item.id })}><i className="glyphicon glyphicon-minus"></i></button>
+                          <Link to={`/admin/configuration/plan/${this.state.plan.id}/feature/${item.id}`} className="btn btn-success mr-1"><i className="fas fa-edit"></i></Link> 
+                          <button className="btn btn-danger" onClick={() => this.handleDeleteData({ feature: item.id })}><i className="fas fa-minus"></i></button>
                         </div> :
                         <div>
-                          <button className="btn btn-success" onClick={() => this.handleRestoreData(item)}><i className="glyphicon glyphicon-ok"></i></button>
+                          <button className="btn btn-success" onClick={() => this.handleRestoreData(item)}><i className="fas fa-check"></i></button>
                         </div> 
                       }
                     </td>

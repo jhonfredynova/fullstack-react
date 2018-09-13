@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
-import { chunk, get, sortBy, toUrl } from 'lodash'
+import { get, sortBy, toUrl } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan } from 'actions/planActions'
@@ -8,9 +8,8 @@ import { getCatalog } from 'actions/catalogActions'
 import NavigationBar from 'components/navigationBar'
 import PlanBox from 'components/planBox'
 import Seo from 'components/seo'
-import './home.css'
 
-class Home extends Component {
+class Home extends React.PureComponent {
 
   constructor(props){
     super(props)
@@ -50,30 +49,28 @@ class Home extends Component {
     })
     return (
       <div id="home">
-        <Seo data={{ title: this.context.t('homeTitle'), description: this.context.t('homeDescription'), keyword: ['jhonfredynova'], siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.context.t('homeTitle')}</h1>, subTitle: <h2>{this.context.t('homeDescription')}</h2> }} />
-        {
-          chunk(sortBy(this.state.planFeatures, ['order']), 2).map((item, index) => 
-            <div key={index} className="row">
-              {
-                item.map(item =>
-                  <div key={item.id} className="col-xs-6">
-                    <div className="well well-lg">
-                      <h2 className="text-center">{item.name}</h2>
-                      <h3 className="text-center"><i className={`${item.thumbnail} fa-2x`} /></h3>
-                      <article className="text-center" dangerouslySetInnerHTML={{__html: get(item, `value[${appPreferences.language}]`, '') }} />
-                    </div>
-                  </div>
-                )
-              }
-            </div>
-          )
-        }
+        <Seo title={this.context.t('homeTitle')} description={this.context.t('homeDescription')} keyword={['jhonfredynova']} siteName={this.context.t('siteName')} />
+        <NavigationBar 
+          title={<h1>{this.context.t('homeTitle')}</h1>} 
+          description={<h2>{this.context.t('homeDescription')}</h2>} />
+        <div className="row mb-4">
+          {
+            sortBy(this.state.planFeatures, ['order']).map(item => 
+              <div key={item.id} className="col">
+                <div className="card bg-faded">
+                  <h2 className="text-center">{item.name}</h2>
+                  <h3 className="text-center"><i className={`${item.thumbnail} fa-2x`} /></h3>
+                  <article className="text-center" dangerouslySetInnerHTML={{__html: get(item, `value[${appPreferences.language}]`, '') }} />
+                </div>
+              </div>
+            )
+          }
+        </div>
         <div className="row">
           {
             sortBy(this.state.plans, ['order']).map(item =>
-              <div key={item.id} className="col-md-4 col-xs-12">
-                <PlanBox data={{ app: this.props.app,  info: item, popular: config.plans.standard }} onClick={() => this.props.history.push(item.url)} />
+              <div key={item.id} className="col">
+                <PlanBox app={this.props.app} info={item} popular={config.plans.standard} onClick={() => this.props.history.push(item.url)} />
               </div>
             )
           }

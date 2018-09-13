@@ -1,21 +1,21 @@
-import  React, { Component } from 'react'
+import React from 'react'
 import { Helmet } from 'react-helmet'
 import { defaultTo } from 'lodash'
 
-class SEO extends Component {
+class SEO extends React.PureComponent {
 
   constructor(props){
     super(props)
     this.state = {
-      title: defaultTo(this.props.data.title, ''),
-      description: defaultTo(this.props.data.description, ''),
-      keywords: defaultTo(this.props.data.keywords, []),
-      siteName: defaultTo(this.props.data.siteName, '')
+      title: defaultTo(this.props.title, ''),
+      description: defaultTo(this.props.description, ''),
+      keywords: defaultTo(this.props.keywords, []),
+      siteName: defaultTo(this.props.siteName, '')
     }
   }
 
   componentWillReceiveProps(nextProps){
-    this.setState(nextProps.data)
+    this.setState(nextProps)
   }
 
   render() {

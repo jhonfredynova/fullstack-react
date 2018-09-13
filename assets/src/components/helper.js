@@ -1,17 +1,7 @@
 import { get, isArray, isObject, isString, join } from 'lodash'
 
-//CONSTANTS
-export const ACTION = {
-  TEMP: 'ACTION_TEMP',
-  DELETE: 'ACTION_DELETE',
-  GET: 'ACTION_GET',
-  SAVE: 'ACTION_SAVE',
-  UPDATE: 'ACTION_UPDATE',
-  UPLOAD: 'ACTION_UPLOAD'
-}
-
 //REQUESTS
-export function handleError(e){
+export function handleRequestError(e){
   let message = null
   let messageDetail = get(e,'response.data', null) 
   if(isString(messageDetail) && !message) message = messageDetail
@@ -42,60 +32,9 @@ export function handleRequestQuery(data){
   return encodeURI(queryString.join('&'))
 }
 
-export function handleResponseAction(action, state, payload){
-  switch(action){
-    case ACTION.TEMP:
-      state = payload
-      break
-    case ACTION.DELETE:
-      state = {
-        ...state,
-        records: state.records.filter(item => item.id!==payload.id),
-        recordsTotal: state.recordsTotal-1
-      }
-      break
-    case ACTION.GET:
-      state = {
-        ...state,
-        records: payload.records,
-        recordsTotal: payload.recordsTotal
-      }
-      break
-    case ACTION.SAVE:
-      state = {
-        ...state,
-        records: state.records.concat(payload),
-        recordsTotal: state.recordsTotal+1
-      }
-      break
-    case ACTION.UPDATE:
-      state = {
-        ...state, 
-        records: state.records.map(item => (item.id===payload.id) ? payload : item),
-        recordsTotal: state.recordsTotal
-      }
-      break
-    case ACTION.UPLOAD:
-      state = {
-        ...state,
-        records: state.records.concat(payload),
-        recordsTotal: state.recordsTotal+payload.length
-      }
-      break
-    default:
-      break
-  }
-  return state
-}
-
 export function handleResponseQuery(data){
-  let response = { find: null, findOne: null }
-  if(data.headers['content-records']){
-    response.find = {}
-    response.find.records = data.data
-    response.find.recordsTotal = parseInt(data.headers['content-records'], 0)
-  }else{
-    response.findOne = data.data
+  return {
+    records: data.data,
+    totalRecords: parseInt(data.headers['content-records'], 0)
   }
-  return response
 }

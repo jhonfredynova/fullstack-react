@@ -1,10 +1,9 @@
 import { PLAN, PLAN_FEATURE } from 'actions/planActions'
-import { ACTION, handleResponseAction } from 'components/helper'
 
 export default function reducer(
   state={
-    plans: { records: [], recordsTotal: 0 },
-    features: { records: [], recordsTotal: 0 },
+    plans: { records: [], totalRecords: 0 },
+    features: { records: [], totalRecords: 0 },
     temp: null
   }, 
   action={}) 
@@ -15,53 +14,81 @@ export default function reducer(
       return state
     
     case PLAN.GET:
-      return { 
-        ...state, 
-        plans: handleResponseAction(ACTION.GET, state.plans, action.payload.find || state.plans),
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload.findOne)
+      return {
+        ...state,
+        plans: {
+          ...state.plans,
+          records: action.payload.records,
+          totalRecords: action.payload.totalRecords
+        }
       }
 
     case PLAN.SAVE:
-      return { 
-        ...state, 
-        plans: handleResponseAction(ACTION.SAVE, state.plans, action.payload) 
+      return {
+        ...state,
+        plans: {
+          ...state.plans,
+          records: state.plans.records.concat(action.payload),
+          totalRecords: state.plans.totalRecords+1
+        }
       }
 
     case PLAN.UPDATE:
       return { 
         ...state, 
-        plans: handleResponseAction(ACTION.UPDATE, state.plans, action.payload) 
+        plans: {
+          ...state.plans,
+          records: state.plans.records.map(item => (item.id===action.payload.id) ? action.payload : item)
+        }
       }
 
     case PLAN.DELETE:
       return { 
         ...state, 
-        plans: handleResponseAction(ACTION.DELETE, state.plans, action.payload) 
+        plans: {
+          ...state.plans,
+          records: state.plans.records.filter(item => item.id!==action.payload.id),
+          totalRecords: state.plans.totalRecords-1
+        }
       }
 
     case PLAN_FEATURE.GET:
-      return { 
-        ...state, 
-        features: handleResponseAction(ACTION.GET, state.features, action.payload.find || state.features),
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload.findOne)
+      return {
+        ...state,
+        features: {
+          ...state.features,
+          records: action.payload.records,
+          totalRecords: action.payload.totalRecords
+        }
       }
-      
+
     case PLAN_FEATURE.SAVE:
-      return { 
-        ...state, 
-        features: handleResponseAction(ACTION.SAVE, state.features, action.payload) 
+      return {
+        ...state,
+        features: {
+          ...state.features,
+          records: state.features.records.concat(action.payload),
+          totalRecords: state.features.totalRecords+1
+        }
       }
 
     case PLAN_FEATURE.UPDATE:
       return { 
         ...state, 
-        features: handleResponseAction(ACTION.UPDATE, state.features, action.payload) 
+        features: {
+          ...state.features,
+          records: state.features.records.map(item => (item.id===action.payload.id) ? action.payload : item)
+        }
       }
 
     case PLAN_FEATURE.DELETE:
       return { 
         ...state, 
-        features: handleResponseAction(ACTION.DELETE, state.features, action.payload) 
+        features: {
+          ...state.features,
+          records: state.features.records.filter(item => item.id!==action.payload.id),
+          totalRecords: state.features.totalRecords-1
+        }
       }
 
   }

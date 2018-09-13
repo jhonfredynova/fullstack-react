@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
@@ -7,7 +7,7 @@ import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import NavigationBar from 'components/navigationBar'
 import Seo from 'components/seo'
 
-class BuyResponse extends Component {
+class BuyResponse extends React.PureComponent {
 
   constructor(props) { 
     super(props)
@@ -75,8 +75,8 @@ class BuyResponse extends Component {
     const { isAuthenticated } = this.props.auth
     return (
       <div id="buy">
-        <Seo data={{ title: this.state.title, description: this.state.message, siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.state.title}</h1>, subTitle: <h2>{this.state.message}</h2> }} />
+        <Seo title={this.state.title} description={this.state.message} siteName={this.context.t('siteName')} />
+        <NavigationBar title={<h1>{this.state.title}</h1>} description={<h2>{this.state.message}</h2>} />
         <section className="text-center">
           <h1><i className={this.state.thumbnail} /></h1>
           <p>

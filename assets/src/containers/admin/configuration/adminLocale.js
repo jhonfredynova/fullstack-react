@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { Table, Nav, NavItem } from 'react-bootstrap'
+import { Table, Nav, NavItem, NavLink } from 'reactstrap'
 import { set } from 'lodash'
 import moment from 'moment'
 import PropTypes from 'prop-types'
@@ -10,7 +10,7 @@ import Pager from 'components/pager'
 import { hideLoading, showLoading, setPreference, setMessage, PREFERENCE } from 'actions/appActions'
 import { getLocale, deleteLocale, updateLocale } from 'actions/localeActions'
 
-class AdminLocale extends Component {
+class AdminLocale extends React.PureComponent {
   
   constructor(props) {
     super(props)
@@ -95,13 +95,23 @@ class AdminLocale extends Component {
     const { records } = this.state.locales
     return (
       <div>
-        <NavigationBar data={{ title: <h1>Locales</h1>, btnRight: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/locale/new')}><i className="glyphicon glyphicon-plus"></i></button> }} />
-        <Nav bsStyle="tabs" activeKey={activeTab} onSelect={value => { this.handleChangeState('localesQuery.where.active', value===1); this.handleChangeSearch(this.state.localesQuery) } }>
-          <NavItem eventKey={1}>Active</NavItem>
-          <NavItem eventKey={2}>Inactive</NavItem>
+        <NavigationBar
+          title={<h1>Locales</h1>} 
+          btnRight={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/locale/new')}><i className="fas fa-plus"></i></button> } />
+        <Nav className="mb-4" tabs>
+          <NavItem>
+            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('localesQuery.where.active', true); this.handleChangeSearch(this.state.localesQuery) }}>
+              Active
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('localesQuery.where.active', false); this.handleChangeSearch(this.state.localesQuery) }}>
+              Inactive
+            </NavLink>
+          </NavItem>
         </Nav>
-        <Pager isLoading={isLoading} data={this.state.localesQuery} items={this.state.locales} onChange={this.handleChangeSearch.bind(this)}>
-          <Table striped condensed hover responsive>
+        <Pager isLoading={isLoading} query={this.state.localesQuery} items={this.state.locales} onChange={this.handleChangeSearch.bind(this)}>
+          <Table striped hover responsive>
             <thead>
               <tr>
                 <th>Created</th>
@@ -121,11 +131,11 @@ class AdminLocale extends Component {
                       {
                         activeTab===1 ?
                         <div>
-                          <Link to={`/admin/configuration/locale/${item.id}`} className="btn btn-success"><i className="glyphicon glyphicon-edit"></i></Link> 
-                          <button className="btn btn-danger" onClick={() => this.handleDeleteData(item)}><i className="glyphicon glyphicon-minus"></i></button>
+                          <Link to={`/admin/configuration/locale/${item.id}`} className="btn btn-success mr-1"><i className="fas fa-edit"></i></Link> 
+                          <button className="btn btn-danger" onClick={() => this.handleDeleteData(item)}><i className="fas fa-minus"></i></button>
                         </div> : 
                         <div>
-                          <button className="btn btn-success" onClick={() => this.handleRestoreData(item)}><i className="glyphicon glyphicon-ok"></i></button>
+                          <button className="btn btn-success" onClick={() => this.handleRestoreData(item)}><i className="fas fa-check"></i></button>
                         </div>
                       }
                     </td>

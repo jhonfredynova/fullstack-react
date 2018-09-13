@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
-import { Table } from 'react-bootstrap'
+import { Table } from 'reactstrap'
 import PropTypes from 'prop-types'
 import moment from 'moment'
 import NavigationBar from 'components/navigationBar'
@@ -10,7 +10,7 @@ import { set } from 'lodash'
 import { hideLoading, showLoading, setMessage, setPreference, PREFERENCE } from 'actions/appActions'
 import { getBilling } from 'actions/paymentActions'
 
-class Billing extends Component {
+class Billing extends React.PureComponent {
 
   constructor(props){
     super(props)
@@ -71,8 +71,10 @@ class Billing extends Component {
     const { records } = this.state.billing
     return (
       <div id="subscription">
-        <NavigationBar data={{ title: <h1>{this.context.t('billingTitle')}</h1>, subTitle: <h2>{this.context.t('billingDescription')}</h2> }} />
-        <Pager isLoading={isLoading} data={this.state.billingQuery} items={this.state.billing} onChange={this.handleChangeSearch.bind(this)}>
+        <NavigationBar
+          title={<h1>{this.context.t('billingTitle')}</h1>} 
+          description={<h2>{this.context.t('billingDescription')}</h2>} />
+        <Pager isLoading={isLoading} query={this.state.billingQuery} items={this.state.billing} onChange={this.handleChangeSearch.bind(this)}>
           <Table striped condensed hover responsive>
             <thead>
               <tr>
@@ -88,10 +90,10 @@ class Billing extends Component {
                   <tr key={index}>
                     <td>{moment(item.dateCharge).format('DD/MM/YYYY')}</td>
                     <td>{item.orderId}</td>
-                    <td><Numeric data={{ amount: item.amount, display: 'text', decimalScale: 0, thousandSeparator: ',',  prefix: '$', suffix: ` ${item.currency.toUpperCase()}` }} /> <label className="label label-primary">{item.state}</label></td>
+                    <td><Numeric amount={item.amount} display='text' decimalScale={0} thousandSeparator=','  prefix='$' suffix={` ${item.currency.toUpperCase()}`} /> <label className="badge badge-primary">{item.state}</label></td>
                     <td className="text-center">
                       {
-                        <button className="btn btn-success"><i className="glyphicon glyphicon-download-alt"></i></button>
+                        <button className="btn btn-success"><i className="fas fa-download"></i></button>
                       }
                     </td>
                   </tr>

@@ -1,9 +1,8 @@
 import { LOCALE } from 'actions/localeActions'
-import { ACTION, handleResponseAction } from 'components/helper'
 
 export default function reducer(
   state={
-    locales: { records: [], recordsTotal: 0 },
+    locales: { records: [], totalRecords: 0 },
     temp: null
   }, 
   action={}) 
@@ -14,28 +13,42 @@ export default function reducer(
       return state
 
     case LOCALE.GET:
-      return { 
-        ...state, 
-        locales: handleResponseAction(ACTION.GET, state.locales, action.payload.find || state.locales),
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload.findOne)
+      return {
+        ...state,
+        locales: {
+          ...state.locales,
+          records: action.payload.records,
+          totalRecords: action.payload.totalRecords
+        }
       }
 
     case LOCALE.SAVE:
-      return { 
-        ...state, 
-        locales: handleResponseAction(ACTION.SAVE, state.locales, action.payload) 
+      return {
+        ...state,
+        locales: {
+          ...state.locales,
+          records: state.locales.records.concat(action.payload),
+          totalRecords: state.locales.totalRecords+1
+        }
       }
 
     case LOCALE.UPDATE:
       return { 
         ...state, 
-        locales: handleResponseAction(ACTION.UPDATE, state.locales, action.payload) 
+        locales: {
+          ...state.locales,
+          records: state.locales.records.map(item => (item.id===action.payload.id) ? action.payload : item)
+        }
       }
 
     case LOCALE.DELETE:
       return { 
         ...state, 
-        locales: handleResponseAction(ACTION.DELETE, state.locales, action.payload) 
+        locales: {
+          ...state.locales,
+          records: state.locales.records.filter(item => item.id!==action.payload.id),
+          totalRecords: state.locales.totalRecords-1
+        }
       }
       
   }

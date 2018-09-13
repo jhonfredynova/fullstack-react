@@ -1,7 +1,7 @@
 import axios from 'axios'
 import shortid from 'shortid'
 import { isEqual, mapValues, pick } from 'lodash'
-import { handleError, handleRequestQuery } from 'components/helper'
+import { handleRequestError, handleRequestQuery } from 'components/helper'
 
 export const APP = {
   HIDE_LOADING: 'HIDE_LOADING',
@@ -51,11 +51,11 @@ export function getConfig(parameters) {
         state().i18nState.translations = response.appIntl.locales
         state().i18nState.lang = response.appPreferences.language
         dispatch({type: APP.GET_CONFIG, payload: response }) 
-      }catch(e){
-        handleError(e)
+      }catch(err){
+        handleRequestError(err)
       }
     })
-    .catch(err => handleError(err) )
+    .catch(err => handleRequestError(err) )
   }
 }
 
@@ -91,7 +91,7 @@ export function setPreference(data) {
       }
       if(changedPreferences) dispatch({ type: APP.SET_PREFERENCE, payload: changedPreferences })    
     }catch(e){
-      handleError(e)
+      handleRequestError(e)
     }
   }
 }

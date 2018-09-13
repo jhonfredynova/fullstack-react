@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { sortBy, toUrl } from 'lodash'
 import PropTypes from 'prop-types'
@@ -8,7 +8,7 @@ import NavigationBar from 'components/navigationBar'
 import PlanBox from 'components/planBox'
 import Seo from 'components/seo'
 
-class Price extends Component {
+class Price extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -43,13 +43,15 @@ class Price extends Component {
     })
     return (
       <div id="price">
-        <Seo data={{ title: this.context.t('priceTitle'), description: this.context.t('priceDescription'), siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.context.t('priceTitle')}</h1>, subTitle: <h2>{this.context.t('priceDescription')}</h2> }} />
+        <Seo title={this.context.t('priceTitle')} description={this.context.t('priceDescription')} siteName={this.context.t('siteName')} />
+        <NavigationBar
+          title={<h1>{this.context.t('priceTitle')}</h1>}
+          description={<h2>{this.context.t('priceDescription')}</h2>} />
         <div className="row">
           {
             sortBy(this.state.plans, ['order']).map(item =>
-              <div key={item.id} className="col-md-4 col-xs-12">
-                <PlanBox data={{ isLoading: isLoading, app: this.props.app, info: item, popular: config.plans.standard  }} onClick={() => this.props.history.push(item.url)} />
+              <div key={item.id} className="col">
+                <PlanBox isLoading={isLoading} app={this.props.app} info={item} popular={config.plans.standard} onClick={() => this.props.history.push(item.url)} />
               </div>
             )
           }

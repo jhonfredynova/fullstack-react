@@ -1,7 +1,7 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { cloneDeep, clean, compact, flow, isEmpty, isEmail, get, set } from 'lodash'
-import { OverlayTrigger, Tooltip } from 'react-bootstrap'
+import { Tooltip } from 'reactstrap'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
@@ -12,7 +12,7 @@ import NavigationBar from 'components/navigationBar'
 import Numeric from 'components/numeric'
 import Seo from 'components/seo'
 
-class BuyTransaction extends Component {
+class BuyTransaction extends React.PureComponent {
 
   constructor(props) { 
     super(props)
@@ -22,6 +22,7 @@ class BuyTransaction extends Component {
         model: { client:{}, plan: {} }
       },
       plan: {},
+      showTooltipPayment: false,
       model: {
         client: {
           id: undefined,
@@ -145,37 +146,35 @@ class BuyTransaction extends Component {
     const { isLoading, config } = this.props.app
     const { appIntl } = this.props.app.config
     const planPrice = this.state.plan.transactionValue
-    const tooltipPayment = (
-      <Tooltip id="tooltipPayment">
-        {this.context.t('securePaymentInfo')}
-      </Tooltip>
-    )
     if(isEmpty(this.state.plan)) return null
     return (
       <div id="buy">
-        <Seo data={{ title: this.context.t('buyTitle', {planName: this.state.plan.name}), description: this.context.t('buyDescription'), siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.context.t('buyTitle', {planName: this.state.plan.name})}</h1>, subTitle: <h2>{this.context.t('buyDescription')}</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.goBack()}><i className="glyphicon glyphicon-arrow-left" /></button> }} />
+        <Seo title={this.context.t('buyTitle', {planName: this.state.plan.name})} description={this.context.t('buyDescription')} siteName={this.context.t('siteName')} />
+        <NavigationBar
+          title={<h1>{this.context.t('buyTitle', {planName: this.state.plan.name})}</h1>} 
+          description={<h2>{this.context.t('buyDescription')}</h2>} 
+          btnLeft={<button className="btn btn-success" onClick={() => this.props.history.goBack()}><i className="fas fa-arrow-left" /></button>} />
         <form id="formCheckout" method="post" action="https://checkout.payulatam.com/ppp-web-gateway-payu/" onSubmit={this.handleBuy.bind(this)}>
-          <div className="panel panel-default">
-            <div className="panel-heading">{this.context.t('userInfo')}</div>
-            <div className="panel-body">
+          <div className="card mb-4">
+            <div className="card-header">{this.context.t('userInfo')}</div>
+            <div className="card-body">
               <div className="row">
-                <div className="form-group col-md-6 col-xs-12">
+                <div className="form-group col-md-6">
                   <label>{this.context.t('email')} <span>*</span></label>
                   <input type="text" className="form-control" value={this.state.model.client.email} onBlur={this.handleBlurEmail.bind(this)} onChange={event => this.handleChangeState('model.client.email', event.target.value)} />
                   <span className="text-danger">{this.state.errors.model.client.email}</span>
                 </div>
-                <div className="form-group col-md-6 col-xs-12">
+                <div className="form-group col-md-6">
                   <label>{this.context.t('fullname')} <span>*</span></label>
                   <input type="text" className="form-control" disabled={this.state.model.client.id} value={this.state.model.client.fullname} onChange={event => this.handleChangeState('model.client.fullname', event.target.value)} />
                   <span className="text-danger">{this.state.errors.model.client.fullname}</span>
                 </div>
-                <div className={classnames({"form-group col-md-6 col-xs-12": true, 'hide': this.state.model.client.id})}>
+                <div className={classnames({"form-group col-md-6": true, 'hide': this.state.model.client.id})}>
                   <label>{this.context.t('password')} <span>*</span></label>
                   <input type="password" className="form-control" value={this.state.model.client.password} onChange={event => this.handleChangeState('model.client.password', event.target.value)} />
                   <span className="text-danger">{this.state.errors.model.client.password}</span>
                 </div>
-                <div className={classnames({"form-group col-md-6 col-xs-12": true, 'hide': this.state.model.client.id})}>
+                <div className={classnames({"form-group col-md-6": true, 'hide': this.state.model.client.id})}>
                   <label>{this.context.t('passwordConfirm')} <span>*</span></label>
                   <input type="password" className="form-control" value={this.state.model.client.passwordConfirmation} onChange={event => this.handleChangeState('model.client.passwordConfirmation', event.target.value)} />
                   <span className="text-danger">{this.state.errors.model.client.passwordConfirmation}</span>
@@ -184,18 +183,20 @@ class BuyTransaction extends Component {
             </div>
           </div>
           <div className="form-group text-right">
-            <label className="checkbox-inline text-left">
-              <input type="checkbox" defaultChecked={this.state.acceptTerms} onClick={e => this.handleChangeState('acceptTerms', !this.state.acceptTerms)} /> <span dangerouslySetInnerHTML={{__html: this.context.t('acceptTerms', { url: "/terms" }) }} />
-            </label>
+            <div className="form-check">
+              <input type="checkbox" className="form-check-input" defaultChecked={this.state.acceptTerms} onClick={e => this.handleChangeState('acceptTerms', !this.state.acceptTerms)} />
+              <label className="form-check-label" dangerouslySetInnerHTML={{__html: this.context.t('acceptTerms', { url: "/terms" }) }}></label>
+            </div>
             <div className="clearfix" />
             <h3 className={classnames({"d-inline": true, 'hide': isLoading})}>
-              <span className="label label-default"><Numeric data={{ amount: planPrice.value, display: 'text', decimalScale: 2, from: config.appPreferences.currency, to: planPrice.currency, prefix: '$', currencyConversion: appIntl.currencyConversion, suffix: ` ${config.appPreferences.currency.toUpperCase()}`, thousandSeparator: ',' }} /></span>
+              <span className="badge badge-secondary mr-1"><Numeric amount={planPrice.value} display='text' decimalScale={2} from={config.appPreferences.currency} to={planPrice.currency} prefix='$' currencyConversion={appIntl.currencyConversion} suffix={` ${config.appPreferences.currency.toUpperCase()}`} thousandSeparator=',' /></span>
             </h3> 
-            <OverlayTrigger placement="top" overlay={tooltipPayment}>
-              <button type="submit" className="btn btn-success btn-lg">
-                <i className="glyphicon glyphicon-lock"></i> {this.context.t('securePayment')}
-              </button>
-            </OverlayTrigger>
+            <button id="tooltipPayment" type="submit" className="btn btn-success btn-lg">
+              <i className="fas fa-lock"></i> {this.context.t('securePayment')}
+            </button>
+            <Tooltip placement="top" isOpen={this.state.showTooltipPayment} target="tooltipPayment" toggle={() => this.handleChangeState("showTooltipPayment", !this.state.showTooltipPayment)}>
+              {this.context.t('securePaymentInfo')}
+            </Tooltip>
           </div>
         </form>
       </div>

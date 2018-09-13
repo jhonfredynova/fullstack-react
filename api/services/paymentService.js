@@ -37,18 +37,23 @@ module.exports = {
 
   createSubscription: async (data) => {
     try{
-      const { plans } = sails.config.app
       let subscription = await paymentService.executeApiPayu('POST', `/subscriptions`, data)
-      await new Promise(resolve => setTimeout(() => resolve('ok'), 10000))
-      try{
-        let currentBilling = await paymentService.executeApiPayu('GET', `/recurringBill?subscriptionId=${subscription.id}`)
-        currentBilling = _.orderBy(currentBilling.recurringBillList, ['dateCharge'], ['asc'])[0]
-        if(currentBilling.state!=='PAID'){
-          await paymentService.executeApiPayu('DELETE', `/subscriptions/${subscription.id}`)
-          throw intlService.i18n('subscriptionCreatedErrorCard')
+      let subscriptionAttempts = 1
+      let subscriptionBilling = null
+      while(subscriptionAttempts<12){
+        try{
+          subscriptionBilling = await paymentService.executeApiPayu('GET', `/recurringBill?subscriptionId=${subscription.id}`)
+          subscriptionBilling = _.orderBy(subscriptionBilling.recurringBillList, ['dateCharge'], ['asc'])[0]
+          break
+        }catch(e){
+          console.warn(`Subscription #(${subscription.id}) not executed, attempt #${subscriptionAttempts}`)
+          await new Promise(resolve => setTimeout(() => resolve('ok'), 5000)) 
+          subscriptionAttempts++
         }
-      }catch(e){
-        throw intlService.i18n('subscriptionCreatedErrorCard')
+      }
+      subscriptionBilling = subscriptionBilling || {}
+      if(subscriptionBilling.state!=='PAID'){
+        await paymentService.executeApiPayu('DELETE', `/subscriptions/${subscription.id}`)
       }
       return subscription
     }catch(e){

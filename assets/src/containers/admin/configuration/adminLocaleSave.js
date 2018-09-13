@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { cloneDeep, clean, compact, defaults, flow, isHtml, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
@@ -7,7 +7,7 @@ import Multilanguage from 'components/multilanguage'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getLocale, saveLocale, updateLocale } from 'actions/localeActions'
 
-class AdminLocaleSave extends Component {
+class AdminLocaleSave extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -89,17 +89,20 @@ class AdminLocaleSave extends Component {
     const { config } = this.props.app
     return (
       <div id="adminLocaleSave">
-        <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update Locale' : 'New Locale'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/locale')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
+        <NavigationBar 
+          title={<h1>{this.state.model.id ? 'Update Locale' : 'New Locale'}</h1>} 
+          btnLeft={<button className="btn btn-success"onClick={() => this.props.history.push('/admin/configuration/locale')}><i className="fas fa-arrow-left"></i></button>} 
+          btnRight={<button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="fas fa-save"></i></button>} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-12 col-xs-12">
+          <div className="form-group col-md-12">
             <label>Name *</label>
             <input type="text" className="form-control" value={this.state.model.name} onChange={e => this.handleChangeState('model.name', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.name}</span>
           </div>
-          <div className="form-group col-md-12 col-xs-12">
+          <div className="form-group col-md-12">
             <label>Value *</label>
-            <Multilanguage data={{ isHtml: isHtml(this.state.model.value.en), languages: config.appLanguages, value: this.state.model.value }} onChange={value => this.handleChangeState('model.value', value)} />
+            <Multilanguage isHtml={isHtml(this.state.model.value.en)} languages={config.appLanguages} value={this.state.model.value } onChange={value => this.handleChangeState('model.value', value)} />
             <span className="text-danger">{this.state.errors.model.value}</span>
           </div>
           <button type="submit" className="hide" />

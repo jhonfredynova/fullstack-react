@@ -47,7 +47,7 @@ module.exports = {
 
   getTransaction: async (req, res) => {
     try{
-      const { email_buyer, reference_sale, state_pol } = req.body
+      const { description, email_buyer, reference_sale, state_pol } = req.body
       let transaction = await sails.models.transaction.findOne({ referenceCode: reference_sale })
       if(!transaction) return res.badRequest(intlService.i18n('transactionNotFound'))
       // updating transaction
@@ -61,7 +61,7 @@ module.exports = {
             fromEmail: sails.config.app.emails.noreply,
             toEmail: email_buyer,
             subject: intlService.i18n('mailTransactionSuccessSubject'),
-            message: intlService.i18n('mailTransactionSuccessMessage')
+            message: intlService.i18n('mailTransactionSuccessMessage', { itemDescription: description })
           })
         }catch(e){
           console.warn(intlService.i18n('emailError'))
@@ -120,7 +120,7 @@ module.exports = {
         installments: 1,
         trialDays: data.plan.trialDays,
         immediatePayment: true,
-        customer: { id: data.client.clientCode, creditCards: [data.creditCard] },
+        customer: { id: data.client.clientCode, creditCards: [_.pick(data.creditCard, ['token'])] },
         plan: { planCode: data.plan.info.planCode }
       }
       data.subscription = await paymentService.createSubscription(subscriptionData)

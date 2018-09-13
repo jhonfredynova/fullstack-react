@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
 import { cloneDeep, clean, compact, defaults, flow, keys, get, set, isEmpty } from 'lodash'
@@ -10,7 +10,7 @@ import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan, getPlanFeature, savePlanFeature, updatePlanFeature } from 'actions/planActions'
 
 
-class AdminPlanFeatureSave extends Component {
+class AdminPlanFeatureSave extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -102,22 +102,26 @@ class AdminPlanFeatureSave extends Component {
   render() {    
     return (
       <div id="adminPlanFeatureSave">
-        <NavigationBar data={{ title: <h1>{this.state.plan.name}</h1>, subTitle: <h2>Feature</h2>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan/${this.props.match.params.id}/feature`)}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
+        <NavigationBar 
+          title={<h1>{this.state.plan.name}</h1>} 
+          description={<h2>Feature</h2>} 
+          btnLeft={<button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan/${this.props.match.params.id}/feature`)}><i className="fas fa-arrow-left"></i></button>} 
+          btnRight={<button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="fas fa-save"></i></button>} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Feature <span>*</span></label>
             <Select className="form-control" options={this.state.planFeatures} valueKey='id' labelKey='name' value={this.state.model.feature} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.feature', value.id)} />
             <span className="text-danger">{this.state.errors.model.feature}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Quantity <span>*</span></label>
-            <Counter data={{ value: this.state.model.quantity, min: -1, max: 100 }} onChange={value => this.handleChangeState('model.quantity', value)} />
+            <Counter value={this.state.model.quantity} min={1} max={100} onChange={value => this.handleChangeState('model.quantity', value)} />
             <span className="text-danger">{this.state.errors.model.quantity}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Order <span>*</span></label>
-            <Counter data={{ value: this.state.model.order, min: 0, max: 100 }} onChange={value => this.handleChangeState('model.order', value)} />
+            <Counter value={this.state.model.order} min={0} max={100} onChange={value => this.handleChangeState('model.order', value)} />
             <span className="text-danger">{this.state.errors.model.order}</span>
           </div>
           <button type="submit" className="hide" />

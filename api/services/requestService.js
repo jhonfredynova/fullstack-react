@@ -80,7 +80,6 @@ module.exports = {
 
   applyPagination: (res, criteria, data, totalData) => {
     try{
-      if(_.get(criteria, 'where.id')) return _.first(data)
       res.set('Access-Control-Expose-Headers', 'Content-Records')
       res.set('Content-Records', totalData)
       return data

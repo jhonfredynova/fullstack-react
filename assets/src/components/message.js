@@ -3,19 +3,19 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { defaultTo } from 'lodash'
 import { deleteMessage } from 'actions/appActions'
-import './message.css'
+import { Style } from 'react-style-tag'
 
 class Message extends React.Component {
 
   constructor(props) {
     super(props)
     this.state = { 
-      messages: defaultTo(this.props.data.messages, [])
+      messages: defaultTo(this.props.messages, [])
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState(nextProps.data)
+    this.setState(nextProps)
   }
 
   async handleClose(idMessage) {
@@ -24,9 +24,10 @@ class Message extends React.Component {
 
   render() {
     const messages = this.state.messages
-    const { isLoading } = this.props.data
+    const { isLoading } = this.props
+    if(messages.length===0) return null
     return (
-      <div id="message" className={classnames({'hide': (isLoading || messages.length===0)})}>
+      <div id="message">
         {
           messages.map(item =>
             <div key={item.id} className={classnames({ 'alert': true, 'alert-success': item.type==='success', 'alert-danger': item.type==='error', 'alert-warning': item.type==='warning' })}>
@@ -37,6 +38,21 @@ class Message extends React.Component {
             </div>
           )
         }
+        <Style key="messageStyles">
+        {`
+          #message {
+            position: sticky;
+            top: 0px;
+            z-index: 1070;
+            max-height: 100px;
+            overflow: auto;
+          }
+          #message .alert{
+            margin-bottom: 0px;
+            border-radius: 0px;
+          }
+        `}
+        </Style>
       </div>
     )
   }

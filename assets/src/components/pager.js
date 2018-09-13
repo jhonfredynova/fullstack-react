@@ -1,25 +1,27 @@
-import React, { Component } from 'react'
-import { DropdownButton, MenuItem, Pagination } from 'react-bootstrap'
-import { defaultTo, isObject, set } from 'lodash'
+import React from 'react'
+import { InputGroupButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Pagination, PaginationItem, PaginationLink } from 'reactstrap'
+import { defaultTo, isObject, set, range } from 'lodash'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import './pager.css'
 
-class Pager extends Component {
+class Pager extends React.PureComponent {
 
   constructor(props) {
     super(props)
     this.state = { 
-      activePage: defaultTo(this.props.data.activePage, 1),
-      pageSize: defaultTo(this.props.data.pageSize, 10),
-      select: defaultTo(this.props.data.select, null),
-      sort: defaultTo(this.props.data.sort, null),
-      where: defaultTo(this.props.data.where, null)
+      query: {
+        activePage: defaultTo(this.props.query.activePage, 1),
+        pageSize: defaultTo(this.props.query.pageSize, 10),
+        select: defaultTo(this.props.query.select, null),
+        sort: defaultTo(this.props.query.sort, null),
+        where: defaultTo(this.props.query.where, null)
+      },
+      showDropdownPageSize: false
     }
   }
 
   componentWillReceiveProps(nextProps) {
-    this.setState(nextProps.data)
+    this.setState(nextProps)
   }
 
   async handleChangeState(path, value){
@@ -35,7 +37,7 @@ class Pager extends Component {
 
   async handleChangeKeyword(value){
     if(value.indexOf('%')===-1) value = `%${value}%`
-    let where = this.state.where
+    let where = this.state.query.where
     let setKeyword = (object, property, value) => {
       for(let key in object) {
         if(isObject(object[key])) object[key] = setKeyword(object[key], property, value)
@@ -44,17 +46,22 @@ class Pager extends Component {
       return object
     }
     where = setKeyword(where, 'like', value)
-    await this.setState(set(this.state, 'where', where))
+    await this.setState(set(this.state.query, 'where', where))
   }
 
   async handleChangeSearch(e){
     if(e) e.preventDefault()
-    this.props.onChange(this.state)
+    this.props.onChange(this.state.query)
   }
     
   render() {
-    const { records, recordsTotal } = this.props.items
+    const { query, showDropdownPageSize } = this.state
     const { isLoading } = this.props
+    const { records, totalRecords } = this.props.items
+    const totalPages = Math.ceil(totalRecords/query.pageSize)
+    const limitRange = 3
+    const previousRange = query.activePage-limitRange>0 ? query.activePage-limitRange : 1
+    const nextRange = query.activePage+limitRange<=totalPages ? query.activePage+limitRange : totalPages
     const thereIsData = records.length>0
     return (
       <div id="pager" className={this.props.className}>
@@ -62,22 +69,43 @@ class Pager extends Component {
         <form onSubmit={this.handleChangeSearch.bind(this)}> 
           <div className='form-group input-group'>
             <input type="text" className="form-control" placeholder="Search" onChange={e => this.handleChangeKeyword(e.target.value)} onKeyPress={this.handleKeyPressKeyword.bind(this)} />
-            <span className="input-group-btn">
-              <DropdownButton id={'cbPageSize'} title={this.state.pageSize} onSelect={value => this.handleChangeState('pageSize', value)} pullRight>
-                <MenuItem eventKey={5}>5</MenuItem>
-                <MenuItem eventKey={10}>10</MenuItem>
-                <MenuItem eventKey={15}>15</MenuItem>
-                <MenuItem eventKey={20}>20</MenuItem>
-              </DropdownButton>
-              <button type="submit" className="btn btn-success"><i className="glyphicon glyphicon-search"></i></button>
-            </span>
+            <InputGroupButtonDropdown addonType="append" isOpen={showDropdownPageSize} toggle={() => this.setState({ showDropdownPageSize: !showDropdownPageSize })}>              
+              <DropdownToggle className="rounded-0" outline caret>{query.pageSize}</DropdownToggle>
+              <DropdownMenu right>
+                <DropdownItem active={query.pageSize===5} onClick={() => this.handleChangeState('query.pageSize', 5)}>5</DropdownItem>
+                <DropdownItem active={query.pageSize===10} onClick={() => this.handleChangeState('query.pageSize', 10)}>10</DropdownItem>
+                <DropdownItem active={query.pageSize===15} onClick={() => this.handleChangeState('query.pageSize', 15)}>15</DropdownItem>
+                <DropdownItem active={query.pageSize===20} onClick={() => this.handleChangeState('query.pageSize', 20)}>20</DropdownItem>
+              </DropdownMenu>
+              <button type="submit" className="btn btn-success"><i className="fas fa-search"></i></button>
+            </InputGroupButtonDropdown>
           </div>
         </form>
         <section>
-          { thereIsData ?  this.props.children : null }
-          <div className={classnames({ 'alert alert-warning': true, 'hide': (isLoading || thereIsData) })}>{this.context.t('thereIsNotData')}</div>
-          <div className={classnames({ 'text-center': true, 'hide': !thereIsData })}>
-            <Pagination bsClass="pagination" bsSize="medium" prev next ellipsis boundaryLinks maxButtons={3} items={Math.ceil(recordsTotal/this.state.pageSize)} activePage={this.state.activePage} onSelect={value => this.handleChangeState('activePage', value)} />
+          { thereIsData && this.props.children }
+          <div className={classnames({ 'alert alert-warning': true, 'd-none': (isLoading || thereIsData) })}>{this.context.t('thereIsNotData')}</div>
+          <div className={classnames({ 'text-center': true, 'd-none': !thereIsData })}>
+            <Pagination maxbuttons={3} className="d-flex justify-content-center" size="md">
+              <PaginationItem disabled={query.activePage<=1}>
+                <PaginationLink previous href="#" onClick={() => this.handleChangeState('query.activePage', 1)} />
+              </PaginationItem>
+              <PaginationItem className={classnames({'d-none': previousRange<=1})}>
+                <PaginationLink href="#" onClick={() => this.handleChangeState('query.activePage', (query.activePage-limitRange))}>...</PaginationLink>
+              </PaginationItem>
+              {
+                range(query.activePage, nextRange).map(item =>
+                  <PaginationItem key={item} active={item===query.activePage}>
+                    <PaginationLink href="#" onClick={() => this.handleChangeState('query.activePage', item)}>{item}</PaginationLink>
+                  </PaginationItem>
+                )
+              }
+              <PaginationItem className={classnames({'d-none': previousRange>=totalPages})}>
+                <PaginationLink href="#" onClick={() => this.handleChangeState('query.activePage', (query.activePage+limitRange))}>...</PaginationLink>
+              </PaginationItem>
+              <PaginationItem disabled={query.activePage>=totalPages}>
+                <PaginationLink next href="#" onClick={() => this.handleChangeState('query.activePage', totalPages)} />
+              </PaginationItem>
+            </Pagination>
           </div>
         </section>
       </div>

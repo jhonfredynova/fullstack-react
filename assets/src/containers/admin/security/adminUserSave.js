@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { cloneDeep, clean, compact, defaultTo, isEmpty, isEmail, flow, keys, get, set } from 'lodash'
 import PropTypes from 'prop-types'
@@ -6,7 +6,7 @@ import NavigationBar from 'components/navigationBar'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getUser, saveUser, updateUser } from 'actions/userActions'
 
-class AdminUserSave extends Component {
+class AdminUserSave extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -90,25 +90,28 @@ class AdminUserSave extends Component {
   render() {    
     return (
       <div id="adminUserSave">
-        <NavigationBar data={{ title: <h1>{this.state.model.id ? 'Update User' : 'New User'}</h1>, btnLeft: <button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user')}><i className="glyphicon glyphicon-arrow-left"></i></button>, btnRight: <button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="glyphicon glyphicon-floppy-disk"></i></button> }} />
+        <NavigationBar 
+          title={<h1>{this.state.model.id ? 'Update User' : 'New User'}</h1>} 
+          btnLeft={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user')}><i className="fas fa-arrow-left"></i></button>} 
+          btnRight={<button className="btn btn-success" onClick={this.handleSubmit.bind(this)}><i className="fas fa-save"></i></button>} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Nombres <span>*</span></label>
             <input type="text" className="form-control" value={this.state.model.firstname} onChange={event => this.handleChangeState('model.firstname', event.target.value)} />
             <span className="text-danger">{this.state.errors.model.firstname}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Apellidos <span>*</span></label>
             <input type="text" className="form-control" value={this.state.model.lastname} onChange={event => this.handleChangeState('model.lastname', event.target.value)} />
             <span className="text-danger">{this.state.errors.model.lastname}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Username <span>*</span></label>
             <input type="text" className="form-control" value={this.state.model.username} onChange={event => this.handleChangeState('model.username', event.target.value)} />
             <span className="text-danger">{this.state.errors.model.username}</span>
           </div>
-          <div className="form-group col-md-6 col-xs-12">
+          <div className="form-group col-md-6">
             <label>Email <span>*</span></label>
             <input type="text" className="form-control" value={this.state.model.email} onChange={event => this.handleChangeState('model.email', event.target.value)} />
             <span className="text-danger">{this.state.errors.model.email}</span>

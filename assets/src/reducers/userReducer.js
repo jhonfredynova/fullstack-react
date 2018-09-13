@@ -1,10 +1,9 @@
 import { USER, USER_ROL } from 'actions/userActions'
-import { ACTION, handleResponseAction } from 'components/helper'
 
 export default function reducer(
   state={
-    users: { records: [], recordsTotal: 0 },
-    roles: { records: [], recordsTotal: 0 },
+    users: { records: [], totalRecords: 0 },
+    roles: { records: [], totalRecords: 0 },
     temp: null
   }, 
   action={}) 
@@ -15,71 +14,99 @@ export default function reducer(
       return state
 
     case USER.GET:
-      return { 
-        ...state, 
-        users: handleResponseAction(ACTION.GET, state.users, action.payload.find || state.users),
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload.findOne)
+      return {
+        ...state,
+        users: {
+          ...state.users,
+          records: action.payload.records,
+          totalRecords: action.payload.totalRecords
+        }
       }
 
     case USER.SAVE:
-      return { 
-        ...state, 
-        users: handleResponseAction(ACTION.SAVE, state.users, action.payload) 
+      return {
+        ...state,
+        users: {
+          ...state.users,
+          records: state.users.records.concat(action.payload),
+          totalRecords: state.users.totalRecords+1
+        }
       }
 
     case USER.UPDATE:
       return { 
         ...state, 
-        users: handleResponseAction(ACTION.UPDATE, state.users, action.payload) 
+        users: {
+          ...state.users,
+          records: state.users.records.map(item => (item.id===action.payload.id) ? action.payload : item)
+        }
       }
 
     case USER.DELETE:
       return { 
         ...state, 
-        users: handleResponseAction(ACTION.DELETE, state.users, action.payload) 
+        users: {
+          ...state.users,
+          records: state.users.records.filter(item => item.id!==action.payload.id),
+          totalRecords: state.users.totalRecords-1
+        }
       }
 
     case USER.FORGOT:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case USER.RESET:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case USER.VALIDATE:
       return { 
         ...state, 
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload) 
+        temp: action.payload
       }
 
     case USER_ROL.GET:
-      return { 
-        ...state, 
-        roles: handleResponseAction(ACTION.GET, state.roles, action.payload.find || state.roles),
-        temp: handleResponseAction(ACTION.TEMP, state.temp, action.payload.findOne)
+      return {
+        ...state,
+        roles: {
+          ...state.roles,
+          records: action.payload.records,
+          totalRecords: action.payload.totalRecords
+        }
       }
-      
+
     case USER_ROL.SAVE:
-      return { 
-        ...state, 
-        roles: handleResponseAction(ACTION.SAVE, state.roles, action.payload) 
+      return {
+        ...state,
+        roles: {
+          ...state.roles,
+          records: state.roles.records.concat(action.payload),
+          totalRecords: state.roles.totalRecords+1
+        }
       }
 
     case USER_ROL.UPDATE:
       return { 
         ...state, 
-        roles: handleResponseAction(ACTION.UPDATE, state.roles, action.payload) 
+        roles: {
+          ...state.roles,
+          records: state.roles.records.map(item => (item.id===action.payload.id) ? action.payload : item)
+        }
       }
 
     case USER_ROL.DELETE:
       return { 
         ...state, 
-        roles: handleResponseAction(ACTION.DELETE, state.roles, action.payload) 
+        roles: {
+          ...state.roles,
+          records: state.roles.records.filter(item => item.id!==action.payload.id),
+          totalRecords: state.roles.totalRecords-1
+        }
       }
     
   }

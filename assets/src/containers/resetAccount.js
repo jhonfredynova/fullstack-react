@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { connect } from 'react-redux'
 import { cloneDeep, clean, compact, flow, isEmpty, isEmail, get, set } from 'lodash'
 import PropTypes from 'prop-types'
@@ -7,7 +7,7 @@ import { resetUser } from 'actions/userActions'
 import NavigationBar from 'components/navigationBar'
 import Seo from 'components/seo'
 
-class ResetAccount extends Component {
+class ResetAccount extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -65,21 +65,23 @@ class ResetAccount extends Component {
   render() {
     return (
       <div>
-        <Seo data={{ title: this.context.t('resetAccountTitle'), description: this.context.t('resetAccountDescription'), siteName: this.context.t('siteName') }} />
-        <NavigationBar data={{ title: <h1>{this.context.t('resetAccountTitle')}</h1>, subTitle: <h2>{this.context.t('resetAccountDescription')}</h2> }} />
+        <Seo title={this.context.t('resetAccountTitle')} description={this.context.t('resetAccountDescription')} siteName={this.context.t('siteName')} />
+        <NavigationBar
+          title={<h1>{this.context.t('resetAccountTitle')}</h1>} 
+          description={<h2>{this.context.t('resetAccountDescription')}</h2>} />
         <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
         <form className="row" onSubmit={this.handleForgot.bind(this)}>
-            <div className="form-group col-md-6 col-xs-12">
+            <div className="form-group col-md-6">
               <label>{this.context.t('password')} *</label>
               <input type="password" className="form-control" onChange={e => this.handleChangeState('model.password', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.password}</span>
             </div>
-            <div className="form-group col-md-6 col-xs-12">
+            <div className="form-group col-md-6">
               <label>{this.context.t('passwordConfirm')} *</label>
               <input type="password" className="form-control" onChange={e => this.handleChangeState('model.passwordConfirmation', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.passwordConfirmation}</span>
             </div>
-            <div className="form-group col-md-12 col-xs-12 text-right">
+            <div className="form-group col-md-12 text-right">
               <button type="submit" className="btn btn-success">
                 {this.context.t('savePassword')}
               </button>
