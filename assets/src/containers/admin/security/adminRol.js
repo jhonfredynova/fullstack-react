@@ -18,6 +18,7 @@ class AdminRol extends React.PureComponent {
     this.state = {
       roles: this.props.rol.roles,
       rolesQuery: {
+        activePage: 1,
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','active','createdAt','updatedAt','name'],
         sort: [
@@ -65,6 +66,16 @@ class AdminRol extends React.PureComponent {
     }
   }
 
+  async handleChangeTab(activeTab){
+    try{
+      await this.handleChangeState('rolesQuery.where.active', activeTab) 
+      this.handleChangeSearch(this.state.rolesQuery)
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
@@ -100,18 +111,18 @@ class AdminRol extends React.PureComponent {
           btnRight={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/rol/new')}><i className="fas fa-plus"></i></button>} />
         <Nav className="mb-4" tabs>
           <NavItem>
-            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('rolesQuery.where.active', true); this.handleChangeSearch(this.state.rolesQuery) }}>
+            <NavLink active={activeTab===1} onClick={() => this.handleChangeTab(true) }>
               Active
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('rolesQuery.where.active', false); this.handleChangeSearch(this.state.rolesQuery) }}>
+            <NavLink active={activeTab===2} onClick={() => this.handleChangeTab(false) }>
               Inactive
             </NavLink>
           </NavItem>
         </Nav>
         <Pager isLoading={isLoading} query={this.state.rolesQuery} items={this.state.roles} onChange={this.handleChangeSearch.bind(this)}>
-          <Table striped condensed hover responsive>
+          <Table striped hover responsive>
             <thead>
               <tr>
                 <th>Created</th>

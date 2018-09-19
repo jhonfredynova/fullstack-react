@@ -11,7 +11,7 @@ let axios = require('axios')
 module.exports = {
 
   getIndex: async (req, res) => {
-    try{      
+    try{
       res.sendFile('index.html', { root: `${sails.config.paths.public}/build` })
     }catch(e){
       res.badRequest(e)

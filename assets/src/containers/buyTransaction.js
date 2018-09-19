@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, clean, compact, flow, isEmpty, isEmail, get, set } from 'lodash'
+import { clean, compact, isEmpty, isEmail, get, set } from 'lodash'
 import { Tooltip } from 'reactstrap'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
@@ -42,7 +42,8 @@ class BuyTransaction extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getPlan({ select: ['id', 'name','description','planCode','paymentType','transactionValue'], where: { permalink: this.props.match.params.idPlan } }))
+      const permalink = this.props.match.params.id || ''
+      await this.props.dispatch(getPlan({ select: ['id', 'name','description','planCode','paymentType','transactionValue'], where: { permalink: permalink } }))
       const plan = this.props.plan.plans.records[0]
       if(!plan || plan.paymentType!=='transaction'){
         this.props.history.push('/')
@@ -87,7 +88,7 @@ class BuyTransaction extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.client.fullname)) {
       errors.model.client.fullname = this.context.t('enterFullname')
     }
@@ -114,7 +115,7 @@ class BuyTransaction extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -169,12 +170,12 @@ class BuyTransaction extends React.PureComponent {
                   <input type="text" className="form-control" disabled={this.state.model.client.id} value={this.state.model.client.fullname} onChange={event => this.handleChangeState('model.client.fullname', event.target.value)} />
                   <span className="text-danger">{this.state.errors.model.client.fullname}</span>
                 </div>
-                <div className={classnames({"form-group col-md-6": true, 'hide': this.state.model.client.id})}>
+                <div className={classnames({"form-group col-md-6": true, 'd-none': this.state.model.client.id})}>
                   <label>{this.context.t('password')} <span>*</span></label>
                   <input type="password" className="form-control" value={this.state.model.client.password} onChange={event => this.handleChangeState('model.client.password', event.target.value)} />
                   <span className="text-danger">{this.state.errors.model.client.password}</span>
                 </div>
-                <div className={classnames({"form-group col-md-6": true, 'hide': this.state.model.client.id})}>
+                <div className={classnames({"form-group col-md-6": true, 'd-none': this.state.model.client.id})}>
                   <label>{this.context.t('passwordConfirm')} <span>*</span></label>
                   <input type="password" className="form-control" value={this.state.model.client.passwordConfirmation} onChange={event => this.handleChangeState('model.client.passwordConfirmation', event.target.value)} />
                   <span className="text-danger">{this.state.errors.model.client.passwordConfirmation}</span>
@@ -188,7 +189,7 @@ class BuyTransaction extends React.PureComponent {
               <label className="form-check-label" dangerouslySetInnerHTML={{__html: this.context.t('acceptTerms', { url: "/terms" }) }}></label>
             </div>
             <div className="clearfix" />
-            <h3 className={classnames({"d-inline": true, 'hide': isLoading})}>
+            <h3 className={classnames({"d-inline": true, 'd-none': isLoading})}>
               <span className="badge badge-secondary mr-1"><Numeric amount={planPrice.value} display='text' decimalScale={2} from={config.appPreferences.currency} to={planPrice.currency} prefix='$' currencyConversion={appIntl.currencyConversion} suffix={` ${config.appPreferences.currency.toUpperCase()}`} thousandSeparator=',' /></span>
             </h3> 
             <button id="tooltipPayment" type="submit" className="btn btn-success btn-lg">

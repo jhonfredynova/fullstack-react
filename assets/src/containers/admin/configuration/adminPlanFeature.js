@@ -18,6 +18,7 @@ class AdminPlanFeature extends React.PureComponent {
       plan: {},
       planFeatures: this.props.plan.features,
       planFeaturesQuery: {
+        activePage: 1,
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','plan','feature','order','quantity'],
         sort: [
@@ -40,7 +41,8 @@ class AdminPlanFeature extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getPlan({ select: ['id','name'], where: {id: this.props.match.params.id } }))
+      const planId = this.props.match.params.id || ''
+      await this.props.dispatch(getPlan({ select: ['id','name'], where: {id: planId } }))
       await this.setState({ plan: this.props.plan.plans.records[0] })
       await this.props.dispatch(getPlanFeature(this.state.planFeaturesQuery))
       this.props.dispatch(hideLoading())
@@ -61,6 +63,16 @@ class AdminPlanFeature extends React.PureComponent {
       await this.setState({ planFeaturesQuery: Object.assign(this.state.planFeaturesQuery, data) })
       await this.props.dispatch(getPlanFeature(this.state.planFeaturesQuery))
       this.props.dispatch(hideLoading())
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
+  async handleChangeTab(activeTab){
+    try{
+      await this.handleChangeState('planFeaturesQuery.where.active', activeTab) 
+      this.handleChangeSearch(this.state.planFeaturesQuery)
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())
@@ -104,18 +116,18 @@ class AdminPlanFeature extends React.PureComponent {
           btnRight={<button className="btn btn-success" onClick={() => this.props.history.push(`/admin/configuration/plan/${this.props.match.params.id}/feature/new`)}><i className="fas fa-plus"></i></button>} />
         <Nav className="mb-4" tabs>
           <NavItem>
-            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('planFeaturesQuery.where.active', true); this.handleChangeSearch(this.state.planFeaturesQuery) }}>
+            <NavLink active={activeTab===1} onClick={() => this.handleChangeTab(true) }>
               Active
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('planFeaturesQuery.where.active', false); this.handleChangeSearch(this.state.planFeaturesQuery) }}>
+            <NavLink active={activeTab===2} onClick={() => this.handleChangeTab(false) }>
               Inactive
             </NavLink>
           </NavItem>
         </Nav>
         <Pager isLoading={isLoading} query={this.state.planFeaturesQuery} items={this.state.planFeatures} onChange={this.handleChangeSearch.bind(this)}>
-          <Table striped condensed hover responsive>
+          <Table striped hover responsive>
             <thead>
               <tr>
                 <th>Order</th>

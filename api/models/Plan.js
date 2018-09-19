@@ -48,7 +48,7 @@ module.exports = {
       let subscriptionPlans = await paymentService.executeApiPayu('GET', '/plans', null)
       let planFeatures = await sails.models.planfeature.find().populateAll()
       for(let plan of values){
-        plan.features = _.filter(planFeatures, item => item.plan.id===plan.id)
+        if(plan.features) plan.features = _.filter(planFeatures, item => item.plan.id===plan.id)
         plan.subscriptionInfo = _.find(subscriptionPlans.subscriptionPlanList, { planCode: plan.planCode })
         if (plan.subscriptionInfo) {
           plan.subscriptionInfo.price = _.find(plan.subscriptionInfo.additionalValues, { name:'PLAN_VALUE' })

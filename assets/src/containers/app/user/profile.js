@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Tooltip } from 'reactstrap'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import { cloneDeep, clean, compact, defaults, flow, isEmail, keys, get, set, omit, isEmpty } from 'lodash'
+import { clean, compact, defaults, isEmail, keys, get, set, omit, isEmpty } from 'lodash'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getUser, updateUser } from 'actions/userActions'
 import NavigationBar from 'components/navigationBar'
@@ -37,7 +37,7 @@ class Profile extends React.PureComponent {
       this.props.dispatch(showLoading())
       const { session } = this.props.auth
       await this.props.dispatch(getUser({ populate: false, select: keys(omit(this.state.model,['passwordConfirmation'])), where:{ id: session.id } }))
-      await this.setState({ model: defaults(this.props.user.temp, this.state.model) })
+      await this.setState({ model: defaults(this.props.user.users.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -54,7 +54,7 @@ class Profile extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.firstname)) {
       errors.model.firstname = this.context.t('enterFirstname')
     }
@@ -84,7 +84,7 @@ class Profile extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }

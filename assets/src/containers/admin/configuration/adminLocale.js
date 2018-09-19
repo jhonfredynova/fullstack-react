@@ -18,6 +18,7 @@ class AdminLocale extends React.PureComponent {
     this.state = {
       locales: this.props.locale.locales,
       localesQuery: {
+        activePage: 1,
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','active','createdAt','updatedAt','name'],
         sort: [
@@ -65,6 +66,16 @@ class AdminLocale extends React.PureComponent {
     }
   }
 
+  async handleChangeTab(activeTab){
+    try{
+      await this.handleChangeState('localesQuery.where.active', activeTab) 
+      this.handleChangeSearch(this.state.localesQuery)
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
@@ -100,12 +111,12 @@ class AdminLocale extends React.PureComponent {
           btnRight={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/locale/new')}><i className="fas fa-plus"></i></button> } />
         <Nav className="mb-4" tabs>
           <NavItem>
-            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('localesQuery.where.active', true); this.handleChangeSearch(this.state.localesQuery) }}>
+            <NavLink active={activeTab===1} onClick={() => this.handleChangeTab(true) }>
               Active
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('localesQuery.where.active', false); this.handleChangeSearch(this.state.localesQuery) }}>
+            <NavLink active={activeTab===2} onClick={() => this.handleChangeTab(false) }>
               Inactive
             </NavLink>
           </NavItem>

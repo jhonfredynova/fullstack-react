@@ -28,7 +28,7 @@ class Multilanguage extends React.PureComponent {
 
   async handleChangeState(path, value) {
     await this.setState(set(this.state, path, value))
-    if(path==='value') this.props.onChange(this.state.value)
+    this.props.onChange(this.state.value)
   }
 
   render(){

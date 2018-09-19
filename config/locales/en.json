@@ -214,5 +214,7 @@
   "mailTransactionSuccessSubject": "Successful transaction",
   "mailTransactionSuccessMessage": "Congratulations!, the payment for {{itemDescription}} was processed correctly.\n",
   "chatEmpty": "You don't have new messages yet.",
-  "send": "Send"
+  "send": "Send",
+  "mailSubscriptionCanceledSubject": "Your subscription has been canceled ",
+  "mailSubscriptionCanceledMessage": "Your subscription has been canceled, we had problems debiting the payment on your credit card, verify the funds of your credit card or contact your bank for more information."
 }

@@ -22,14 +22,14 @@ class NavigationBar extends React.PureComponent {
   render() {
     return (
       <div id="navigationBar" className="border-bottom">
-        <div className={classnames({'btn-navigation': true, 'hide': !this.state.btnLeft})}>
+        <div className={classnames({'btn-navigation': true, 'd-none': !this.state.btnLeft})}>
           {this.state.btnLeft}
         </div>
         <div className="head-navigation text-center">
           {this.state.title}
           {this.state.description}
         </div>
-        <div className={classnames({'btn-navigation': true, 'hide': !this.state.btnRight})}>
+        <div className={classnames({'btn-navigation': true, 'd-none': !this.state.btnRight})}>
           {this.state.btnRight}
         </div>
         <Style>

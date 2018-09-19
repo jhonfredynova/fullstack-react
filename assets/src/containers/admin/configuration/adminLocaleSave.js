@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, clean, compact, defaults, flow, isHtml, keys, get, set, isEmpty } from 'lodash'
+import { clean, compact, defaults, isHtml, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import Multilanguage from 'components/multilanguage'
@@ -33,8 +33,9 @@ class AdminLocaleSave extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getLocale({ select: keys(this.state.model), where: {id: this.props.match.params.id} }))
-      await this.setState({ model: defaults(this.props.locale.temp, this.state.model) })
+      const localeId = this.props.match.params.id || ''
+      await this.props.dispatch(getLocale({ select: keys(this.state.model), where: {id: localeId} }))
+      await this.setState({ model: defaults(this.props.locale.locales.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -49,7 +50,7 @@ class AdminLocaleSave extends React.PureComponent {
 
   async handleValidate(path) {
     const { appLanguages } = this.props.app.config
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.name)) {
       errors.model.name = "Enter name."
     }
@@ -65,7 +66,7 @@ class AdminLocaleSave extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -105,7 +106,7 @@ class AdminLocaleSave extends React.PureComponent {
             <Multilanguage isHtml={isHtml(this.state.model.value.en)} languages={config.appLanguages} value={this.state.model.value } onChange={value => this.handleChangeState('model.value', value)} />
             <span className="text-danger">{this.state.errors.model.value}</span>
           </div>
-          <button type="submit" className="hide" />
+          <button type="submit" className="d-none" />
         </form>
       </div>
     )

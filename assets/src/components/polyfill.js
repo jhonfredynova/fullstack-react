@@ -18,22 +18,28 @@ Object.defineProperty(document, 'execCommand', {
 })
 
 //LODASH
+const lodashSet = _.set
 _.mixin({
   clean: (object, value) => {
-    for(let key in object) {
-      if(_.isObject(object[key])) object[key] = _.clean(object[key], value)
-      else object[key] = value
+    let exec = (object) => {
+      for(let key in object) {
+        if(_.isObject(object[key])) object[key] = exec(object[key], value)
+        else object[key] = value
+      }
+      return object
     }
-    return object
+    return exec({...object})
   },
-  compact: (value, customizer) => {
-    customizer = customizer || ((item) => _.isEmpty(item))
-    for(let key in value){
-      if(_.isObject(value[key])) value[key] = _.compact(value[key], customizer)
-      if(customizer(value[key], key)) delete value[key]
-      if(_.isArray(value)) value = value.filter(item => !_.isEmpty(item))
+  compact: (value) => {
+    let exec = (value) => {
+      for(let key in value){
+        if(_.isObject(value[key])) value[key] = exec(value[key])
+        if(_.isEmpty(value[key])) delete value[key]
+        if(_.isArray(value)) value = value.filter(item => !_.isEmpty(item))
+      }
+      return value
     }
-    return value
+    return exec({...value})
   },
   includes: (collection, value, mustHaveAll=false) => {
     let unmatchedItems = _.difference(collection, value)
@@ -54,6 +60,9 @@ _.mixin({
       if (c[i].nodeType===1) return true
     }
     return false
+  },
+  set: (object, path, value) => {
+    return lodashSet(_.cloneDeep(object), path, value)
   },
   toUrl: (value) => {
     let encodedUrl = value.toString().toLowerCase()

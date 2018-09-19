@@ -31,7 +31,7 @@ module.exports = {
         subject: intlService.i18n('mailForgotAccountSubject'),
         message: intlService.i18n('mailForgotAccountMessage', { url: `${sails.config.app.appUrl}/reset-account/${user.passwordResetToken}` })
       })
-      if (!responseEmail){
+      if(!responseEmail){
         throw intlService.i18n('emailError')
       }
       res.json({ message: intlService.i18n('userRecoveryAccountSuccess') })
@@ -43,10 +43,10 @@ module.exports = {
   reset: async (req, res, next) => {
     try{
       let user = await sails.models.user.findOne({ passwordResetToken: req.params.token, passwordResetExpiration: { '>': Date.now() } })
-      if (!user){ 
+      if(!user){ 
         throw intlService.i18n('userResetError')
       }
-      if (!req.body.password) {
+      if(!req.body.password) {
         throw intlService.i18n('userResetPasswordEmpty')
       }
       user.password = req.body.password

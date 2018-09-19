@@ -2,7 +2,7 @@ import React from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
 import classnames from 'classnames'
-import { cloneDeep, clean, compact, defaults, flow, isEmpty, keys, get, set, toUrl } from 'lodash'
+import { clean, compact, defaults, isEmpty, keys, get, set, toUrl } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getPlan, savePlan, updatePlan } from 'actions/planActions'
@@ -35,8 +35,9 @@ class AdminPlanSave extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getPlan({ populate: false, select: keys(this.state.model), where: { id: this.props.match.params.id } }))
-      await this.setState({ model: defaults(this.props.plan.temp, this.state.model) })
+      const planId = this.props.match.params.id || ''
+      await this.props.dispatch(getPlan({ populate: false, select: keys(this.state.model), where: { id: planId } }))
+      await this.setState({ model: defaults(this.props.plan.plans.records[0], this.state.model) })
       await this.props.dispatch(getSubscriptionPlan({ sort: [{name: 'ASC'}] }))
       await this.setState({ plans: this.props.payment.temp })
       this.props.dispatch(hideLoading())
@@ -56,7 +57,7 @@ class AdminPlanSave extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.name)) {
       errors.model.name = "Enter name."
     }
@@ -84,7 +85,7 @@ class AdminPlanSave extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -134,7 +135,7 @@ class AdminPlanSave extends React.PureComponent {
             </select>
             <span className="text-danger">{this.state.errors.model.paymentType}</span>
           </div>
-          <div className={classnames({'form-group col-md-6': true, 'hide': this.state.model.paymentType!=='subscription'})}>
+          <div className={classnames({'form-group col-md-6': true, 'd-none': this.state.model.paymentType!=='subscription'})}>
             <label>Plan Code *</label>
             <select className="form-control" value={this.state.model.planCode} onChange={e => this.handleChangeState('model.planCode', e.target.value)}>
               <option value=''>Select...</option>
@@ -146,16 +147,18 @@ class AdminPlanSave extends React.PureComponent {
             </select>
             <span className="text-danger">{this.state.errors.model.planCode}</span>
           </div>
-          <div className={classnames({'form-group col-md-6': true, 'hide': this.state.model.paymentType!=='transaction'})}>
+          <div className={classnames({'form-group col-md-6': true, 'd-none': this.state.model.paymentType!=='transaction'})}>
             <label>Transaction Value *</label>
             <div className="row">
-              <div className="col-xs-4">
+              <div className="col-4 pr-0">
                 <Select placeholder='Select...' className="form-control" options={currencies} optionRenderer={option => option.label} valueRenderer={option => option.label} value={get(this.state.model.transactionValue, 'currency')} simpleValue={true} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.transactionValue.currency', value)} /> 
                 <span className="text-danger">{get(this.state.errors.model.transactionValue, 'currency')}</span>
               </div>
-              <div className="col-xs-8">
+              <div className="col-8">
                 <div className="input-group">
-                  <span className="input-group-addon">$</span>
+                  <div className="input-group-prepend">
+                    <span className="input-group-text">$</span>
+                  </div>
                   <Numeric className="form-control" currencyConversion={this.state.currencyConversion} amount={get(this.state.model.transactionValue, 'value', '')} from={get(this.state.model.transactionValue, 'currency')} to={get(this.state.model.transactionValue, 'currency')} onChange={value => this.handleChangeState('model.transactionValue.value', value)} />
                 </div>
                 <span className="text-danger">{get(this.state.errors.model.transactionValue, 'value')}</span>
@@ -167,7 +170,7 @@ class AdminPlanSave extends React.PureComponent {
             <Counter value={this.state.model.order} min={0} max={100} onChange={value => this.handleChangeState('model.order', value)} />
             <span className="text-danger">{this.state.errors.model.order}</span>
           </div>
-          <button type='submit' className="hide" />
+          <button type='submit' className="d-none" />
         </form>
       </div>
     )

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Modal, ModalHeader, ModalBody, ModalFooter } from 'reactstrap'
-import { clean, compact, get, set, sortBy, range, flow, cloneDeep, toUrl, isEmpty } from 'lodash'
+import { clean, compact, get, set, sortBy, range, toUrl, isEmpty } from 'lodash'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage, deleteMessage } from 'actions/appActions'
@@ -66,7 +66,7 @@ class Subscription extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.creditCard.number)) {
       errors.model.creditCard.number = this.context.t('enterCreditCardNumber')
     }
@@ -90,7 +90,7 @@ class Subscription extends React.PureComponent {
     try{
       await this.handleChangeState('showModalCreditCard', !this.state.showModalCreditCard) 
       if(this.state.showModalCreditCard) return
-      clean(this.state.model.creditCard, '')
+      clean(this.state.model.creditCard)
       clean(this.state.errors.model.creditCard)
       this.props.dispatch(deleteMessage())
       
@@ -105,7 +105,7 @@ class Subscription extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors.model.creditCard)){
+      if(!isEmpty(compact(this.state.errors.model.creditCard))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -119,6 +119,18 @@ class Subscription extends React.PureComponent {
       await this.handleCloseCreditCard()
       this.props.dispatch(setMessage({ type: 'success', message: this.props.payment.temp.message }))
       this.props.dispatch(hideLoading())
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
+  async handleOpenSubscription(plan){
+    try{
+      const { session } = this.props.auth
+      if(plan.id===session.plan.id) return 
+      await this.handleChangeState('showModalSubscription', true) 
+      this.handleChangeState('model.plan.info', plan)
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())
@@ -155,7 +167,7 @@ class Subscription extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors.model.subscription)){
+      if(!isEmpty(compact(this.state.errors.model.subscription))){
         this.props.dispatch(setMessage({ type: 'success', message: this.context.t('formErrors') }))
         return
       }
@@ -319,7 +331,7 @@ class Subscription extends React.PureComponent {
           </div>
         </div>
         <Modal isOpen={this.state.showModalSubscription} toggle={this.handleCloseSubscription.bind(this)}>
-          <ModalHeader>
+          <ModalHeader toggle={this.handleCloseSubscription.bind(this)}>
             {this.context.t('updateSubscription')}
           </ModalHeader>
           <ModalBody>
@@ -337,7 +349,7 @@ class Subscription extends React.PureComponent {
           {
             sortBy(plans, ['order']).map(item =>
               <div key={item.id} className="col-md-4">
-                <PlanBox isLoading={isLoading} app={this.props.app} info={item} selected={session.plan.id} onClick={() => { if(item.id===session.plan.id) return; this.handleChangeState('showModalSubscription', true); this.handleChangeState('model.plan.info', item) }  }/>
+                <PlanBox isLoading={isLoading} app={this.props.app} info={item} selected={session.plan.id} onClick={() => this.handleOpenSubscription(item) }/>
               </div>
             )
           }

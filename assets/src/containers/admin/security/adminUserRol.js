@@ -18,6 +18,7 @@ class AdminUserRol extends React.PureComponent {
       user: {},
       userRoles: this.props.user.roles,
       userRolesQuery: {
+        activePage: 1,
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         sort: [
           { name: 'ASC' }
@@ -39,7 +40,8 @@ class AdminUserRol extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getUser({ where: { id: this.props.match.params.id } }))
+      const userId = this.props.match.params.id || ''
+      await this.props.dispatch(getUser({ where: { id: userId } }))
       await this.setState({ user: this.props.user.users.records[0] })
       await this.props.dispatch(getUserRol(this.state.userRolesQuery))
       this.props.dispatch(hideLoading())
@@ -82,14 +84,14 @@ class AdminUserRol extends React.PureComponent {
     const { isLoading } = this.props.app
     const { records } = this.state.userRoles
     return (
-      <div className={classnames({'hide': isLoading})}>
+      <div className={classnames({'d-none': isLoading})}>
         <NavigationBar
           title={<h1>Roles</h1>} 
           description={<h2>{this.state.user.username}</h2>} 
           btnLeft={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/security/user')}><i className="fas fa-arrow-left"></i></button>} 
           btnRight={<button className="btn btn-success" onClick={() => this.props.history.push(`/admin/security/user/${this.props.match.params.id}/rol/new`)}><i className="fas fa-plus"></i></button>} />
         <Pager isLoading={isLoading} query={this.state.userRolesQuery} items={this.state.userRoles} onChange={this.handleChangeSearch.bind(this)}>
-          <Table striped condensed hover responsive>
+          <Table striped hover responsive>
             <thead>
               <tr>
                 <th>Name</th>

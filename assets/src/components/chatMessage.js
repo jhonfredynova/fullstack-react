@@ -1,10 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { defaultTo, isEmpty, set, flow, cloneDeep, clean, compact, get } from 'lodash'
+import { defaultTo, isEmpty, set, clean, compact, get } from 'lodash'
 import { setMessage } from 'actions/appActions'
 import { Style } from 'react-style-tag'
 
-class ChatMessage extends React.Component {
+class ChatMessage extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -24,7 +24,7 @@ class ChatMessage extends React.Component {
   }
 
   async handleValidate(path){
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.value)) {
       errors.value = this.context.t('enterMessage')
     }
@@ -37,7 +37,7 @@ class ChatMessage extends React.Component {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!compact(this.state.errors)){
         this.context.store.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -53,26 +53,31 @@ class ChatMessage extends React.Component {
     return (
       <div id="chatMessage" className={className}>
         <div className="messageWrap">
-          <h2><i className="fa fa-comments-o fa-2x" /></h2>
-          <p>{this.context.t('chatEmpty')}</p>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
-          <div className="alert alert-info">Hola</div>
+          <h2 className="text-center"><i className="fa fa-comments fa-2x" /></h2>
+          <p className="text-center">{this.context.t('chatEmpty')}</p>
+          <div className="d-flex flex-row">
+            <div className="alert alert-primary">Hola <small>15/09/2018</small></div>
+          </div>
+          <div className="d-flex flex-row-reverse">
+            <div className="alert alert-secondary">Que tal como esta? <small>15/09/2018</small></div>
+          </div>
+          <div className="d-flex flex-row">
+            <div className="alert alert-primary">Bien que hay que hacer por alla? esta todo bien o hay algún problema? <small>16/09/2018</small></div>
+          </div>
+          <div className="d-flex flex-row-reverse">
+            <div className="alert alert-secondary">Todo bien, todo sin novedad<small>17/09/2018</small></div>
+          </div>
+          <div className="d-flex flex-row">
+            <div className="alert alert-primary d-flex flex-row">Ha bueno bien entonces, chao estamos hablando! <small>Hace 1 hora</small></div>
+          </div>
+          <div className="d-flex flex-row-reverse">
+            <div className="alert alert-secondary">Ok Ciudese <small>Hace un momento</small></div>
+          </div>
         </div>
-        <form className="editorWrap" onSubmit={this.handleSendMessage.bind(this)}>
+        <form onSubmit={this.handleSendMessage.bind(this)}>
           <div className="input-group">
             <input type="text" className="form-control" />
-            <div className="input-group-btn">
+            <div className="input-group-append">
               <button type="submit" className="btn btn-success">{this.context.t('send')}</button>
             </div>
           </div>
@@ -84,16 +89,14 @@ class ChatMessage extends React.Component {
             height: 100%;
           }
           #chatMessage .messageWrap{
-            height: 75%;
-            text-align: center;
+            height: 74%;
             overflow: auto;
           }
           #chatMessage .messageWrap h2{
             margin-top: 0px;
           }
-          #chatMessage .editorWrap{
-            position: absolute;
-            bottom: 0px;
+          #chatMessage .messageWrap .alert{
+            max-width: 70%
           }
         `}
         </Style>

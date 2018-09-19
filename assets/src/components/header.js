@@ -50,9 +50,8 @@ class Header extends React.PureComponent {
   }
 
   render() {
-    const { isLoading } = this.props
     const { config } = this.props.app
-    const { isAuthenticated } = this.props.auth
+    const { session } = this.props.auth
     const { appDisabled, appPreferences } = config
     const currencies = get(config.appIntl, 'currencies', [])
     const languages = filter(get(config.appIntl, 'languages', []), item => config.appLanguages.indexOf(item.value)>-1)
@@ -62,7 +61,7 @@ class Header extends React.PureComponent {
           <NavbarBrand to="/" tag={Link}>
             <img src={config.appLogo} alt={config.appName} width={35} /> <span>{config.appName}</span>
           </NavbarBrand> 
-          <Navbar className={classnames({'ml-auto': true, 'hide': (isLoading || appDisabled) })}>
+          <Navbar className={classnames({'ml-auto': true, 'd-none': appDisabled })}>
             <div className="form-inline">
               {/* PREFERENCES */}
               <button id="popoverPreferences" className="btn btn-success mr-1" onClick={() => this.handleChangeState('showPopoverPreferences', !this.state.showPopoverPreferences)}><i className="fas fa-cog"></i></button>
@@ -80,7 +79,7 @@ class Header extends React.PureComponent {
                 </PopoverBody>
               </Popover>
               {/* MESSAGES */}
-              <button id="popoverMessages" className={classnames({"btn btn-success mr-1": true, 'hide': !isAuthenticated})} onClick={() => this.handleChangeState('showPopoverMessages', !this.state.showPopoverMessages)}><i className="fas fa-comment-alt"></i></button>
+              <button id="popoverMessages" className={classnames({"btn btn-success mr-1": true, 'd-none': !session})} onClick={() => this.handleChangeState('showPopoverMessages', !this.state.showPopoverMessages)}><i className="fas fa-comment-alt"></i></button>
               <Popover target="popoverMessages" placement="bottom" isOpen={this.state.showPopoverMessages} toggle={() => this.handleChangeState('showPopoverMessages', !this.state.showPopoverMessages)}>
                 <PopoverHeader>{this.context.t('messages')}</PopoverHeader>
                 <PopoverBody>
@@ -99,7 +98,7 @@ class Header extends React.PureComponent {
               </Popover>
             </div>
           </Navbar>
-          <NavbarToggler className={classnames({'hide': (isLoading || appDisabled) })} onClick={() => this.handleChangeState('showMenu',!this.state.showMenu)} />
+          <NavbarToggler className={classnames({'d-none': appDisabled })} onClick={() => this.handleChangeState('showMenu',!this.state.showMenu)} />
           <Collapse isOpen={this.state.showMenu} navbar>
             { !appDisabled && <Menu app={this.props.app} auth={this.props.auth} /> }
           </Collapse>

@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
-import { cloneDeep, clean, compact, flow, get, set, isEmpty } from 'lodash'
+import { clean, compact, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import { getRol } from 'actions/rolActions'
@@ -36,8 +36,9 @@ class AdminUserRolSave extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
+      const userId = this.props.match.params.id || ''
       await this.props.dispatch(getRol({ select: ['id','name'] }))
-      await this.props.dispatch(getUser({ where: { id: this.props.match.params.id }, select: ['id','firstname','lastname','email'] }))    
+      await this.props.dispatch(getUser({ where: { id: userId }, select: ['id','firstname','lastname','email'] }))    
       await this.setState({ user: this.props.user.temp })
       await this.setState({ model: Object.assign(this.state.model, { user: this.state.user.id }) })
       this.props.dispatch(hideLoading())
@@ -53,7 +54,7 @@ class AdminUserRolSave extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.rol)) {
       errors.model.rol = "Select rol."
     }
@@ -66,7 +67,7 @@ class AdminUserRolSave extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -100,7 +101,7 @@ class AdminUserRolSave extends React.PureComponent {
             <Select options={this.state.roles} valueKey='id' labelKey='name' value={this.state.model.rol} clearable={false} autosize={false} onChange={value => this.handleChangeState('model.rol', value.id)} />
             <span className="text-danger">{this.state.errors.model.rol}</span>
           </div>
-          <button type="submit" className="hide" />
+          <button type="submit" className="d-none" />
         </form>
       </div>
     )

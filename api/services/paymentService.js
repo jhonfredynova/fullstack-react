@@ -40,19 +40,19 @@ module.exports = {
       let subscription = await paymentService.executeApiPayu('POST', `/subscriptions`, data)
       let subscriptionAttempts = 1
       let subscriptionBilling = null
-      while(subscriptionAttempts<12){
+      while(subscriptionAttempts<=12){
         try{
           subscriptionBilling = await paymentService.executeApiPayu('GET', `/recurringBill?subscriptionId=${subscription.id}`)
           subscriptionBilling = _.orderBy(subscriptionBilling.recurringBillList, ['dateCharge'], ['asc'])[0]
           break
         }catch(e){
-          console.warn(`Subscription #(${subscription.id}) not executed, attempt #${subscriptionAttempts}`)
+          sails.log(`Subscription #(${subscription.id}) not executed, attempt #${subscriptionAttempts}`)
           await new Promise(resolve => setTimeout(() => resolve('ok'), 5000)) 
           subscriptionAttempts++
         }
       }
       subscriptionBilling = subscriptionBilling || {}
-      if(subscriptionBilling.state!=='PAID'){
+      if(!['PAID','PENDING'].includes(subscriptionBilling.state)){
         await paymentService.executeApiPayu('DELETE', `/subscriptions/${subscription.id}`)
       }
       return subscription

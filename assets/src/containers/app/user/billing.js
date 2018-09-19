@@ -19,6 +19,7 @@ class Billing extends React.PureComponent {
     this.state = {
       billing: this.props.payment.billing,
       billingQuery: {
+        activePage: 1,
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['dateCharge','orderId','amount','currency'],
         sort: [
@@ -75,7 +76,7 @@ class Billing extends React.PureComponent {
           title={<h1>{this.context.t('billingTitle')}</h1>} 
           description={<h2>{this.context.t('billingDescription')}</h2>} />
         <Pager isLoading={isLoading} query={this.state.billingQuery} items={this.state.billing} onChange={this.handleChangeSearch.bind(this)}>
-          <Table striped condensed hover responsive>
+          <Table striped hover responsive>
             <thead>
               <tr>
                 <th>{this.context.t('date')}</th>

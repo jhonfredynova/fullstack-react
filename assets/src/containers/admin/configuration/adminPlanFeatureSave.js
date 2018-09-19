@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
-import { cloneDeep, clean, compact, defaults, flow, keys, get, set, isEmpty } from 'lodash'
+import { clean, compact, defaults, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import Counter from 'components/counter'
@@ -40,13 +40,14 @@ class AdminPlanFeatureSave extends React.PureComponent {
     try{
       this.props.dispatch(showLoading())
       const { config } = this.props.app
-      const { id: idPlan, idFeature } = this.props.match.params
+      const idPlan = this.props.match.params.id || ''
+      const idFeature = this.props.match.params.idFeature || ''
       await this.props.dispatch(getPlan({ select: ['id','name'], where: { id: idPlan } }))
-      await this.setState({ plan: this.props.plan.temp })
+      await this.setState({ plan: defaults(this.props.plan.plans.records[0], this.state.plan) })
       await this.setState({ model: Object.assign(this.state.model, { plan: this.state.plan.id }) })
       await this.props.dispatch(getCatalog({ select: ['id','name'], where: { 'parent': config.catalogs.planFeatures } }))
       await this.props.dispatch(getPlanFeature({ populate: false, select: keys(this.state.model), where: { id: idFeature } }))
-      await this.setState({ model: defaults(this.props.plan.temp, this.state.model) })
+      await this.setState({ model: defaults(this.props.plan.features.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -60,7 +61,7 @@ class AdminPlanFeatureSave extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.feature)) {
       errors.model.feature = "Select a feature."
     }
@@ -79,7 +80,7 @@ class AdminPlanFeatureSave extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -124,7 +125,7 @@ class AdminPlanFeatureSave extends React.PureComponent {
             <Counter value={this.state.model.order} min={0} max={100} onChange={value => this.handleChangeState('model.order', value)} />
             <span className="text-danger">{this.state.errors.model.order}</span>
           </div>
-          <button type="submit" className="hide" />
+          <button type="submit" className="d-none" />
         </form>
       </div>
     )

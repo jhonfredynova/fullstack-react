@@ -1,9 +1,7 @@
 import { AUTH } from 'actions/authActions'
-import { isEmpty } from 'lodash'
 
 export default function reducer(
   state={
-    isAuthenticated: null,
     session: null,
     temp: null,
     token: null
@@ -18,21 +16,18 @@ export default function reducer(
     case AUTH.GET:
       return { 
         ...state, 
-        isAuthenticated: !isEmpty(action.payload),
         session: action.payload
       }
 
     case AUTH.LOGIN:
       return { 
         ...state,
-        isAuthenticated: isEmpty(action.payload),
         session: action.payload
       }
 
     case AUTH.LOGOUT:
       return { 
         ...state, 
-        isAuthenticated: false,
         session: action.payload,
         token: null
       }

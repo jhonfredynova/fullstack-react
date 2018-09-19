@@ -50,7 +50,6 @@ class Main extends React.PureComponent {
 
   async componentDidUpdate(prevProps) {
     try{
-      const { messages } = this.props.app
       if(this.props.location!==prevProps.location){
         return this.props.dispatch(deleteMessage())
       }
@@ -63,6 +62,7 @@ class Main extends React.PureComponent {
     const { isLoading, config, messages } = this.props.app
     return (
       <div id="main">
+        { isLoading && <div className="loading-backdrop" /> }
         <Loading color="green" show={isLoading} showSpinner={false} />
         <Message isLoading={isLoading} messages={messages} />
         <Header isLoading={isLoading} app={this.props.app} auth={this.props.auth} />
@@ -77,6 +77,16 @@ class Main extends React.PureComponent {
           }
           table td{
             vertical-align: middle!important;
+          }
+          .loading-backdrop{
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1100;
+            background-color: white;
+            opacity: 0.2;
           }
           .modal-dialog {
             top: 15%;
@@ -104,10 +114,12 @@ class Main extends React.PureComponent {
             border: none;
           }
           .Select.form-control .Select-control{
-            height: 34px;
+            height: 38px;
           }
-          .Select.form-control .Select-input{
-            height: 32px;
+          .Select.form-control .Select-input,
+          .Select.form-control .Select-value{
+            height: 36px;
+            line-height: 36px;
           } 
         `}
         </Style>

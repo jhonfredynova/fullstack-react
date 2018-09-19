@@ -31,7 +31,7 @@ class Pager extends React.PureComponent {
 
   async handleKeyPressKeyword(e){
     if(e.key==='Enter'){
-      await this.setState({ activePage: 1 })
+      await this.handleChangeState('query.activePage', 1)
     }
   }
 
@@ -60,9 +60,10 @@ class Pager extends React.PureComponent {
     const { records, totalRecords } = this.props.items
     const totalPages = Math.ceil(totalRecords/query.pageSize)
     const limitRange = 3
-    const previousRange = query.activePage-limitRange>0 ? query.activePage-limitRange : 1
-    const nextRange = query.activePage+limitRange<=totalPages ? query.activePage+limitRange : totalPages
-    const thereIsData = records.length>0
+    const currentRange = Math.ceil(query.activePage/limitRange)
+    const previousRange = currentRange>1 ? (currentRange*limitRange)-(limitRange-1) : 1
+    const nextRange = previousRange+limitRange<=totalPages ? previousRange+limitRange : totalPages+1
+    const thereIsData = !isLoading && records.length>0
     return (
       <div id="pager" className={this.props.className}>
         <div className="help-block"></div>
@@ -90,17 +91,17 @@ class Pager extends React.PureComponent {
                 <PaginationLink previous href="#" onClick={() => this.handleChangeState('query.activePage', 1)} />
               </PaginationItem>
               <PaginationItem className={classnames({'d-none': previousRange<=1})}>
-                <PaginationLink href="#" onClick={() => this.handleChangeState('query.activePage', (query.activePage-limitRange))}>...</PaginationLink>
+                <PaginationLink href="#" onClick={() => this.handleChangeState('query.activePage', (previousRange-limitRange))}>...</PaginationLink>
               </PaginationItem>
               {
-                range(query.activePage, nextRange).map(item =>
+                range(previousRange, nextRange).map(item =>
                   <PaginationItem key={item} active={item===query.activePage}>
                     <PaginationLink href="#" onClick={() => this.handleChangeState('query.activePage', item)}>{item}</PaginationLink>
                   </PaginationItem>
                 )
               }
-              <PaginationItem className={classnames({'d-none': previousRange>=totalPages})}>
-                <PaginationLink href="#" onClick={() => this.handleChangeState('query.activePage', (query.activePage+limitRange))}>...</PaginationLink>
+              <PaginationItem className={classnames({'d-none': nextRange>=totalPages})}>
+                <PaginationLink href="#" onClick={() => this.handleChangeState('query.activePage', nextRange)}>...</PaginationLink>
               </PaginationItem>
               <PaginationItem disabled={query.activePage>=totalPages}>
                 <PaginationLink next href="#" onClick={() => this.handleChangeState('query.activePage', totalPages)} />

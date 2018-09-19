@@ -9,7 +9,15 @@ import NavigationBar from 'components/navigationBar'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getChat, saveChat, saveChatMessage } from 'actions/chatActions'
 import { Style } from 'react-style-tag'
+
+import socketIOClient from 'socket.io-client'
+import sailsIOClient from 'sails.io.js'
+
+
 const sidebarMql = window.matchMedia(`(min-width: 768px)`)
+
+
+
 
 class Chat extends React.PureComponent {
 
@@ -36,6 +44,52 @@ class Chat extends React.PureComponent {
         }
       }
     }
+  }
+
+  componentDidMount() {
+    const io = sailsIOClient(socketIOClient)
+    io.sails.url = 'http://localhost:1337'
+    io.sails.headers = {
+      authorization: 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiNWI2YWZlNGI3MjE3YWVkNmU5MTQxNzA2IiwiY3JlYXRlZEF0IjoxNTMzNzM4NTcxNDE2LCJ1cGRhdGVkQXQiOjE1MzM3Mzg1NzE0MTYsImFjdGl2ZSI6dHJ1ZSwiZmlyc3RuYW1lIjoiSmhvbiIsImxhc3RuYW1lIjoiTm92YSIsInVzZXJuYW1lIjoiamhvbmZyZWR5bm92YSIsImVtYWlsIjoiamhvbmZyZWR5bm92YUBnbWFpbC5jb20iLCJlbWFpbENvbmZpcm1lZCI6ZmFsc2UsInBob3RvIjoiaHR0cHM6Ly9wbGF0Zm9ybS1sb29rYXNpZGUuZmJzYnguY29tL3BsYXRmb3JtL3Byb2ZpbGVwaWMvP2FzaWQ9MTU5NDIxNTE1NDAwMTk0OSZoZWlnaHQ9MjAwJndpZHRoPTIwMCZleHQ9MTUzNjMzMDU3MSZoYXNoPUFlVE40N09nVjRMc2hMdmQiLCJwcmVmZXJlbmNlcyI6W10sImNsaWVudENvZGUiOiIiLCJwbGFuIjoiNWI0Y2NlMDgwYWY5OTAzMmIyMTM0OGE4In0sImlhdCI6MTUzMzczODU3MiwiZXhwIjoxNTMzNzQwMDEyfQ.QMKQAiQUvQeQZ6R4nA9VmoEW6-RR117-RDGdP0WO-h8' 
+    }
+    io.sails.useCORSRouteToGetCookie = false
+
+    io.socket.on('connect', () => {
+      console.warn("Socket connected!")
+    })
+    //change
+    io.socket.on('/api/catalog', (data) => {
+      console.warn('CHANGE')
+      console.warn(data)
+    })
+    //list
+    io.socket.get('/api/catalog', (data) => {
+      console.warn('LIST')
+      console.warn(data)
+    })
+    //request
+    io.socket.get('/api/plan', function (resData, jwres){
+      console.warn('GET')
+      console.warn(jwres.statusCode)
+      console.warn(resData)
+    })
+    //post
+    io.socket.post('/api/catalog', { name: 'test2', value: {}, order:1 }, function(resData, jwres){
+      console.warn('POST')
+      console.warn(jwres.statusCode)
+      console.warn(resData)
+    })
+    //update
+    io.socket.put('/api/catalog/5ba1744991d295428cc5150e', { name: 'test', value: {}, order:1 }, function(resData, jwres){
+      console.warn('PUT')
+      console.warn(jwres.statusCode)
+      console.warn(resData)
+    })
+    //delete
+    io.socket.delete('/api/catalog/5ba1744991d295428cc5150e', function(resData){
+      console.warn('DELETE')
+      console.warn(resData)
+    })
   }
 
   componentWillReceiveProps(nextProps) {
@@ -127,8 +181,8 @@ class Chat extends React.PureComponent {
     const chatConversations = (
       <div className="card">
         <div className="card-header">
-          <span className="pull-left"><h2>{this.context.t('messages')}</h2></span>
-          <span className="pull-right"><button className="btn btn-success"><i className="fas fa-edit" /></button></span>
+          <span className="float-left"><h2>{this.context.t('messages')}</h2></span>
+          <span className="float-right"><button className="btn btn-success"><i className="fas fa-edit" /></button></span>
           <span className="clearfix" />
         </div>
         <div className="card-body" onScroll={this.handleChatScroll.bind(this)}>
@@ -139,7 +193,7 @@ class Chat extends React.PureComponent {
                   <div key={item.id} />
                 )
               }
-              <div className={(classnames({'text-center': true, 'hide': !isLoading}))}><i className="fa fa-spinner fa-spin fa-2x"></i></div>
+              <div className={(classnames({'text-center': true, 'd-none': !isLoading}))}><i className="fa fa-spinner fa-spin fa-2x"></i></div>
             </div>
           }
         </div>
@@ -157,6 +211,7 @@ class Chat extends React.PureComponent {
         <Style>
         {`
           #chat{
+            margin-top: 20px;
             position: relative;
             height: 600px;
           }
@@ -165,7 +220,7 @@ class Chat extends React.PureComponent {
             width: 250px;
           }
           #chat .card .card-header{
-            max-height: 48px;
+            max-height: 58px;
             padding: 8px;
           }
           #chat .card .card-header h2{
@@ -173,7 +228,7 @@ class Chat extends React.PureComponent {
             margin: 5px 0px;
           }
           #chat .card .card-body{
-            height: 550px;
+            height: 540px;
             padding: 0px;
             overflow: auto;
           }

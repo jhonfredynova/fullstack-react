@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import { setMessage } from 'actions/appActions'
 
 export default function(ComposedComponent, requiredLevels, mustHaveAll) {
-  class Authorization extends React.Component {
+  class Authorization extends React.PureComponent {
 
     constructor(props) {
       super(props)
@@ -24,13 +24,13 @@ export default function(ComposedComponent, requiredLevels, mustHaveAll) {
 
     async handleAuthentication(props){
       const { isLoading } = props.app
-      const { isAuthenticated, session } = props.auth
+      const { session } = props.auth
       if(isLoading) return
-      if(!isAuthenticated) {
+      if(!session) {
         await props.history.push('/login')
         props.dispatch(setMessage({ type: 'error', message: this.context.t('authNotLogin') }))
         return
-      }else if(isAuthenticated && !includes(requiredLevels, session.permissions, mustHaveAll)){
+      }else if(session && !includes(requiredLevels, session.permissions, mustHaveAll)){
         await props.history.push('/')
         props.dispatch(setMessage({ type: 'error', message: this.context.t('authNotPriviliges') }))
         return

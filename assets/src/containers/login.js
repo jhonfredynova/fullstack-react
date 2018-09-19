@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
-import { cloneDeep, clean, compact, flow, get, set, isEmpty } from 'lodash'
+import { clean, compact, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import { login, me, setToken } from 'actions/authActions'
 import { hideLoading, showLoading, setMessage, setPreference } from 'actions/appActions'
@@ -52,7 +52,7 @@ class Login extends React.PureComponent {
   }
 
   async handleValidate(path){
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.username)) {
       errors.model.username = this.context.t('enterEmailOrUsername')
     }
@@ -68,7 +68,7 @@ class Login extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, clean, compact, flow, isEmpty, get, set } from 'lodash'
+import { clean, compact, isEmpty, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { forgotUser } from 'actions/userActions'
@@ -27,7 +27,7 @@ class ForgotAccount extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if (isEmpty(this.state.model.username)) {
       errors.model.username = this.context.t('enterUsernameOrEmail')
     }
@@ -40,7 +40,7 @@ class ForgotAccount extends React.PureComponent {
       e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }

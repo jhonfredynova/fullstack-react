@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, clean, compact, flow, isEmpty, isEmail, get, set } from 'lodash'
+import { clean, compact, isEmpty, isEmail, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { resetUser } from 'actions/userActions'
@@ -29,7 +29,7 @@ class ResetAccount extends React.PureComponent {
   }
 
   async handleValidate(path){
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmail(this.state.model.password) || Object.keys(this.state.model.password.trim()).length<6) {
       errors.model.password = this.context.t('enterPasswordMin5Char')
     }
@@ -45,7 +45,7 @@ class ResetAccount extends React.PureComponent {
       e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }

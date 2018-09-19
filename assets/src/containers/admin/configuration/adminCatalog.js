@@ -20,6 +20,7 @@ class AdminCatalog extends React.PureComponent {
       catalogParent: null,
       catalogs: this.props.catalog.catalogs,
       catalogsQuery: {
+        activePage: 1,
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','active','createdAt','updatedAt','name','parent'],
         sort: [
@@ -49,7 +50,7 @@ class AdminCatalog extends React.PureComponent {
       this.props.dispatch(showLoading())
       await this.setState({ catalogsQuery: set(this.state.catalogsQuery, 'where.parent', parentId) })
       await this.props.dispatch(getCatalog({ where: { id: parentId } }))
-      await this.setState({ catalogParent: this.props.catalog.temp })
+      await this.setState({ catalogParent: this.props.catalog.catalogs.records[0] })
       await this.props.dispatch(getCatalog(this.state.catalogsQuery))
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -89,6 +90,16 @@ class AdminCatalog extends React.PureComponent {
     }
   }
 
+  async handleChangeTab(activeTab){
+    try{
+      await this.handleChangeState('catalogsQuery.where.active', activeTab) 
+      this.handleChangeSearch(this.state.catalogsQuery)
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
@@ -122,16 +133,16 @@ class AdminCatalog extends React.PureComponent {
         <NavigationBar 
           title={<h1>Catalogs</h1>} 
           description={<h2>{get(this.state.catalogParent,'name', 'All')}</h2>} 
-          btnLeft={<button className={classnames({'btn btn-success': true, 'hide': !this.state.catalogParent})} onClick={() => this.props.history.goBack()}><i className="fas fa-arrow-left"></i></button>} 
+          btnLeft={<button className={classnames({'btn btn-success': true, 'd-none': !this.state.catalogParent})} onClick={() => this.props.history.goBack()}><i className="fas fa-arrow-left"></i></button>} 
           btnRight={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/catalog/new')}><i className="fas fa-plus"></i></button>} />
         <Nav className="mb-4" tabs>
           <NavItem>
-            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('catalogsQuery.where.active', true); this.handleChangeSearch(this.state.catalogsQuery) }}>
+            <NavLink active={activeTab===1} onClick={() => this.handleChangeTab(true) }>
               Active
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('catalogsQuery.where.active', false); this.handleChangeSearch(this.state.catalogsQuery) }}>
+            <NavLink active={activeTab===2} onClick={() => this.handleChangeTab(false) }>
               Inactive
             </NavLink>
           </NavItem>

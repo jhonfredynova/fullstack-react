@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, clean, compact, defaultTo, isEmpty, isEmail, flow, keys, get, set } from 'lodash'
+import { clean, compact, defaultTo, isEmpty, isEmail, keys, get, set } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
@@ -27,8 +27,9 @@ class AdminUserSave extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getUser({ where: { id: this.props.match.params.id }, select: keys(this.state.model) }))
-      await this.setState({ model: defaultTo(this.props.user.temp, this.state.model) })
+      const userId = this.props.match.params.id || ''
+      await this.props.dispatch(getUser({ where: { id: userId }, select: keys(this.state.model) }))
+      await this.setState({ model: defaultTo(this.props.user.users.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -42,7 +43,7 @@ class AdminUserSave extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.firstname)) {
       errors.model.firstname = "Enter firstnames."
     }
@@ -67,7 +68,7 @@ class AdminUserSave extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -116,7 +117,7 @@ class AdminUserSave extends React.PureComponent {
             <input type="text" className="form-control" value={this.state.model.email} onChange={event => this.handleChangeState('model.email', event.target.value)} />
             <span className="text-danger">{this.state.errors.model.email}</span>
           </div>
-          <button type="submit" className="hide" />
+          <button type="submit" className="d-none" />
         </form>
       </div>
     )

@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { cloneDeep, clean, compact, defaults, flow, keys, get, set, isEmpty } from 'lodash'
+import { clean, compact, defaults, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
@@ -25,8 +25,9 @@ class AdminRolSave extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
-      await this.props.dispatch(getRol({ select: keys(this.state.model), where: { id: this.props.match.params.id } }))
-      await this.setState({ model: defaults(this.props.rol.temp, this.state.model) })
+      const rolId = this.props.match.params.id || ''
+      await this.props.dispatch(getRol({ select: keys(this.state.model), where: { id: rolId } }))
+      await this.setState({ model: defaults(this.props.rol.roles.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -40,7 +41,7 @@ class AdminRolSave extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.name)) {
       errors.model.name = "Enter name."
     }
@@ -56,7 +57,7 @@ class AdminRolSave extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -95,7 +96,7 @@ class AdminRolSave extends React.PureComponent {
             <input type="text" className="form-control" value={this.state.model.description} onChange={e => this.handleChangeState('model.description', e.target.value)} />
             <span className="text-danger">{this.state.errors.model.value}</span>
           </div>
-          <button type="submit" className="hide" />
+          <button type="submit" className="d-none" />
         </form>
       </div>
     )

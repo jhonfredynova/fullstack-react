@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { cloneDeep, clean, compact, flow, isEmail, get, set, isEmpty } from 'lodash'
+import { clean, compact, isEmail, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { register } from 'actions/authActions'
@@ -12,6 +12,7 @@ class Register extends React.PureComponent {
 
   constructor(props) {
     super(props)
+    const { plans } = this.props.app.config
     this.state = {
       errors: {
         model: {}
@@ -22,7 +23,8 @@ class Register extends React.PureComponent {
         username: '',
         email: '',
         password: '',
-        passwordConfirmation: ''
+        passwordConfirmation: '',
+        plan: plans.free
       }
     }
   }
@@ -36,7 +38,7 @@ class Register extends React.PureComponent {
   }
 
   async handleValidate(path) {
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.firstname)) {
       errors.model.firstname = this.context.t('enterFirstname')
     }
@@ -67,7 +69,7 @@ class Register extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }   

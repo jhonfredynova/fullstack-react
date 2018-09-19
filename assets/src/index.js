@@ -95,8 +95,8 @@ render((
             {/* HOME */}
             <Route path="/" exact component={Home}/>
             <Route path="/buy/response" exact component={BuyResponse}/>
-            <Route path="/buy/subscription/:idPlan" exact component={BuySubscription}/>
-            <Route path="/buy/transaction/:idPlan" exact component={BuyTransaction}/>
+            <Route path="/buy/subscription/:id" exact component={BuySubscription}/>
+            <Route path="/buy/transaction/:id" exact component={BuyTransaction}/>
             <Route path="/contact" component={Contact}/>
             <Route path="/coming-soon" component={ComingSoon}/>
             <Route path="/docs" component={Docs}/>

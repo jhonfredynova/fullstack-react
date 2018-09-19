@@ -22,7 +22,7 @@ class Footer extends React.PureComponent {
               </ul>
             </div>
           </div>
-          <div className={classnames({'row': true, 'hide': (isLoading || appDisabled)})}>
+          <div className={classnames({'row': true, 'd-none': (isLoading || appDisabled)})}>
             <div className="col-md-12 text-center">
               <ul className="list-inline">
                 <li className="list-inline-item"><Link className="text-dark" to="/docs">{this.context.t('docs')}</Link></li>

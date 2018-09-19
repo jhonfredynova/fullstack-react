@@ -5,7 +5,7 @@ import { defaultTo } from 'lodash'
 import { deleteMessage } from 'actions/appActions'
 import { Style } from 'react-style-tag'
 
-class Message extends React.Component {
+class Message extends React.PureComponent {
 
   constructor(props) {
     super(props)
@@ -24,14 +24,13 @@ class Message extends React.Component {
 
   render() {
     const messages = this.state.messages
-    const { isLoading } = this.props
     if(messages.length===0) return null
     return (
       <div id="message">
         {
           messages.map(item =>
             <div key={item.id} className={classnames({ 'alert': true, 'alert-success': item.type==='success', 'alert-danger': item.type==='error', 'alert-warning': item.type==='warning' })}>
-              <button className={classnames({ 'close': true, 'hide': item.hideClose })} onClick={e => this.handleClose(item.id)}>
+              <button className={classnames({ 'close': true, 'd-none': item.hideClose })} onClick={e => this.handleClose(item.id)}>
                 <span>&times;</span>
               </button>
               {item.message.toString()}

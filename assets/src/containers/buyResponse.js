@@ -72,7 +72,7 @@ class BuyResponse extends React.PureComponent {
   }
 
   render() {
-    const { isAuthenticated } = this.props.auth
+    const { session } = this.props.auth
     return (
       <div id="buy">
         <Seo title={this.state.title} description={this.state.message} siteName={this.context.t('siteName')} />
@@ -81,7 +81,7 @@ class BuyResponse extends React.PureComponent {
           <h1><i className={this.state.thumbnail} /></h1>
           <p>
             {
-              !isAuthenticated ? <Link className="btn btn-success" to="/">{this.context.t('goHomePage')}</Link>
+              !session ? <Link className="btn btn-success" to="/">{this.context.t('goHomePage')}</Link>
               : <Link className="btn btn-success" to="/app/dashboard">{this.context.t('goToDashboard')}</Link>
             }
           </p>

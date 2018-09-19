@@ -19,6 +19,7 @@ class AdminPlan extends React.PureComponent {
     this.state = {
       plans: this.props.plan.plans,
       plansQuery: {
+        activePage: 1,
         pageSize: appPreferences[PREFERENCE.ADMIN_PAGINATION],
         select: ['id','createdAt','updatedAt','name','description','order', 'planCode', 'paymentType','transactionValue'],
         sort: [
@@ -66,6 +67,16 @@ class AdminPlan extends React.PureComponent {
     }
   }
 
+  async handleChangeTab(activeTab){
+    try{
+      await this.handleChangeState('plansQuery.where.active', activeTab) 
+      this.handleChangeSearch(this.state.plansQuery)
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
   async handleDeleteData(item){
     try{
       this.props.dispatch(showLoading())
@@ -98,21 +109,21 @@ class AdminPlan extends React.PureComponent {
       <div>
         <NavigationBar
           title={<h1>Plans</h1>} 
-          btnRight={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/plan/new')}><i className="fas fa-check"></i></button>} />
+          btnRight={<button className="btn btn-success" onClick={() => this.props.history.push('/admin/configuration/plan/new')}><i className="fas fa-plus"></i></button>} />
         <Nav className="mb-4" tabs>
           <NavItem>
-            <NavLink active={activeTab===1} onClick={() => { this.handleChangeState('plansQuery.where.active', true); this.handleChangeSearch(this.state.plansQuery) }}>
+            <NavLink active={activeTab===1} onClick={() => this.handleChangeTab(true) }>
               Active
             </NavLink>
           </NavItem>
           <NavItem>
-            <NavLink active={activeTab===2} onClick={() => { this.handleChangeState('plansQuery.where.active', false); this.handleChangeSearch(this.state.plansQuery) }}>
+            <NavLink active={activeTab===2} onClick={() => this.handleChangeTab(false) }>
               Inactive
             </NavLink>
           </NavItem>
         </Nav>
         <Pager isLoading={isLoading} query={this.state.plansQuery} items={this.state.plans} onChange={this.handleChangeSearch.bind(this)}>
-          <Table striped condensed hover responsive>
+          <Table striped hover responsive>
             <thead>
               <tr>
                 <th>Order</th>
@@ -132,12 +143,12 @@ class AdminPlan extends React.PureComponent {
                     <td>{moment(item.updatedAt).format('DD/MM/YYYY')}</td>
                     <td>{item.name}</td>
                     <td className="text-center">
-                      <span className={classnames({'hide': item.paymentType })}>
+                      <span className={classnames({'d-none': item.paymentType })}>
                         $0
                       </span>
-                      <span className={classnames({'hide': !item.paymentType })}>
+                      <span className={classnames({'d-none': !item.paymentType })}>
                         <span className="d-block">{item.paymentType}</span>
-                        <small className={classnames({'text-success d-block': true, 'hide': item.paymentType!=='subscription'})}>{item.planCode}</small>
+                        <small className={classnames({'text-success d-block': true, 'd-none': item.paymentType!=='subscription'})}>{item.planCode}</small>
                         {item.subscriptionInfo ? `$${get(item, 'subscriptionInfo.price.value', 0)} ${get(item, 'subscriptionInfo.price.currency', '')}` : `$${get(item, 'transactionValue.value', 0)} ${get(item, 'transactionValue.currency', '').toUpperCase()}` }
                       </span>
                     </td>

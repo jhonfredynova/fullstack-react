@@ -19,13 +19,13 @@ class Menu extends React.PureComponent {
   }
 
   render() {
-    const { isAuthenticated, session } = this.props.auth
+    const { session } = this.props.auth
     const currentPath = window.location.pathname
     return (
       <Nav className="ml-auto" navbar>        
         {/* HOME */}
         {
-          !isAuthenticated &&
+          !session &&
           <Navbar>
             <NavLink to="/" tag={Link}>{this.context.t('home')}</NavLink>
             <NavLink to="/price" tag={Link}>{this.context.t('price')}</NavLink>
@@ -38,7 +38,7 @@ class Menu extends React.PureComponent {
         }
         {/* APP */}
         {
-          isAuthenticated && includes([2,3,4], session.permissions, false) && 
+          session && includes([2,3,4], session.permissions, false) && 
           <Navbar>
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>App</DropdownToggle>
@@ -50,7 +50,7 @@ class Menu extends React.PureComponent {
         }
         {/* ADMIN */}
         {
-          isAuthenticated && includes([1], session.permissions, true) &&
+          session && includes([1], session.permissions, true) &&
           <Navbar>   
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>Admin</DropdownToggle>
@@ -69,7 +69,7 @@ class Menu extends React.PureComponent {
         }
         {/* SESSION */}
         {
-          isAuthenticated && 
+          session && 
           <Navbar>   
             <UncontrolledDropdown nav inNavbar>
               <DropdownToggle nav caret>

@@ -60,9 +60,7 @@ module.exports = function destroyOneRecord (req, res) {
     /*****************************************************
     // START PATCH
     ******************************************************/
-    record = _.pick(record, ['id'])
-    record.active = false
-    Model.update(_.cloneDeep(criteria), record).exec(function destroyedRecord (err) {
+    Model.update({ id: record.id }, { active: false }).exec(function destroyedRecord (err) {
     /*****************************************************
     // END PATCH
     ******************************************************/

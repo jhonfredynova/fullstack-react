@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import Select from 'react-select'
-import { cloneDeep, clean, compact, defaults, flow, keys, get, set, isEmpty } from 'lodash'
+import { clean, compact, defaults, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import Counter from 'components/counter'
 import NavigationBar from 'components/navigationBar'
@@ -38,9 +38,10 @@ class AdminCatalogSave extends React.PureComponent {
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
+      const catalogId = this.props.match.params.id || ''
       await this.props.dispatch(getCatalog({ select: keys(this.state.model), sort: [{name: 'ASC'}], where: { active: true } }))
-      await this.props.dispatch(getCatalog({ populate: false, select: keys(this.state.model), where: {id: this.props.match.params.id} }))
-      await this.setState({ model: defaults(this.props.catalog.temp, this.state.model) })
+      await this.props.dispatch(getCatalog({ populate: false, select: keys(this.state.model), where: {id: catalogId} }))
+      await this.setState({ model: defaults(this.props.catalog.catalogs.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -55,7 +56,7 @@ class AdminCatalogSave extends React.PureComponent {
 
   async handleValidate(path) {
     const { appLanguages } = this.props.app.config
-    let errors = flow(cloneDeep, clean)(this.state.errors)
+    let errors = clean(this.state.errors)
     if(isEmpty(this.state.model.name)) {
       errors.model.name = "Enter name."
     }
@@ -74,7 +75,7 @@ class AdminCatalogSave extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!flow(cloneDeep, compact, isEmpty)(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         this.props.dispatch(setMessage({ type: 'error', message: this.context.t('formErrors') }))
         return
       }
@@ -132,7 +133,7 @@ class AdminCatalogSave extends React.PureComponent {
             <Multilanguage languages={config.appLanguages} type='html' value={this.state.model.value} onChange={value => this.handleChangeState('model.value', value)} />
             <span className="text-danger">{this.state.errors.model.value}</span>
           </div>
-          <button type="submit" className="hide" />
+          <button type="submit" className="d-none" />
         </form>
       </div>
     )
