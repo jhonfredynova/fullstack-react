@@ -12,11 +12,10 @@ module.exports = {
         if(user.clientCode){
           user.clientInfo =  await paymentService.executeApiPayu('GET', `/customers/${user.clientCode}`)
         }
-        currentBilling = null
         user.clientInfo.subscriptions = _.get(user.clientInfo, 'subscriptions', [])
         user.clientInfo.subscriptions = user.clientInfo.subscriptions.filter(item => sails.config.app.plans.subscriptions.includes(item.plan.planCode))
-        // cancel subscription
-        if(user.clientInfo.subscriptions.length===0 && user.plan!==plans.free){
+        //cancel subscription
+        if(user.clientInfo.subscriptions.length===0 && user.plan.id!==plans.free){
           await sails.models.user.update({ id: user.id }, { nextPlan: null, plan: plans.free })
           try{
             await mailService.sendEmail({
@@ -27,16 +26,17 @@ module.exports = {
               message: intlService.i18n('mailSubscriptionCanceledMessage')
             })
           }catch(e){
-            console.warn(intlService.i18n('emailError'))
+            sails.log(intlService.i18n('emailError'))
           }
         }
-        // change subscription
+        //change subscription
+        currentBilling = null
         for(let subscription of user.clientInfo.subscriptions){
           currentBilling = await paymentService.executeApiPayu('GET', `/recurringBill?subscriptionId=${subscription.id}`)
           currentBilling = _.orderBy(currentBilling.recurringBillList, ['dateCharge'], ['desc'])[0] || {}
           if(user.nextPlan && (currentBilling.dateCharge-Date.now())/36e5<2){
             await paymentService.executeApiPayu('DELETE', `/subscriptions/${subscription.id}`)
-            if(nextPlan.planCode){
+            if(user.nextPlan.planCode){
               let subscriptionData = {
                 quantity: 1,
                 installments: 1,
@@ -50,12 +50,12 @@ module.exports = {
                 await mailService.sendEmail({
                   fromName: sails.config.app.appName,
                   fromEmail: sails.config.app.emails.noreply,
-                  toEmail: data.client.email,
+                  toEmail: user.email,
                   subject: intlService.i18n('mailSubscriptionChangedSubject'),
                   message: intlService.i18n('mailSubscriptionChangedMessage', { appName: sails.config.app.appName, planName: user.nextPlan.name })
                 })
               }catch(e){
-                console.warn(intlService.i18n('emailError'))
+                sails.log(intlService.i18n('emailError'))
               }
             }
             await sails.models.user.update({ id: user.id }, { nextPlan: null, plan: user.nextPlan.id })
