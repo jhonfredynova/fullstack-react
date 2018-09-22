@@ -1,5 +1,5 @@
-import axios from 'axios'
 import shortid from 'shortid'
+import socket from 'components/socket'
 import { isEqual, mapValues, pick } from 'lodash'
 import { handleRequestError, handleRequestQuery } from 'components/helper'
 
@@ -36,7 +36,7 @@ export function showLoading() {
 
 export function getConfig(parameters) {
   return async (dispatch, state)  => {
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/app/config?${handleRequestQuery(parameters)}`)
+    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/app/config?${handleRequestQuery(parameters)}`)
     .then(async (response) => { 
       try{
         response = response.data
@@ -87,7 +87,7 @@ export function setPreference(data) {
       if(changedPreferences && session) {
         let user = pick(session, ['id','preferences'])
         user.preferences = appPreferences
-        await axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/user/${user.id}`, user)
+        await socket.patch(`${process.env.REACT_APP_LOCAL_API_URL}/user/${user.id}`, user)
       }
       if(changedPreferences) dispatch({ type: APP.SET_PREFERENCE, payload: changedPreferences })    
     }catch(e){

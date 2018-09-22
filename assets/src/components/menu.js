@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Nav, Navbar, NavLink, DropdownItem, UncontrolledDropdown, DropdownToggle, DropdownMenu } from 'reactstrap'
-import { includes } from 'lodash'
+import { includes, isNull } from 'lodash'
 import PropTypes from 'prop-types'
 import { setMessage } from 'actions/appActions'
 import { logout } from 'actions/authActions'
@@ -25,7 +25,7 @@ class Menu extends React.PureComponent {
       <Nav className="ml-auto" navbar>        
         {/* HOME */}
         {
-          !session &&
+          isNull(session) &&
           <Navbar>
             <NavLink to="/" tag={Link}>{this.context.t('home')}</NavLink>
             <NavLink to="/price" tag={Link}>{this.context.t('price')}</NavLink>

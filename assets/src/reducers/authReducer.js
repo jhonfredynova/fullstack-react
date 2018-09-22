@@ -2,7 +2,7 @@ import { AUTH } from 'actions/authActions'
 
 export default function reducer(
   state={
-    session: null,
+    session: undefined,
     temp: null,
     token: null
   }, 

@@ -12,7 +12,9 @@ module.exports = {
 
   getIndex: async (req, res) => {
     try{
-      res.sendFile('index.html', { root: `${sails.config.paths.public}/build` })
+      if(!req.isSocket){
+        res.sendFile('index.html', { root: `${sails.config.paths.public}/build` })
+      }
     }catch(e){
       res.badRequest(e)
     }
@@ -20,6 +22,13 @@ module.exports = {
 
   getConfig: async (req, res) => {
     try{
+      if(req.isSocket){
+        const { app } = sails.config
+        app.appPreferences.currency = _.get(req.headers, 'accept-currency', app.appPreferences.currency)
+        app.appPreferences.language = _.get(req.headers, 'accept-language', app.appPreferences.language)      
+        app.appDisabled = JSON.parse(process.env.LOCAL_APP_DISABLED)
+        app.appIntl = await intlService.getIntl()
+      }
       res.ok(sails.config.app)
     }catch(e){
       res.badRequest(e)

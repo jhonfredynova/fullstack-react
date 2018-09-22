@@ -54,6 +54,7 @@ import Register from 'containers/register'
 import RegisterConfirm from 'containers/registerConfirm'
 import Terms from 'containers/terms'
 import NotFound from 'components/notFound'
+
 //RENDER
 render((
   <Provider store={Store}>
@@ -61,7 +62,6 @@ render((
       <BrowserRouter>
         <Main>
           <Switch>
-            {/* ADMIN */}
             {/* CONFIGURATION */}
             <Route path="/admin/configuration/catalog" exact component={Authorization(AdminCatalog, [1], true)}/>
             <Route path="/admin/configuration/catalog/new" component={Authorization(AdminCatalogSave, [1], true)}/>
@@ -85,7 +85,6 @@ render((
             <Route path="/admin/security/rol" exact component={Authorization(AdminRol, [1], true)}/>
             <Route path="/admin/security/rol/new" component={Authorization(AdminRolSave, [1], true)}/>
             <Route path="/admin/security/rol/:id" component={Authorization(AdminRolSave, [1], true)}/>    
-            {/* APP */}
             {/* USER */}
             <Route path="/app/dashboard" component={Authorization(Dashboard, [1,2,3,4], false)}/>
             <Route path="/app/user/billing" component={Authorization(Billing, [1,2,3,4], false)}/>

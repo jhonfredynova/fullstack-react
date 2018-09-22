@@ -84,7 +84,7 @@ class Pager extends React.PureComponent {
         </form>
         <section>
           { thereIsData && this.props.children }
-          <div className={classnames({ 'alert alert-warning': true, 'd-none': (isLoading || thereIsData) })}>{this.context.t('thereIsNotData')}</div>
+          { !thereIsData && <div className="alert alert-warning">{this.context.t('thereIsNotData')}</div> }
           <div className={classnames({ 'text-center': true, 'd-none': !thereIsData })}>
             <Pagination maxbuttons={3} className="d-flex justify-content-center" size="md">
               <PaginationItem disabled={query.activePage<=1}>

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import socket from 'components/socket'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
 export const CHAT = {
@@ -10,7 +10,7 @@ export const CHAT = {
 
 export function getChat(parameters) {
   return dispatch  => {
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/chat?${handleRequestQuery(parameters)}`)
+    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/chat?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: CHAT.GET, payload: handleResponseQuery(response)}) )
     .catch(err => handleRequestError(err) )
   }
@@ -18,7 +18,7 @@ export function getChat(parameters) {
 
 export function saveChat(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/chat`, data)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/chat`, data)
     .then(response => dispatch({type: CHAT.SAVE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }
@@ -26,7 +26,7 @@ export function saveChat(data) {
 
 export function updateChat(data) {
   return dispatch => {
-    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/chat/${data.id}`, data)
+    return socket.patch(`${process.env.REACT_APP_LOCAL_API_URL}/chat/${data.id}`, data)
     .then(response => dispatch({type: CHAT.UPDATE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }
@@ -34,7 +34,7 @@ export function updateChat(data) {
 
 export function deleteChat(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/chat/${data.id}`)
+    return socket.delete(`${process.env.REACT_APP_LOCAL_API_URL}/chat/${data.id}`)
     .then(response => dispatch({type: CHAT.DELETE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }
@@ -49,7 +49,7 @@ export const CHAT_MESSAGE = {
 
 export function getChatMessage(parameters) {
   return dispatch  => {
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage?${handleRequestQuery(parameters)}`)
+    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: CHAT_MESSAGE.GET, payload: handleResponseQuery(response) }) )
     .catch(err => handleRequestError(err) )
   }
@@ -57,7 +57,7 @@ export function getChatMessage(parameters) {
 
 export function saveChatMessage(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage`, data)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage`, data)
     .then(response => dispatch({type: CHAT_MESSAGE.SAVE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }
@@ -65,7 +65,7 @@ export function saveChatMessage(data) {
 
 export function updateChatMessage(data) {
   return dispatch => {
-    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage/${data.id}`, data)
+    return socket.patch(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage/${data.id}`, data)
     .then(response => dispatch({type: CHAT_MESSAGE.UPDATE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }
@@ -73,7 +73,7 @@ export function updateChatMessage(data) {
 
 export function deleteChatMessage(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage/${data.id}`)
+    return socket.delete(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage/${data.id}`)
     .then(response => dispatch({type: CHAT_MESSAGE.DELETE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }

@@ -18,17 +18,17 @@ module.exports = {
         // cancel subscription
         if(user.clientInfo.subscriptions.length===0 && user.plan!==plans.free){
           await sails.models.user.update({ id: user.id }, { nextPlan: null, plan: plans.free })
-        }
-        try{
-          await mailService.sendEmail({
-            fromName: sails.config.app.appName,
-            fromEmail: sails.config.app.emails.noreply,
-            toEmail: user.email,
-            subject: intlService.i18n('mailSubscriptionCanceledSubject'),
-            message: intlService.i18n('mailSubscriptionCanceledMessage')
-          })
-        }catch(e){
-          console.warn(intlService.i18n('emailError'))
+          try{
+            await mailService.sendEmail({
+              fromName: sails.config.app.appName,
+              fromEmail: sails.config.app.emails.noreply,
+              toEmail: user.email,
+              subject: intlService.i18n('mailSubscriptionCanceledSubject'),
+              message: intlService.i18n('mailSubscriptionCanceledMessage')
+            })
+          }catch(e){
+            console.warn(intlService.i18n('emailError'))
+          }
         }
         // change subscription
         for(let subscription of user.clientInfo.subscriptions){

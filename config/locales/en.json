@@ -216,5 +216,7 @@
   "chatEmpty": "You don't have new messages yet.",
   "send": "Send",
   "mailSubscriptionCanceledSubject": "Your subscription has been canceled ",
-  "mailSubscriptionCanceledMessage": "Your subscription has been canceled, we had problems debiting the payment on your credit card, verify the funds of your credit card or contact your bank for more information."
+  "mailSubscriptionCanceledMessage": "Your subscription has been canceled, we had problems debiting the payment on your credit card, verify the funds of your credit card or contact your bank for more information.",
+  "chatConversationsEmpty": "You don't have conversations so far.",
+  "search": "Search"
 }

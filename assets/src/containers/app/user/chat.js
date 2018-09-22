@@ -3,21 +3,16 @@ import { connect } from 'react-redux'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 import Sidebar from "react-sidebar"
-import { set } from 'lodash'
+import { isEmpty, set } from 'lodash'
+import Select from 'react-select'
+import ChatConversation from 'components/chatConversation'
 import ChatMessage from 'components/chatMessage'
 import NavigationBar from 'components/navigationBar'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
-import { getChat, saveChat, saveChatMessage } from 'actions/chatActions'
+import { getChat, getChatMessage, saveChat, saveChatMessage } from 'actions/chatActions'
+import { getUser } from 'actions/userActions'
 import { Style } from 'react-style-tag'
-
-import socketIOClient from 'socket.io-client'
-import sailsIOClient from 'sails.io.js'
-
-
 const sidebarMql = window.matchMedia(`(min-width: 768px)`)
-
-
-
 
 class Chat extends React.PureComponent {
 
@@ -30,8 +25,10 @@ class Chat extends React.PureComponent {
       sidebarDocked: sidebarMql.matches,
       sidebarMql: sidebarMql,
       sidebarOpen: false,
-      chat: { messages: [] },
+      chat: null,
       chats: this.props.chat.chats,
+      chatMessages: this.props.chat.messages,
+      users: this.props.user.users,
       chatQuery: {
         isLoading: false,
         pageSize: 10,
@@ -42,59 +39,26 @@ class Chat extends React.PureComponent {
         where: {
           to: session.id
         }
+      },
+      chatMessageQuery: {
+        isLoading: false,
+        pageSize: 10,
+        select: ['createdAt','value','seen'],
+        sort: [
+          { updatedAt: 'DESC' }
+        ],
+        where: {
+          chat: null
+        }
       }
     }
   }
 
-  componentDidMount() {
-    const io = sailsIOClient(socketIOClient)
-    io.sails.url = 'http://localhost:1337'
-    io.sails.headers = {
-      authorization: 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjoiNWI2YWZlNGI3MjE3YWVkNmU5MTQxNzA2IiwiY3JlYXRlZEF0IjoxNTMzNzM4NTcxNDE2LCJ1cGRhdGVkQXQiOjE1MzM3Mzg1NzE0MTYsImFjdGl2ZSI6dHJ1ZSwiZmlyc3RuYW1lIjoiSmhvbiIsImxhc3RuYW1lIjoiTm92YSIsInVzZXJuYW1lIjoiamhvbmZyZWR5bm92YSIsImVtYWlsIjoiamhvbmZyZWR5bm92YUBnbWFpbC5jb20iLCJlbWFpbENvbmZpcm1lZCI6ZmFsc2UsInBob3RvIjoiaHR0cHM6Ly9wbGF0Zm9ybS1sb29rYXNpZGUuZmJzYnguY29tL3BsYXRmb3JtL3Byb2ZpbGVwaWMvP2FzaWQ9MTU5NDIxNTE1NDAwMTk0OSZoZWlnaHQ9MjAwJndpZHRoPTIwMCZleHQ9MTUzNjMzMDU3MSZoYXNoPUFlVE40N09nVjRMc2hMdmQiLCJwcmVmZXJlbmNlcyI6W10sImNsaWVudENvZGUiOiIiLCJwbGFuIjoiNWI0Y2NlMDgwYWY5OTAzMmIyMTM0OGE4In0sImlhdCI6MTUzMzczODU3MiwiZXhwIjoxNTMzNzQwMDEyfQ.QMKQAiQUvQeQZ6R4nA9VmoEW6-RR117-RDGdP0WO-h8' 
-    }
-    io.sails.useCORSRouteToGetCookie = false
-
-    io.socket.on('connect', () => {
-      console.warn("Socket connected!")
-    })
-    //change
-    io.socket.on('/api/catalog', (data) => {
-      console.warn('CHANGE')
-      console.warn(data)
-    })
-    //list
-    io.socket.get('/api/catalog', (data) => {
-      console.warn('LIST')
-      console.warn(data)
-    })
-    //request
-    io.socket.get('/api/plan', function (resData, jwres){
-      console.warn('GET')
-      console.warn(jwres.statusCode)
-      console.warn(resData)
-    })
-    //post
-    io.socket.post('/api/catalog', { name: 'test2', value: {}, order:1 }, function(resData, jwres){
-      console.warn('POST')
-      console.warn(jwres.statusCode)
-      console.warn(resData)
-    })
-    //update
-    io.socket.put('/api/catalog/5ba1744991d295428cc5150e', { name: 'test', value: {}, order:1 }, function(resData, jwres){
-      console.warn('PUT')
-      console.warn(jwres.statusCode)
-      console.warn(resData)
-    })
-    //delete
-    io.socket.delete('/api/catalog/5ba1744991d295428cc5150e', function(resData){
-      console.warn('DELETE')
-      console.warn(resData)
-    })
-  }
-
   componentWillReceiveProps(nextProps) {
     this.setState({
-      chats: nextProps.chat.chats
+      chats: nextProps.chat.chats,
+      chatMessages: nextProps.chat.messages,
+      users: nextProps.user.users
     })
   }
 
@@ -104,6 +68,12 @@ class Chat extends React.PureComponent {
       this.state.sidebarMql.addListener(this.handleMediaQuery)
       document.addEventListener('keydown', this.handlePressKey, false)
       await this.props.dispatch(getChat(this.state.chatQuery))
+      this.props.dispatch(getUser({ select: ['id','firstname','lastname'], where: { active: true }}))
+      const lastChat = this.props.chat.chats.records.shift()
+      if(lastChat){
+        await this.handleChangeState('chatQuery.where.chat', lastChat.id)
+        await this.props.dispatch(getChatMessage(this.state.chatQuery))
+      }
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -144,6 +114,21 @@ class Chat extends React.PureComponent {
       this.props.dispatch(hideLoading())
     }
   }
+
+  async handleChatLoad(chat){
+    try{
+      this.props.dispatch(showLoading())
+      if(chat.id){
+        await this.handleChangeState('chatMessageQuery.chat', chat.id)
+        await this.props.dispatch(getChatMessage(this.state.chatMessageQuery))
+      }
+      this.setState({ chat: chat })
+      this.props.dispatch(hideLoading())
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
   
   async handleChatScroll(event){
     try{
@@ -161,13 +146,30 @@ class Chat extends React.PureComponent {
     }
   }
 
-  async handleSaveChat(data){
+  async handleChatMessageScroll(event){
+    try{
+      const { target: element } = event
+      const { records, recordsTotal } = this.state.chats
+      if(records.length+1<recordsTotal && element.offsetHeight+element.scrollTop===element.scrollHeight){
+        this.props.dispatch(showLoading())
+        await this.setState({ chatQuery: Object.assign(this.state.chatQuery, { pageSize: this.state.chatQuery.pageSize+5 }) })
+        await this.props.dispatch(getChat(this.state.chatQuery))
+        this.props.dispatch(hideLoading())
+      }
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
+  async handleChatMessageSave(data){
     try{
       this.props.dispatch(showLoading())
       if(!this.state.chat.id){
-        this.state.chat.id = await this.props.dispatch(saveChat())
+        this.state.chat.id = await this.props.dispatch(saveChat(this.state.chat))
       }
-      this.props.dispatch(saveChatMessage(this.state.chat))
+      data.chat = this.state.chat.id
+      this.props.dispatch(saveChatMessage(data))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -177,25 +179,25 @@ class Chat extends React.PureComponent {
 
   render(){
     const { isLoading } = this.props.app
-    const { records } = this.state.chats
+    const { records: chats } = this.state.chats
+    const { records: chatMessages } = this.state.chatMessages
+    const { records: users } = this.state.users
     const chatConversations = (
       <div className="card">
         <div className="card-header">
-          <span className="float-left"><h2>{this.context.t('messages')}</h2></span>
-          <span className="float-right"><button className="btn btn-success"><i className="fas fa-edit" /></button></span>
-          <span className="clearfix" />
+          <span className="text-left"><h2>{this.context.t('messages')}</h2></span>
         </div>
         <div className="card-body" onScroll={this.handleChatScroll.bind(this)}>
-          {
-            <div>
-              {
-                records.map((item, index) => 
-                  <div key={item.id} />
-                )
-              }
-              <div className={(classnames({'text-center': true, 'd-none': !isLoading}))}><i className="fa fa-spinner fa-spin fa-2x"></i></div>
-            </div>
+          <div className="form-group mb-0">
+            <Select className="form-control" placeholder={`${this.context.t('search')}...`} options={users} optionRenderer={item => <span>{item.fullname}</span>} valueRenderer={item => <span>{item.fullname}</span>} valueKey='id' simpleValue={true} clearable={true} autosize={false} onChange={item => this.handleChatLoad.bind(this, item)} />
+          </div>
+          { !isLoading && chats.length===0 &&
+            <p className="text-center p-2">{this.context.t('chatConversationsEmpty')}</p>
           }
+          {
+            chats.map(item => <ChatConversation key={item.id} info={item} onSelect={this.handleChatLoad.bind(this, item)} />)
+          }
+          <div className={(classnames({'text-center p-2': true, 'd-none': !isLoading}))}><i className="fa fa-spinner fa-spin fa-2x"></i></div>
         </div>
       </div>
     )
@@ -206,7 +208,7 @@ class Chat extends React.PureComponent {
             title={<h1>{this.context.t('chatTitle')}</h1>} 
             description={<h2>{this.context.t('chatDescription')}</h2>} 
             btnLeft={(this.state.sidebarDocked ? null : <button className="btn btn-success" onClick={() => this.handleChangeState('sidebarOpen', !this.state.sidebarOpen)}><i className="fas fa-right" /></button>)} />
-          <ChatMessage query={this.state.chat} onSend={this.handleSaveChat.bind(this)} />
+          <ChatMessage isLoading={isLoading} messages={chatMessages} onScroll={this.handleChatMessageScroll.bind(this)} onSend={this.handleChatMessageSave.bind(this)} />
         </Sidebar>
         <Style>
         {`
@@ -278,7 +280,8 @@ function mapStateToProps(state, props) {
   return {
     app: state.app,
     auth: state.auth,
-    chat: state.chat
+    chat: state.chat,
+    user: state.user
   }
 }
 

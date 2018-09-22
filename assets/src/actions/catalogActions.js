@@ -1,4 +1,4 @@
-import axios from 'axios'
+import socket from 'components/socket'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
 export const CATALOG = {
@@ -10,7 +10,7 @@ export const CATALOG = {
 
 export function getCatalog(parameters) {
   return dispatch  => {
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/catalog?${handleRequestQuery(parameters)}`)
+    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/catalog?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: CATALOG.GET, payload: handleResponseQuery(response)}) )
     .catch(err => handleRequestError(err) )
   }
@@ -18,7 +18,7 @@ export function getCatalog(parameters) {
 
 export function saveCatalog(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/catalog`, data)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/catalog`, data)
     .then(response => dispatch({type: CATALOG.SAVE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }
@@ -26,7 +26,7 @@ export function saveCatalog(data) {
 
 export function updateCatalog(data) {
   return dispatch => {
-    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/catalog/${data.id}`, data)
+    return socket.patch(`${process.env.REACT_APP_LOCAL_API_URL}/catalog/${data.id}`, data)
     .then(response => dispatch({type: CATALOG.UPDATE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }
@@ -34,7 +34,7 @@ export function updateCatalog(data) {
 
 export function deleteCatalog(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/catalog/${data.id}`)
+    return socket.delete(`${process.env.REACT_APP_LOCAL_API_URL}/catalog/${data.id}`)
     .then(response => dispatch({type: CATALOG.DELETE, payload: response.data}) )
     .catch(err => handleRequestError(err) )
   }

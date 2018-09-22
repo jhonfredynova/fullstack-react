@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { includes } from 'lodash'
+import { includes, isUndefined } from 'lodash'
 import PropTypes from 'prop-types'
 import { setMessage } from 'actions/appActions'
 
@@ -23,9 +23,8 @@ export default function(ComposedComponent, requiredLevels, mustHaveAll) {
     }
 
     async handleAuthentication(props){
-      const { isLoading } = props.app
       const { session } = props.auth
-      if(isLoading) return
+      if(isUndefined(session)) return
       if(!session) {
         await props.history.push('/login')
         props.dispatch(setMessage({ type: 'error', message: this.context.t('authNotLogin') }))

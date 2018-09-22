@@ -10,8 +10,7 @@ class ChatMessage extends React.PureComponent {
     super(props)
     this.state = { 
       errors: {},
-      seen: defaultTo(this.props.seen, false),
-      value: defaultTo(this.props.value, '')
+      messages: defaultTo(this.props.messages, []) 
     }
   }
 
@@ -49,30 +48,24 @@ class ChatMessage extends React.PureComponent {
   }
 
   render() {
-    const { className } = this.props
+    const { messages } = this.state
+    const { isLoading, className } = this.props
     return (
       <div id="chatMessage" className={className}>
         <div className="messageWrap">
-          <h2 className="text-center"><i className="fa fa-comments fa-2x" /></h2>
-          <p className="text-center">{this.context.t('chatEmpty')}</p>
-          <div className="d-flex flex-row">
-            <div className="alert alert-primary">Hola <small>15/09/2018</small></div>
-          </div>
-          <div className="d-flex flex-row-reverse">
-            <div className="alert alert-secondary">Que tal como esta? <small>15/09/2018</small></div>
-          </div>
-          <div className="d-flex flex-row">
-            <div className="alert alert-primary">Bien que hay que hacer por alla? esta todo bien o hay algún problema? <small>16/09/2018</small></div>
-          </div>
-          <div className="d-flex flex-row-reverse">
-            <div className="alert alert-secondary">Todo bien, todo sin novedad<small>17/09/2018</small></div>
-          </div>
-          <div className="d-flex flex-row">
-            <div className="alert alert-primary d-flex flex-row">Ha bueno bien entonces, chao estamos hablando! <small>Hace 1 hora</small></div>
-          </div>
-          <div className="d-flex flex-row-reverse">
-            <div className="alert alert-secondary">Ok Ciudese <small>Hace un momento</small></div>
-          </div>
+          { !isLoading && messages.length===0 &&
+            <div>
+              <h2 className="text-center"><i className="fa fa-comments fa-2x" /></h2>
+              <p className="text-center">{this.context.t('chatEmpty')}</p>
+            </div>
+          }
+          {
+            messages.map(item => 
+              <div key={item.id} className="d-flex flex-row">
+                <div className="alert alert-primary">{item.value}</div>
+              </div>
+            )
+          }
         </div>
         <form onSubmit={this.handleSendMessage.bind(this)}>
           <div className="input-group">

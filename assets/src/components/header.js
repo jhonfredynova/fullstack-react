@@ -84,7 +84,7 @@ class Header extends React.PureComponent {
                 <PopoverHeader>{this.context.t('messages')}</PopoverHeader>
                 <PopoverBody>
                   <p>{this.context.t('userNotHaveMessages')}</p>
-                  <hr/>
+                  <hr className="mb-2" />
                   <div className="text-center"><Link to="/app/user/chat">{this.context.t('seeAll')}</Link></div>
                 </PopoverBody>
               </Popover>

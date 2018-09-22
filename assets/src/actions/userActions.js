@@ -1,4 +1,4 @@
-import axios from 'axios'
+import socket from 'components/socket'
 import { omit } from 'lodash'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
@@ -14,7 +14,7 @@ export const USER = {
 
 export function getUser(parameters) {
   return dispatch  => {
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/user?${handleRequestQuery(parameters)}`)
+    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/user?${handleRequestQuery(parameters)}`)
     .then(response => { dispatch({type: USER.GET, payload: handleResponseQuery(response) }) })
     .catch(err => handleRequestError(err) )
   }
@@ -22,7 +22,7 @@ export function getUser(parameters) {
 
 export function saveUser(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/user`, data)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/user`, data)
     .then(response => { dispatch({type: USER.SAVE, payload: response.data}) })
     .catch(err => handleRequestError(err) )
   }
@@ -30,7 +30,7 @@ export function saveUser(data) {
 
 export function updateUser(data) {
   return dispatch => {
-    return axios.patch(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.id}`, data)
+    return socket.patch(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.id}`, data)
     .then(response => { dispatch({type: USER.UPDATE, payload: response.data}) })
     .catch(err => handleRequestError(err) )
   }
@@ -38,7 +38,7 @@ export function updateUser(data) {
 
 export function deleteUser(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.id}`)
+    return socket.delete(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.id}`)
     .then(response => { dispatch({type: USER.DELETE, payload: response.data}) })
     .catch(err => handleRequestError(err) )
   }
@@ -46,7 +46,7 @@ export function deleteUser(data) {
 
 export function forgotUser(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/forgot`, data)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/forgot`, data)
     .then(response => dispatch({type: USER.FORGOT, payload: response.data}))
     .catch(err => handleRequestError(err) )
   }
@@ -54,7 +54,7 @@ export function forgotUser(data) {
 
 export function resetUser(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/reset/${data.token}`, data)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/reset/${data.token}`, data)
     .then(response => dispatch({type: USER.RESET, payload: response.data}))
     .catch(err => handleRequestError(err) )
   }
@@ -62,7 +62,7 @@ export function resetUser(data) {
 
 export function validateUser(data) {
   return (dispatch, state) => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/validate/${data.token}`)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/user/validate/${data.token}`)
     .then(response => dispatch({type: USER.VALIDATE, payload: response.data}))
     .catch(err => handleRequestError(err) )
   }
@@ -77,7 +77,7 @@ export const USER_ROL = {
 
 export function getUserRol(parameters) {
   return dispatch  => {
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/user/${parameters.where.user}/roles?${handleRequestQuery(omit(parameters,['where.user']))}`)
+    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/user/${parameters.where.user}/roles?${handleRequestQuery(omit(parameters,['where.user']))}`)
     .then(response => { dispatch({type: USER_ROL.GET, payload: handleResponseQuery(response) }) })
     .catch(err => handleRequestError(err) )
   }
@@ -85,7 +85,7 @@ export function getUserRol(parameters) {
 
 export function saveUserRol(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`, data)
+    return socket.put(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`, data)
     .then(response => { dispatch({type: USER_ROL.SAVE, payload: response.data}) })
     .catch(err => handleRequestError(err) )
   }
@@ -93,7 +93,7 @@ export function saveUserRol(data) {
 
 export function updateUserRol(data) {
   return dispatch => {
-    return axios.put(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`, data)
+    return socket.put(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`, data)
     .then(response => { dispatch({type: USER_ROL.UPDATE, payload: response.data}) })
     .catch(err => handleRequestError(err) )
   }
@@ -101,7 +101,7 @@ export function updateUserRol(data) {
 
 export function deleteUserRol(data) {
   return dispatch => {
-    return axios.delete(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`)
+    return socket.delete(`${process.env.REACT_APP_LOCAL_API_URL}/user/${data.user}/roles/${data.rol}`)
     .then(response => { dispatch({type: USER_ROL.DELETE, payload: response.data}) })
     .catch(err => handleRequestError(err) )
   }

@@ -33,7 +33,6 @@ class PlanBox extends React.PureComponent {
   }
 
   render() {
-    const { isLoading } = this.props
     const { config } = this.props.app
     const { plans } = config
     let { info } = this.state
@@ -49,7 +48,7 @@ class PlanBox extends React.PureComponent {
       info.price.recurrence = ''
     }
     return (
-      <div id="planBox" className={classnames({'popular': info.popular, 'selected': info.selected, 'd-none': isLoading})} onClick={this.handleClick.bind(this)}>
+      <div id="planBox" className={classnames({'popular': info.popular, 'selected': info.selected})} onClick={this.handleClick.bind(this)}>
         <div id={`plan-${info.id}`} className="card" onClick={() => this.handleChangeState('showTooltipPlanFree', !this.state.showTooltipPlanFree)}>
           <div className="card-header text-center">
             <div id="popular" className={classnames({'d-none': !info.popular})}>

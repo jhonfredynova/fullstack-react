@@ -1,4 +1,4 @@
-import axios from 'axios'
+import socket from 'components/socket'
 import { handleRequestError } from 'components/helper'
 
 export const AUTH = {
@@ -13,8 +13,8 @@ export const AUTH = {
 
 export function me() {
   return (dispatch, state) => {
-    if (!state().auth.token) return
-    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/auth/me`)
+    if (!state().auth.token) return dispatch({type: AUTH.GET, payload: null})
+    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/auth/me`)
     .then(response => dispatch({type: AUTH.GET, payload: response.data}))
     .catch(err => dispatch({type: AUTH.GET, payload: null}) )
   }
@@ -22,7 +22,7 @@ export function me() {
 
 export function login(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/login`, data)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/login`, data)
     .then(response => dispatch({type: AUTH.LOGIN, payload: response.data}))
     .catch(err => handleRequestError(err) )
   }
@@ -37,7 +37,7 @@ export function logout(username) {
 
 export function register(data) {
   return dispatch => {
-    return axios.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/register`, data)
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/register`, data)
     .then(response => dispatch({type: AUTH.REGISTER, payload: response.data}))
     .catch(err => handleRequestError(err) )
   }

@@ -32,9 +32,9 @@ export function handleRequestQuery(data){
   return encodeURI(queryString.join('&'))
 }
 
-export function handleResponseQuery(data){
+export function handleResponseQuery(response){
   return {
-    records: data.data,
-    totalRecords: parseInt(data.headers['content-records'], 0)
+    records: response.data,
+    totalRecords: parseInt(response.headers['content-records'], 0)
   }
 }

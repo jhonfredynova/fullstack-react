@@ -10,7 +10,7 @@ import { setTranslations, setLanguage } from 'redux-i18n'
 import Header from 'components/header'
 import Footer from 'components/footer'
 import Message from 'components/message'
-import { hideLoading, showLoading, getConfig, setMessage, deleteMessage, setPreference } from 'actions/appActions'
+import { getConfig, setMessage, deleteMessage, setPreference } from 'actions/appActions'
 import { getToken, me } from 'actions/authActions'
 import { Style } from 'react-style-tag'
 
@@ -18,21 +18,18 @@ class Main extends React.PureComponent {
 
   async componentWillMount() {
     try{
-      this.props.dispatch(showLoading())
       await this.props.dispatch(getConfig())
-      await this.props.dispatch(getToken())
-      await this.props.dispatch(me())
+      this.props.dispatch(getToken())
+      this.props.dispatch(me())
       const { config } = this.props.app
       const { session } = this.props.auth      
       const preferences = defaults(get(session, 'preferences'), config.appPreferences)
-      await this.props.dispatch(setPreference(preferences))
-      await moment.locale(config.appPreferences.language)      
-      await this.props.dispatch(setTranslations(config.appIntl.locales))
-      await this.props.dispatch(setLanguage(config.appPreferences.language))
-      await this.props.dispatch(hideLoading())
+      this.props.dispatch(setPreference(preferences))
+      moment.locale(config.appPreferences.language)      
+      this.props.dispatch(setTranslations(config.appIntl.locales))
+      this.props.dispatch(setLanguage(config.appPreferences.language))
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message, hideClose: true }))
-      this.props.dispatch(hideLoading())
     }
   }
 
