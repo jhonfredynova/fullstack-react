@@ -27,7 +27,6 @@ class Chat extends React.PureComponent {
       sidebarOpen: false,
       chat: null,
       chats: this.props.chat.chats,
-      chatMessages: this.props.chat.messages,
       users: this.props.user.users,
       chatQuery: {
         isLoading: false,
@@ -57,7 +56,6 @@ class Chat extends React.PureComponent {
   componentWillReceiveProps(nextProps) {
     this.setState({
       chats: nextProps.chat.chats,
-      chatMessages: nextProps.chat.messages,
       users: nextProps.user.users
     })
   }
@@ -118,11 +116,26 @@ class Chat extends React.PureComponent {
   async handleChatLoad(chat){
     try{
       this.props.dispatch(showLoading())
-      if(chat.id){
-        await this.handleChangeState('chatMessageQuery.chat', chat.id)
+      if(this.state.chat.id){
+        await this.handleChangeState('chatMessageQuery.chat', this.state.chat.id)
         await this.props.dispatch(getChatMessage(this.state.chatMessageQuery))
       }
       this.setState({ chat: chat })
+      this.props.dispatch(hideLoading())
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.props.dispatch(hideLoading())
+    }
+  }
+
+  async handleChatSave(data){
+    try{
+      this.props.dispatch(showLoading())
+      if(!this.state.chat.id){
+        this.state.chat.id = await this.props.dispatch(saveChat(this.state.chat))
+      }
+      data.chat = this.state.chat.id
+      this.props.dispatch(saveChatMessage(data))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -156,21 +169,6 @@ class Chat extends React.PureComponent {
         await this.props.dispatch(getChat(this.state.chatQuery))
         this.props.dispatch(hideLoading())
       }
-    }catch(e){
-      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
-      this.props.dispatch(hideLoading())
-    }
-  }
-
-  async handleChatMessageSave(data){
-    try{
-      this.props.dispatch(showLoading())
-      if(!this.state.chat.id){
-        this.state.chat.id = await this.props.dispatch(saveChat(this.state.chat))
-      }
-      data.chat = this.state.chat.id
-      this.props.dispatch(saveChatMessage(data))
-      this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())
