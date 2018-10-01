@@ -35,25 +35,21 @@ export function showLoading() {
 }
 
 export function getConfig(parameters) {
-  return async (dispatch, state)  => {
+  return (dispatch, state)  => {
     return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/app/config?${handleRequestQuery(parameters)}`)
-    .then(async (response) => { 
-      try{
-        response = response.data
-        // updating locales
-        for(let locale in response.appIntl.locales){
-          response.appIntl.locales[locale] = mapValues(response.appIntl.locales[locale], (item) =>  item.replace(/{{/gi, "{").replace(/}}/gi, "}"))
-        }
-        // updating preferences
-        for(let key in response.appPreferences){
-          response.appPreferences[key] = localStorage.getItem(key) || response.appPreferences[key]
-        }
-        state().i18nState.translations = response.appIntl.locales
-        state().i18nState.lang = response.appPreferences.language
-        dispatch({type: APP.GET_CONFIG, payload: response }) 
-      }catch(err){
-        handleRequestError(err)
+    .then(response => { 
+      response = response.data
+      // updating locales
+      for(let locale in response.appIntl.locales){
+        response.appIntl.locales[locale] = mapValues(response.appIntl.locales[locale], (item) =>  item.replace(/{{/gi, "{").replace(/}}/gi, "}"))
       }
+      // updating preferences
+      for(let key in response.appPreferences){
+        response.appPreferences[key] = localStorage.getItem(key) || response.appPreferences[key]
+      }
+      state().i18nState.translations = response.appIntl.locales
+      state().i18nState.lang = response.appPreferences.language
+      dispatch({type: APP.GET_CONFIG, payload: response }) 
     })
     .catch(err => handleRequestError(err) )
   }

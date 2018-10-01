@@ -5,11 +5,6 @@ function Socket(params){
   this.io = sailsIOClient(socketIOClient)
   Object.keys(params).map(key => (this.io.sails[key] = params[key]))
 
-  this.disconnect = () => {
-    this.io.sails.disconnect()
-    this.io = null
-  }
-
   this.setHeader = (headers) => {
     this.io.socket.headers = headers
   }
@@ -48,17 +43,28 @@ function Socket(params){
     })
   }
 
-  this.on = (eventIdentity, cb) => {
-    this.io.socket.on(eventIdentity, cb)
+  this.on = (event, callback) => {
+    return new Promise(resolve => {
+      this.io.socket.on(event, (data) => {
+        callback(data)
+        resolve(data)
+      })
+    })
   }
 
-  this.off = (eventIdentity, cb) => {
-    this.io.socket.off(eventIdentity, cb)
+  this.off = (event, callback) => {
+    return new Promise(resolve => {
+      this.io.socket.off(event, (data) => {
+        callback(data)
+        resolve(data)
+      })
+    })
   }
 }
-
+const authorization = JSON.parse(localStorage.token)
 const socket = new Socket({ 
   autoConnect: true,
+  headers: { 'authorization': `${authorization.provider} ${authorization.token}` },
   url: process.env.REACT_APP_LOCAL_API_SERVER,
   useCORSRouteToGetCookie: false
 })

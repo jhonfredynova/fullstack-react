@@ -45,15 +45,15 @@ module.exports.app = {
   },
   //IMAGES
   images: {
-    defaultCompany: 'https://s3.amazonaws.com/XXX',
-    defaultUser: 'https://s3.amazonaws.com/XXX'
+    defaultCompany: 'https://s3.amazonaws.com/tucode/defaults/company.png',
+    defaultUser: 'https://s3.amazonaws.com/tucode/defaults/user.png'
   },
   //PLANS
   plans: {
     free: '5b4cce080af99032b21348a8',
     premium: '5b4cce650af99032b21348aa',
     standard: '5b4cce380af99032b21348a9',
-    subscriptions: ['tucode-plan-standard','tucode-plan.premium']
+    subscriptions: ['tucode-plan-standard','tucode-plan-premium']
   },
   //ROLES
   roles: {

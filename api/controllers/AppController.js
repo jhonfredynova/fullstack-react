@@ -12,6 +12,20 @@ module.exports = {
 
   getIndex: async (req, res) => {
     try{
+      
+      sails.log('---')
+      sails.log(`ROOMS: ${sails.io.sockets.rooms.length}`)
+      let sockets = sails.io.sockets.clients().sockets
+      for(let socket in sockets){
+        sails.log(`SOCKET: ${socket}, HAS-ROOMS: ${!_.isEmpty(sockets[socket].rooms)}`) 
+      }
+      sails.io.sockets.emit('test', 'hello from server')
+      //sails.io.sockets.blast('test', 'hello from server')
+      sails.sockets.broadcast('juan', 'gameRoom', 'Hello form game room')
+
+
+      
+      
       if(!req.isSocket){
         res.sendFile('index.html', { root: `${sails.config.paths.public}/build` })
       }
@@ -22,13 +36,6 @@ module.exports = {
 
   getConfig: async (req, res) => {
     try{
-      if(req.isSocket){
-        const { app } = sails.config
-        app.appPreferences.currency = _.get(req.headers, 'accept-currency', app.appPreferences.currency)
-        app.appPreferences.language = _.get(req.headers, 'accept-language', app.appPreferences.language)      
-        app.appDisabled = JSON.parse(process.env.LOCAL_APP_DISABLED)
-        app.appIntl = await intlService.getIntl()
-      }
       res.ok(sails.config.app)
     }catch(e){
       res.badRequest(e)

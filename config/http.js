@@ -31,7 +31,6 @@ module.exports.http = {
 
     order: [
       'forceDomain',
-      'forceIntl',
       'cookieParser',
       'session',
       'bodyParser',
@@ -56,16 +55,6 @@ module.exports.http = {
         hostname: process.env.LOCAL_DOMAIN,
         protocol: 'https' 
       })(req, res, next)
-    },
-
-    forceIntl: async (req, res, next) => {
-      if(req.method==='OPTIONS') return next()
-      const { app } = sails.config
-      app.appPreferences.currency = _.get(req.headers, 'accept-currency', app.appPreferences.currency)
-      app.appPreferences.language = _.get(req.headers, 'accept-language', app.appPreferences.language)      
-      app.appDisabled = JSON.parse(process.env.LOCAL_APP_DISABLED)
-      app.appIntl = await intlService.getIntl()
-      next()
     },
 
     // bodyParser: (function _configureBodyParser(){

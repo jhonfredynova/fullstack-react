@@ -8,6 +8,7 @@ import locale from 'reducers/localeReducer'
 import payment from 'reducers/paymentReducer'
 import plan from 'reducers/planReducer'
 import rol from 'reducers/rolReducer'
+import socket from 'reducers/socketReducer'
 import user from 'reducers/userReducer'
 
 export default combineReducers({
@@ -20,5 +21,6 @@ export default combineReducers({
   payment,
   plan,
   rol,
+  socket,
   user
 })

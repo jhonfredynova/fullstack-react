@@ -4,7 +4,7 @@ import classnames from 'classnames'
 import { defaultTo, get, set, sortBy } from 'lodash'
 import Numeric from 'components/numeric'
 import PropTypes from 'prop-types' 
-import { Style } from 'react-style-tag'
+import Style from 'components/style'
 
 class PlanBox extends React.PureComponent {
 

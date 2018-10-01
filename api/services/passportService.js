@@ -1,6 +1,7 @@
 let passport = require('passport'),
 passportConfig = sails.config.passport
 
+//CALLBACK
 let callbackProviderStrategy = async (token, refreshToken, profile, next) => {
   try{
     //create user
@@ -90,11 +91,10 @@ passport.use(new passportConfig.google.strategyToken({
   clientSecret: passportConfig.google.options.clientSecret
 }, callbackProviderStrategy))
 
-// Configuring passport functions
+//SERIALIZE
 passport.serializeUser(async (user, next) => {
   next(null, user.id)
 })
-
 passport.deserializeUser(async (id, next) => {
   try{
     let user = await sails.models.user.findOne(id)

@@ -17,8 +17,7 @@ module.exports = {
       required: true
     },
     to: {
-      /*model: 'user',*/
-      type: 'string',
+      model: 'user',
       required: true
     },
     messages: {

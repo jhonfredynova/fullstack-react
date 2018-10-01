@@ -1,7 +1,7 @@
 import React from 'react'
 import classnames from 'classnames'
 import { defaultTo } from 'lodash'
-import { Style } from 'react-style-tag'
+import Style from 'components/style'
 
 class NavigationBar extends React.PureComponent {
 

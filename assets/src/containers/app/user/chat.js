@@ -8,10 +8,10 @@ import Select from 'react-select'
 import ChatConversation from 'components/chatConversation'
 import ChatMessage from 'components/chatMessage'
 import NavigationBar from 'components/navigationBar'
+import Style from 'components/style'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
-import { getChat, getChatMessage, saveChat, saveChatMessage } from 'actions/chatActions'
+import { getChat, getChatMessage, saveChat, updateChat } from 'actions/chatActions'
 import { getUser } from 'actions/userActions'
-import { Style } from 'react-style-tag'
 const sidebarMql = window.matchMedia(`(min-width: 768px)`)
 
 class Chat extends React.PureComponent {
@@ -25,18 +25,18 @@ class Chat extends React.PureComponent {
       sidebarDocked: sidebarMql.matches,
       sidebarMql: sidebarMql,
       sidebarOpen: false,
-      chat: null,
+      chat: {},
       chats: this.props.chat.chats,
       users: this.props.user.users,
       chatQuery: {
         isLoading: false,
         pageSize: 10,
-        select: ['updatedAt','id','from'],
+        select: ['updatedAt','id','from','to'],
         sort: [
           { updatedAt: 'DESC' }
         ],
         where: {
-          to: session.id
+          from: session.id
         }
       },
       chatMessageQuery: {
@@ -45,10 +45,7 @@ class Chat extends React.PureComponent {
         select: ['createdAt','value','seen'],
         sort: [
           { updatedAt: 'DESC' }
-        ],
-        where: {
-          chat: null
-        }
+        ]
       }
     }
   }
@@ -66,12 +63,8 @@ class Chat extends React.PureComponent {
       this.state.sidebarMql.addListener(this.handleMediaQuery)
       document.addEventListener('keydown', this.handlePressKey, false)
       await this.props.dispatch(getChat(this.state.chatQuery))
-      this.props.dispatch(getUser({ select: ['id','firstname','lastname'], where: { active: true }}))
-      const lastChat = this.props.chat.chats.records.shift()
-      if(lastChat){
-        await this.handleChangeState('chatQuery.where.chat', lastChat.id)
-        await this.props.dispatch(getChatMessage(this.state.chatQuery))
-      }
+      const { session } = this.props.auth
+      this.props.dispatch(getUser({ select: ['id','firstname','lastname','email'], where: { active: true, id: { '!=': session.id } }}))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -116,11 +109,7 @@ class Chat extends React.PureComponent {
   async handleChatLoad(chat){
     try{
       this.props.dispatch(showLoading())
-      if(this.state.chat.id){
-        await this.handleChangeState('chatMessageQuery.chat', this.state.chat.id)
-        await this.props.dispatch(getChatMessage(this.state.chatMessageQuery))
-      }
-      this.setState({ chat: chat })
+      await this.setState({ chat: chat })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -128,14 +117,20 @@ class Chat extends React.PureComponent {
     }
   }
 
-  async handleChatSave(data){
+  async handleChatSave(message){
     try{
       this.props.dispatch(showLoading())
-      if(!this.state.chat.id){
-        this.state.chat.id = await this.props.dispatch(saveChat(this.state.chat))
+      const { session } = this.props.auth
+      const chat = {
+        ...this.state.chat,
+        to: this.state.chat.to.id,
+        from: session.id
       }
-      data.chat = this.state.chat.id
-      this.props.dispatch(saveChatMessage(data))
+      if(!chat.id) await this.props.dispatch(saveChat(chat))
+      else await this.props.dispatch(updateChat(chat))
+      const { records: chats } = this.props.chat
+      const chatUpdated = chat.id ? chats.find(item => item.id===chat.id) : chats.shift()
+      this.setState({ chat: chatUpdated })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -177,9 +172,14 @@ class Chat extends React.PureComponent {
 
   render(){
     const { isLoading } = this.props.app
+    const { defaultUser: defaultUserPhoto } = this.props.app.config.images
+    const { chat } = this.state
     const { records: chats } = this.state.chats
-    const { records: chatMessages } = this.state.chatMessages
     const { records: users } = this.state.users
+    const chatHeader = {
+      title: isEmpty(chat) ? this.context.t('chatTitle') : <span><img className="rounded-circle" src={chat.to.photo || defaultUserPhoto} alt={chat.to.fullname} height={40} /> {chat.to.fullname}</span>,
+      description: isEmpty(chat) ? this.context.t('chatDescription') : chat.to.email
+    }
     const chatConversations = (
       <div className="card">
         <div className="card-header">
@@ -187,13 +187,16 @@ class Chat extends React.PureComponent {
         </div>
         <div className="card-body" onScroll={this.handleChatScroll.bind(this)}>
           <div className="form-group mb-0">
-            <Select className="form-control" placeholder={`${this.context.t('search')}...`} options={users} optionRenderer={item => <span>{item.fullname}</span>} valueRenderer={item => <span>{item.fullname}</span>} valueKey='id' simpleValue={true} clearable={true} autosize={false} onChange={item => this.handleChatLoad.bind(this, item)} />
+            <Select className="form-control" placeholder={`${this.context.t('search')}...`} options={users} optionRenderer={item => <span>{item.fullname}</span>} valueRenderer={item => <span>{item.fullname}</span>} valueKey='id' simpleValue={false} clearable={true} autosize={false} onChange={item => this.handleChatLoad({ to: item })} />
           </div>
           { !isLoading && chats.length===0 &&
             <p className="text-center p-2">{this.context.t('chatConversationsEmpty')}</p>
           }
           {
-            chats.map(item => <ChatConversation key={item.id} info={item} onSelect={this.handleChatLoad.bind(this, item)} />)
+            chats.map(item => {
+              item.to.photo = item.to.photo || defaultUserPhoto
+              return <ChatConversation key={item.id} chat={item} onSelect={this.handleChatLoad.bind(this, item)} />
+            })
           }
           <div className={(classnames({'text-center p-2': true, 'd-none': !isLoading}))}><i className="fa fa-spinner fa-spin fa-2x"></i></div>
         </div>
@@ -203,10 +206,10 @@ class Chat extends React.PureComponent {
       <div id="chat">
         <Sidebar rootClassName='sidebarRoot' sidebarClassName='sidebar' contentClassName='sidebarContent' overlayClassName='sidebarOverlay' docked={this.state.sidebarDocked} sidebar={chatConversations} open={this.state.sidebarOpen} onSetOpen={() => this.handleChangeState('sidebarOpen',false)}>
           <NavigationBar 
-            title={<h1>{this.context.t('chatTitle')}</h1>} 
-            description={<h2>{this.context.t('chatDescription')}</h2>} 
-            btnLeft={(this.state.sidebarDocked ? null : <button className="btn btn-success" onClick={() => this.handleChangeState('sidebarOpen', !this.state.sidebarOpen)}><i className="fas fa-right" /></button>)} />
-          <ChatMessage isLoading={isLoading} messages={chatMessages} onScroll={this.handleChatMessageScroll.bind(this)} onSend={this.handleChatMessageSave.bind(this)} />
+            title={<h1>{chatHeader.title}</h1>} 
+            description={<h2>{chatHeader.description}</h2>} 
+            btnLeft={(this.state.sidebarDocked ? null : <button className="btn btn-success" onClick={() => this.handleChangeState('sidebarOpen', !this.state.sidebarOpen)}><i className="fas fa-arrow-right" /></button>)} />
+          <ChatMessage isLoading={isLoading} chat={chat} onScroll={this.handleChatMessageScroll.bind(this)} onSend={this.handleChatSave.bind(this)} />
         </Sidebar>
         <Style>
         {`

@@ -63,7 +63,7 @@ class Pager extends React.PureComponent {
     const currentRange = Math.ceil(query.activePage/limitRange)
     const previousRange = currentRange>1 ? (currentRange*limitRange)-(limitRange-1) : 1
     const nextRange = previousRange+limitRange<=totalPages ? previousRange+limitRange : totalPages+1
-    const thereIsData = !isLoading && records.length>0
+    const thereIsData = records.length>0
     return (
       <div id="pager" className={this.props.className}>
         <div className="help-block"></div>
@@ -84,7 +84,7 @@ class Pager extends React.PureComponent {
         </form>
         <section>
           { thereIsData && this.props.children }
-          { !thereIsData && <div className="alert alert-warning">{this.context.t('thereIsNotData')}</div> }
+          { !isLoading && !thereIsData && <div className="alert alert-warning">{this.context.t('thereIsNotData')}</div> }
           <div className={classnames({ 'text-center': true, 'd-none': !thereIsData })}>
             <Pagination maxbuttons={3} className="d-flex justify-content-center" size="md">
               <PaginationItem disabled={query.activePage<=1}>

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import { defaultTo } from 'lodash'
 import { deleteMessage } from 'actions/appActions'
-import { Style } from 'react-style-tag'
+import Style from 'components/style'
 
 class Message extends React.PureComponent {
 
@@ -24,7 +24,6 @@ class Message extends React.PureComponent {
 
   render() {
     const messages = this.state.messages
-    if(messages.length===0) return null
     return (
       <div id="message">
         {

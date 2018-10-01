@@ -10,15 +10,46 @@ import { setTranslations, setLanguage } from 'redux-i18n'
 import Header from 'components/header'
 import Footer from 'components/footer'
 import Message from 'components/message'
+import Style from 'components/style'
 import { getConfig, setMessage, deleteMessage, setPreference } from 'actions/appActions'
 import { getToken, me } from 'actions/authActions'
-import { Style } from 'react-style-tag'
+import { connectSocket, disconnectSocket, onEvent, EVENT } from 'actions/socketActions'
+
+import socket from 'components/socket'
 
 class Main extends React.PureComponent {
 
   async componentWillMount() {
-    try{
-      await this.props.dispatch(getConfig())
+    try{      
+
+
+
+
+      //socket
+      this.props.dispatch(onEvent(EVENT.CONNECT, () => {
+        this.props.dispatch(connectSocket())
+        console.warn('connected!')
+      }))
+      this.props.dispatch(onEvent(EVENT.DISCONNECT, () =>{
+        this.props.dispatch(disconnectSocket())
+      }))
+
+      socket.get('/api/user', function(body, response){
+        console.warn(body)
+      })
+
+
+      this.props.dispatch(onEvent('test', (data) => {
+        console.warn(data)
+      }))
+      this.props.dispatch(onEvent('gameRoom', (data) => {
+        console.warn(data)
+      }))
+
+
+
+      //config
+      await this.props.dispatch(getConfig())      
       this.props.dispatch(getToken())
       this.props.dispatch(me())
       const { config } = this.props.app
@@ -85,9 +116,6 @@ class Main extends React.PureComponent {
             background-color: white;
             opacity: 0.2;
           }
-          .modal-dialog {
-            top: 15%;
-          }
           .modal-header {
             background-color: #f5f5f5;
             border-radius: 6px 6px 0px 0px;
@@ -132,7 +160,8 @@ Main.contextTypes = {
 function mapStateToProps(state) {
   return {
     app: state.app,
-    auth: state.auth
+    auth: state.auth,
+    socket: state.socket
   }
 }
 

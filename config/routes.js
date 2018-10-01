@@ -63,6 +63,9 @@ module.exports.routes = {
   'delete /api/payment/subscription/:subscriptionId': 'PaymentController.deleteSubscription',
   'post   /api/payment/transaction': 'PaymentController.createTransaction',
   'post   /api/payment/transaction/confirmation': 'PaymentController.getTransaction',
+  //SOCKET
+  'post   /api/socket/connect': 'SocketController.connect',
+  'post   /api/socket/disconnect': 'SocketController.disconnect',
   //USER
   'post   /api/user/forgot': 'UserController.forgot',
   'post   /api/user/forgot': 'UserController.forgot',

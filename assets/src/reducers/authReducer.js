@@ -13,6 +13,12 @@ export default function reducer(
     default:
       return state
 
+    case AUTH.SOCKET_CONNECT:
+      return { 
+        ...state, 
+        temp: action.payload
+      }
+
     case AUTH.GET:
       return { 
         ...state, 

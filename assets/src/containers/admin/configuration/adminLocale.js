@@ -58,7 +58,7 @@ class AdminLocale extends React.PureComponent {
       this.props.dispatch(showLoading())
       await this.props.dispatch(setPreference({ [PREFERENCE.ADMIN_PAGINATION]: data.pageSize }))
       await this.setState({ localesQuery: Object.assign(this.state.localesQuery, data) })
-      await this.props.dispatch(getLocale(this.state.localesQuery))
+      await this.props.dispatch(getLocale(this.state.localesQuery))      
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))

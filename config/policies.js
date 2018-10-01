@@ -33,7 +33,7 @@ module.exports.policies = {
     getContact: true
   },
   AuthController: {
-    me: ['isAuthenticated'],
+    me: ['session'],
     login: true,
     register: true,
     provider: true,
@@ -42,66 +42,70 @@ module.exports.policies = {
   },
   CatalogController: {
     find: true,
-    create: ['isAuthenticated', authorization([1], true)],
-    update: ['isAuthenticated', authorization([1], true)],
-    destroy: ['isAuthenticated', authorization([1], true)]
+    create: ['session', authorization([1], true)],
+    update: ['session', authorization([1], true)],
+    destroy: ['session', authorization([1], true)]
   },
   ChatController: {
-    find: ['isAuthenticated', authorization([1,2,3,4], false)],
-    create: ['isAuthenticated', authorization([1,2,3,4], false)],
-    update: ['isAuthenticated', authorization([1,2,3,4], false)],
-    destroy: ['isAuthenticated', authorization([1,2,3,4], false)]
+    find: ['session', authorization([1,2,3,4], false)],
+    create: ['session', authorization([1,2,3,4], false)],
+    update: ['session', authorization([1,2,3,4], false)],
+    destroy: ['session', authorization([1,2,3,4], false)]
   },
   ChatMessageController: {
-    find: ['isAuthenticated', authorization([1,2,3,4], false)],
-    create: ['isAuthenticated', authorization([1,2,3,4], false)],
-    update: ['isAuthenticated', authorization([1,2,3,4], false)],
-    destroy: ['isAuthenticated', authorization([1,2,3,4], false)]
+    find: ['session', authorization([1,2,3,4], false)],
+    create: ['session', authorization([1,2,3,4], false)],
+    update: ['session', authorization([1,2,3,4], false)],
+    destroy: ['session', authorization([1,2,3,4], false)]
   },
   LocaleController: {
     find: true,
-    create: ['isAuthenticated', authorization([1], true)],
-    update: ['isAuthenticated', authorization([1], true)],
-    destroy: ['isAuthenticated', authorization([1], true)]
+    create: ['session', authorization([1], true)],
+    update: ['session', authorization([1], true)],
+    destroy: ['session', authorization([1], true)]
   },
   PaymentController: {
-    getBilling: ['isAuthenticated', authorization([1,2,3,4], false)],
-    getSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
-    getSubscriptionPlan: ['isAuthenticated', authorization([1,2,3,4], false)],
+    getBilling: ['session', authorization([1,2,3,4], false)],
+    getSubscription: ['session', authorization([1,2,3,4], false)],
+    getSubscriptionPlan: ['session', authorization([1,2,3,4], false)],
     getTransaction: true,
     createSubscription: true,
     createTransaction: true,
-    updateCreditCard: ['isAuthenticated', authorization([1,2,3,4], false)],
-    updateSubscription: ['isAuthenticated', authorization([1,2,3,4], false)],
-    deleteSubscription: ['isAuthenticated', authorization([1,2,3,4], false)]
+    updateCreditCard: ['session', authorization([1,2,3,4], false)],
+    updateSubscription: ['session', authorization([1,2,3,4], false)],
+    deleteSubscription: ['session', authorization([1,2,3,4], false)]
   },
   PlanController: {
     find: true,
-    create: ['isAuthenticated', authorization([1], true)],
-    update: ['isAuthenticated', authorization([1], true)],
-    destroy: ['isAuthenticated', authorization([1], true)]
+    create: ['session', authorization([1], true)],
+    update: ['session', authorization([1], true)],
+    destroy: ['session', authorization([1], true)]
   },
   PlanFeatureController: {
     find: true,
-    create: ['isAuthenticated', authorization([1], true)],
-    update: ['isAuthenticated', authorization([1], true)],
-    destroy: ['isAuthenticated', authorization([1], true)]
+    create: ['session', authorization([1], true)],
+    update: ['session', authorization([1], true)],
+    destroy: ['session', authorization([1], true)]
   },
   RolController: {
     find: true,
-    create: ['isAuthenticated', authorization([1], true)],
-    update: ['isAuthenticated', authorization([1], true)],
-    destroy: ['isAuthenticated', authorization([1], true)]
+    create: ['session', authorization([1], true)],
+    update: ['session', authorization([1], true)],
+    destroy: ['session', authorization([1], true)]
+  },
+  SocketController: {
+    connect: true,
+    disconnect: true
   },
   UserController: {
     find: true,
-    create: ['isAuthenticated', authorization([1], true)],
-    update: ['isAuthenticated', authorization([1,2,3,4], false)],
-    destroy: ['isAuthenticated', authorization([1], true)],
-    populate: ['isAuthenticated', authorization([1], true)],
-    add: ['isAuthenticated', authorization([1], true)],
-    replace: ['isAuthenticated', authorization([1], true)],
-    remove: ['isAuthenticated', authorization([1], true)],
+    create: ['session', authorization([1], true)],
+    update: ['session', authorization([1,2,3,4], false)],
+    destroy: ['session', authorization([1], true)],
+    populate: ['session', authorization([1], true)],
+    add: ['session', authorization([1], true)],
+    replace: ['session', authorization([1], true)],
+    remove: ['session', authorization([1], true)],
     forgot: true,
     reset: true,
     validate: true

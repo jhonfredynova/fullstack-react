@@ -46,19 +46,19 @@ module.exports = {
                 plan: { planCode: user.nextPlan.planCode }
               }
               await paymentService.createSubscription(subscriptionData)
-              try{
-                await mailService.sendEmail({
-                  fromName: sails.config.app.appName,
-                  fromEmail: sails.config.app.emails.noreply,
-                  toEmail: user.email,
-                  subject: intlService.i18n('mailSubscriptionChangedSubject'),
-                  message: intlService.i18n('mailSubscriptionChangedMessage', { appName: sails.config.app.appName, planName: user.nextPlan.name })
-                })
-              }catch(e){
-                sails.log(intlService.i18n('emailError'))
-              }
             }
             await sails.models.user.update({ id: user.id }, { nextPlan: null, plan: user.nextPlan.id })
+            try{
+              await mailService.sendEmail({
+                fromName: sails.config.app.appName,
+                fromEmail: sails.config.app.emails.noreply,
+                toEmail: user.email,
+                subject: intlService.i18n('mailSubscriptionChangedSubject'),
+                message: intlService.i18n('mailSubscriptionChangedMessage', { appName: sails.config.app.appName, planName: user.nextPlan.name })
+              })
+            }catch(e){
+              sails.log(intlService.i18n('emailError'))
+            }
           }
         }
       }

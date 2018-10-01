@@ -3,7 +3,7 @@ import { get, isArray, isObject, isString, join } from 'lodash'
 //REQUESTS
 export function handleRequestError(e){
   let message = null
-  let messageDetail = get(e,'response.data', null) 
+  let messageDetail = get(e,'response.data', e.error) 
   if(isString(messageDetail) && !message) message = messageDetail
   if(isObject(messageDetail) && !message) message = get(messageDetail, 'message', null)
   if(isObject(messageDetail) && !message) message = get(messageDetail, 'raw', null)

@@ -2,6 +2,7 @@ import socket from 'components/socket'
 import { handleRequestError } from 'components/helper'
 
 export const AUTH = {
+  SOCKET_CONNECT: 'SOCKET_CONNECT',
   GET: 'GET_SESSION',
   LOGIN: 'LOGIN',
   LOGOUT: 'LOGOUT',
@@ -9,6 +10,14 @@ export const AUTH = {
   GET_TOKEN: 'GET_TOKEN',
   SET_TOKEN: 'SET_TOKEN',
   TOKEN_NAME: 'token'
+}
+
+export function socketConnect(data) {
+  return (dispatch, state) => {
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/socketConnect`, data)
+    .then(response => dispatch({type: AUTH.SOCKET_CONNECT, payload: response.data}))
+    .catch(err => handleRequestError(err) )
+  }
 }
 
 export function me() {
