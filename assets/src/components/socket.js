@@ -1,3 +1,4 @@
+import localStorage from 'localStorage'
 import sailsIOClient from 'sails.io.js'
 import socketIOClient from 'socket.io-client'
 
