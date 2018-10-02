@@ -11,6 +11,7 @@ import NavigationBar from 'components/navigationBar'
 import Style from 'components/style'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getChat, getChatMessage, saveChat, updateChat } from 'actions/chatActions'
+import { onEvent } from 'actions/socketActions'
 import { getUser } from 'actions/userActions'
 const sidebarMql = window.matchMedia(`(min-width: 768px)`)
 
@@ -64,7 +65,10 @@ class Chat extends React.PureComponent {
       document.addEventListener('keydown', this.handlePressKey, false)
       await this.props.dispatch(getChat(this.state.chatQuery))
       const { session } = this.props.auth
-      this.props.dispatch(getUser({ select: ['id','firstname','lastname','email'], where: { active: true, id: { '!=': session.id } }}))
+      await this.props.dispatch(getUser({ select: ['id','firstname','lastname','email'], where: { active: true, id: { '!=': session.id } }}))
+      this.props.dispatch(onEvent('user', (data) => {
+        this.props.dispatch(getUser({ select: ['id','firstname','lastname','email'], where: { active: true, id: { '!=': session.id } }}))
+      }))
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -187,7 +191,7 @@ class Chat extends React.PureComponent {
         </div>
         <div className="card-body" onScroll={this.handleChatScroll.bind(this)}>
           <div className="form-group mb-0">
-            <Select className="form-control" placeholder={`${this.context.t('search')}...`} options={users} optionRenderer={item => <span>{item.fullname}</span>} valueRenderer={item => <span>{item.fullname}</span>} valueKey='id' simpleValue={false} clearable={true} autosize={false} onChange={item => this.handleChatLoad({ to: item })} />
+            <Select className="form-control" placeholder={`${this.context.t('search')}...`} options={users} optionRenderer={item => <span><i className={classnames({'fas fa-circle': true, 'text-success': item.online})} /> {item.fullname}</span>} valueRenderer={item => <span>{item.fullname}</span>} valueKey='id' simpleValue={false} clearable={true} autosize={false} onChange={item => this.handleChatLoad({ to: item })} />
           </div>
           { !isLoading && chats.length===0 &&
             <p className="text-center p-2">{this.context.t('chatConversationsEmpty')}</p>

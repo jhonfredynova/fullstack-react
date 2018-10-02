@@ -16,12 +16,6 @@ export default function reducer(
         ...state, 
         temp: action.payload
       }
-
-    case SOCKET.DISCONNECT:
-      return { 
-        ...state, 
-        temp: action.payload
-      }
     
     case SOCKET.ON:
       return { 

@@ -12,20 +12,6 @@ module.exports = {
 
   getIndex: async (req, res) => {
     try{
-      
-      sails.log('---')
-      sails.log(`ROOMS: ${sails.io.sockets.rooms.length}`)
-      let sockets = sails.io.sockets.clients().sockets
-      for(let socket in sockets){
-        sails.log(`SOCKET: ${socket}, HAS-ROOMS: ${!_.isEmpty(sockets[socket].rooms)}`) 
-      }
-      sails.io.sockets.emit('test', 'hello from server')
-      //sails.io.sockets.blast('test', 'hello from server')
-      sails.sockets.broadcast('juan', 'gameRoom', 'Hello form game room')
-
-
-      
-      
       if(!req.isSocket){
         res.sendFile('index.html', { root: `${sails.config.paths.public}/build` })
       }

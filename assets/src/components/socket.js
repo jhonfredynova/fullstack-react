@@ -61,7 +61,7 @@ function Socket(params){
     })
   }
 }
-const authorization = JSON.parse(localStorage.token)
+const authorization = JSON.parse(localStorage.token || '{}')
 const socket = new Socket({ 
   autoConnect: true,
   headers: { 'authorization': `${authorization.provider} ${authorization.token}` },

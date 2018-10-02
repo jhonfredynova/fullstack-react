@@ -28,7 +28,7 @@ _.mixin({
       }
       return object
     }
-    return exec({...object})
+    return exec(_.cloneDeep(object))
   },
   compact: (value) => {
     let exec = (value) => {
@@ -39,7 +39,7 @@ _.mixin({
       }
       return value
     }
-    return exec({...value})
+    return exec(_.cloneDeep(value))
   },
   includes: (collection, value, mustHaveAll=false) => {
     let unmatchedItems = _.difference(collection, value)

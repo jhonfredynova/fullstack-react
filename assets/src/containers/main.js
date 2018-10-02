@@ -15,39 +15,14 @@ import { getConfig, setMessage, deleteMessage, setPreference } from 'actions/app
 import { getToken, me } from 'actions/authActions'
 import { connectSocket, disconnectSocket, onEvent, EVENT } from 'actions/socketActions'
 
-import socket from 'components/socket'
-
 class Main extends React.PureComponent {
 
   async componentWillMount() {
     try{      
-
-
-
-
       //socket
       this.props.dispatch(onEvent(EVENT.CONNECT, () => {
         this.props.dispatch(connectSocket())
-        console.warn('connected!')
       }))
-      this.props.dispatch(onEvent(EVENT.DISCONNECT, () =>{
-        this.props.dispatch(disconnectSocket())
-      }))
-
-      socket.get('/api/user', function(body, response){
-        console.warn(body)
-      })
-
-
-      this.props.dispatch(onEvent('test', (data) => {
-        console.warn(data)
-      }))
-      this.props.dispatch(onEvent('gameRoom', (data) => {
-        console.warn(data)
-      }))
-
-
-
       //config
       await this.props.dispatch(getConfig())      
       this.props.dispatch(getToken())

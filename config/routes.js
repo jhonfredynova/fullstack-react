@@ -65,7 +65,7 @@ module.exports.routes = {
   'post   /api/payment/transaction/confirmation': 'PaymentController.getTransaction',
   //SOCKET
   'post   /api/socket/connect': 'SocketController.connect',
-  'post   /api/socket/disconnect': 'SocketController.disconnect',
+  'post   /api/socket/subscribe/:room': 'SocketController.subscribe',
   //USER
   'post   /api/user/forgot': 'UserController.forgot',
   'post   /api/user/forgot': 'UserController.forgot',

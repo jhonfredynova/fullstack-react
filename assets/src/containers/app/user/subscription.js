@@ -221,8 +221,8 @@ class Subscription extends React.PureComponent {
     const { session } = this.props.auth
     const { isLoading, config } = this.props.app
     const currentYear = (new Date()).getFullYear()
-    const creditCards = get(session.clientInfo, 'creditCards', [])
-    const subscription = get(session.clientInfo, 'subscriptions[0]', {})
+    const creditCards = get(session, 'clientInfo.creditCards', [])
+    const subscription = get(session, 'clientInfo.subscriptions[0]', {})
     const planSelected = this.state.model.plan.info || {}
     const plans = this.state.plans.filter(item => item.paymentType!=='transaction').map(item => {
       item.url = '/register'

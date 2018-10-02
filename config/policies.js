@@ -95,7 +95,7 @@ module.exports.policies = {
   },
   SocketController: {
     connect: true,
-    disconnect: true
+    subscribe: true
   },
   UserController: {
     find: true,

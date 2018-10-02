@@ -48,7 +48,8 @@ module.exports = {
     },
     photo: {
       type: 'string',
-      isURL: true
+      isURL: true,
+      defaultsTo: sails.config.app.images.defaultUser
     },
     preferences: {
       type: 'json',
@@ -74,7 +75,8 @@ module.exports = {
     }
   },
   customToJSON: function() {
-    this.fullname = `${this.firstname} ${this.lastname}`
+    this.online = socketService.getRoom(`user-${this.id}`).length>0
+    this.fullname = `${this.firstname} ${this.lastname}`    
     return _.omit(this, ['password','passwordResetExpiration','passwordResetToken','passports'])
   },
   beforeCreate: async (values, next) => {
