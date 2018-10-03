@@ -43,6 +43,9 @@ module.exports = {
       }
       return subscription      
     }catch(e){
+      sails.log('PAYMENT-SERVICE: CREATE-SUBSCRIPTION')
+      sails.log(e)
+      sails.log(e.message)
       throw e
     }
   },
