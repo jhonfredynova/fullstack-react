@@ -12,7 +12,7 @@ function Socket(params){
   }
 
   let parseUrl = (url) => {
-    return url.replace(process.env.REACT_APP_LOCAL_API_SERVER, '')
+    return url.replace(process.env.REACT_APP_LOCAL_SOCKET_URL, '')
   }
 
   this.setHeader = (headers) => {
@@ -70,7 +70,7 @@ function Socket(params){
 
 const socket = new Socket({ 
   autoConnect: true,
-  url: process.env.REACT_APP_LOCAL_API_SERVER,
+  url: process.env.REACT_APP_LOCAL_SOCKET_URL,
   useCORSRouteToGetCookie: false
 })
 
