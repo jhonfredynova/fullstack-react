@@ -146,9 +146,6 @@ module.exports = {
       }
       res.json({ message: intlService.i18n('subscriptionCreatedSuccess') })
     }catch(e){
-      sails.log('PAYMENT-CONTROLLER: CREATE-SUBSCRIPTION')
-      sails.log(e)
-      sails.log(e.message)
       res.badRequest(e)
     }
   },

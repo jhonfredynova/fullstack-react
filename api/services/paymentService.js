@@ -37,34 +37,24 @@ module.exports = {
 
   createSubscription: async (data) => {
     try{
-      sails.log('PAYMENT-SERVICE: OK0')
       let subscription = await paymentService.executeApiPayu('POST', `/subscriptions`, data)
-      sails.log('PAYMENT-SERVICE: OK1')
       if(!subscription){
         throw intlService.i18n('subscriptionCreatedErrorCard')
       }
       return subscription      
     }catch(e){
-      sails.log('PAYMENT-SERVICE: CREATE-SUBSCRIPTION')
-      sails.log(e)
-      sails.log(e.message)
       throw e
     }
   },
 
   executeApiPayu: async (method, urlAction, data) => {
     try{
-      sails.log('EXECUTE-PAYU: '+process.env.PAYU_API_URL)
       headersApiPayu.method = method
       headersApiPayu.url = `${process.env.PAYU_API_URL+urlAction}`
       headersApiPayu.data = data
-      sails.log('EXECUTE-PAYU: OK001')
       let response = await axios(headersApiPayu)
       return response.data
     }catch(e){
-      sails.log('EXECUTE-PAYU: CREATE-SUBSCRIPTION')
-      sails.log(e)
-      sails.log(e.message)
       throw e
     }
   },
