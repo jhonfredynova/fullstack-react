@@ -3,11 +3,6 @@ let axios = require('axios')
 let he = require('he')
 let fs = require('fs')
 let path = require('path')
-const CACHE = {
-  INTL: 'CACHE_INTL',
-  LOCALES: 'CACHE_LOCALES',
-  RATES: 'CACHE_RATES'
-}
 
 module.exports = {
 
@@ -22,7 +17,7 @@ module.exports = {
       const { appPreferences } = sails.config.app
       let intl = sails.config.app.appIntl
       //INTL
-      let responseIntl = cacheService.get(CACHE.INTL)
+      let responseIntl = cacheService.get(cacheService.KEY.INTL)
       if(!responseIntl){ 
         let sourceIntl = await axios.get(`${process.env.INTL_API_URL}/all?fields=callingCodes;currencies;flag;languages;translations`)
         sourceIntl = sourceIntl.data
@@ -61,13 +56,13 @@ module.exports = {
           })
         })
         responseIntl.languages = _.sortBy(_.uniqBy(responseIntl.languages, 'value'), 'value')
-        cacheService.set(CACHE.INTL, responseIntl, 1500)
+        cacheService.set(cacheService.KEY.INTL, responseIntl, 1500)
       }
       intl.callingCodes = responseIntl.callingCodes
       intl.currencies = responseIntl.currencies
       intl.languages = responseIntl.languages
       //LOCALES
-      let responseLocales = cacheService.get(CACHE.LOCALES) 
+      let responseLocales = cacheService.get(cacheService.KEY.LOCALES) 
       if(!responseLocales){
         let sourceLocales = await sails.models.locale.find({ active: true })
         responseLocales = {}
@@ -75,16 +70,16 @@ module.exports = {
           responseLocales[locale] = _.mapValues(_.mapKeys(sourceLocales, 'name'), `value.${locale}`)
           fs.writeFileSync(path.join(__dirname,'../../config/locales',`${locale}.json`), JSON.stringify(responseLocales[locale], null, 2))
         }
-        cacheService.set(CACHE.LOCALES, responseLocales, 1500)   
+        cacheService.set(cacheService.KEY.LOCALES, responseLocales, 1500)   
       }
       intl.locales = responseLocales
       //RATES
       let baseCurrency = appPreferences.currency.toUpperCase()
-      let responseRates = cacheService.get(CACHE.RATES) 
+      let responseRates = cacheService.get(cacheService.KEY.RATES) 
       if(!responseRates || responseRates[baseCurrency]!==1){
         responseRates = await axios.get(`${process.env.RATE_API_URL}?access_key=${process.env.RATE_API_KEY}&base=${baseCurrency}`)
         responseRates = responseRates.data.rates
-        cacheService.set(CACHE.RATES, responseRates, 1500)      
+        cacheService.set(cacheService.KEY.RATES, responseRates, 1500)      
       }
       intl.currencyConversion = responseRates
       //RETURN

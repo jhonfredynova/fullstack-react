@@ -91,9 +91,9 @@ class AdminPlanFeatureSave extends React.PureComponent {
       }else{
         await this.props.dispatch(savePlanFeature(this.state.model))
       }
-      this.props.dispatch(hideLoading())
       this.props.history.push(`/admin/configuration/plan/${this.props.match.params.id}/feature`)
       this.props.dispatch(setMessage({ type: 'success', message: this.context.t('successfulOperation') }))
+      this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())

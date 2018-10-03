@@ -36,7 +36,18 @@ module.exports = {
         throw intlService.i18n('userInactive')
       }
       user.currentPassport = passport
+      if(req.isSocket) socketService.login(req, user)
       res.json(user)
+    }catch(e){
+      res.badRequest(e)
+    }
+  },
+
+  logout: async (req, res, next) => {
+    try{
+      let user = req.body
+      if(req.isSocket) socketService.logout(req, user)
+      res.ok()  
     }catch(e){
       res.badRequest(e)
     }

@@ -1,9 +1,10 @@
 import axios from 'axios'
+import { AUTH } from 'actions/authActions'
 import socket from 'components/socket'
 
 const requestHeader = store => next => action => {
   const appPreferences = store.getState().app.config.appPreferences || localStorage
-  const authorization = store.getState().auth.token
+  const authorization = JSON.parse(localStorage.getItem(AUTH.TOKEN_NAME))
   if(authorization){
     axios.defaults.headers.common['authorization'] = `${authorization.provider} ${authorization.token}`
     socket.setHeader({ 'authorization': `${authorization.provider} ${authorization.token}` })

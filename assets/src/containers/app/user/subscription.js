@@ -219,6 +219,7 @@ class Subscription extends React.PureComponent {
 
   render() {
     const { session } = this.props.auth
+    if(!session) return null
     const { isLoading, config } = this.props.app
     const currentYear = (new Date()).getFullYear()
     const creditCards = get(session, 'clientInfo.creditCards', [])

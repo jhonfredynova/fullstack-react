@@ -3,18 +3,23 @@ import { Link } from 'react-router-dom'
 import { Nav, Navbar, NavLink, DropdownItem, UncontrolledDropdown, DropdownToggle, DropdownMenu } from 'reactstrap'
 import { includes, isNull } from 'lodash'
 import PropTypes from 'prop-types'
-import { setMessage } from 'actions/appActions'
+import { setMessage, showLoading, hideLoading } from 'actions/appActions'
 import { logout } from 'actions/authActions'
 
 class Menu extends React.PureComponent {
 
   async handleLogout() {
     try {
-      await this.context.store.dispatch(logout())
+      this.context.store.dispatch(showLoading())
+      const { session } = this.props.auth
+      await this.context.store.dispatch(logout(session))
       await this.context.router.history.push('/')
       this.context.store.dispatch(setMessage({ type: 'success', message: this.context.t('sessionFinished') }))
+      this.context.store.dispatch(hideLoading())
+
     }catch(e){
       this.context.store.dispatch(setMessage({ type: 'error', message: e.message }))
+      this.context.store.dispatch(hideLoading())
     }
   }
 

@@ -3,8 +3,7 @@ import { AUTH } from 'actions/authActions'
 export default function reducer(
   state={
     session: undefined,
-    temp: null,
-    token: null
+    temp: null
   }, 
   action={}) 
 {
@@ -34,8 +33,7 @@ export default function reducer(
     case AUTH.LOGOUT:
       return { 
         ...state, 
-        session: action.payload,
-        token: null
+        session: action.payload
       }
 
     case AUTH.REGISTER:
@@ -47,13 +45,13 @@ export default function reducer(
     case AUTH.GET_TOKEN:
       return { 
         ...state, 
-        token: action.payload
+        temp: action.payload
       }
 
     case AUTH.SET_TOKEN:
       return { 
         ...state, 
-        token: action.payload
+        temp: action.payload
       }
       
   }

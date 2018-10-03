@@ -35,6 +35,7 @@ module.exports.policies = {
   AuthController: {
     me: ['session'],
     login: true,
+    logout: true,
     register: true,
     provider: true,
     providerAction: true,

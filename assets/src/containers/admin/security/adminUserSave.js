@@ -28,7 +28,7 @@ class AdminUserSave extends React.PureComponent {
     try{
       this.props.dispatch(showLoading())
       const userId = this.props.match.params.id || ''
-      await this.props.dispatch(getUser({ where: { id: userId }, select: keys(this.state.model) }))
+      await this.props.dispatch(getUser({ populate: false, select: keys(this.state.model), where: { id: userId } }))
       await this.setState({ model: defaultTo(this.props.user.users.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -79,9 +79,9 @@ class AdminUserSave extends React.PureComponent {
       }else{
         await this.props.dispatch(saveUser(this.state.model))
       }
-      this.props.dispatch(hideLoading())
       this.props.history.push('/admin/security/user')
       this.props.dispatch(setMessage({ type: 'success', message: this.context.t('successfulOperation') }))
+      this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())

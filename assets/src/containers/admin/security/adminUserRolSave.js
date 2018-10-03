@@ -37,9 +37,9 @@ class AdminUserRolSave extends React.PureComponent {
     try{
       this.props.dispatch(showLoading())
       const userId = this.props.match.params.id || ''
-      await this.props.dispatch(getRol({ select: ['id','name'] }))
-      await this.props.dispatch(getUser({ where: { id: userId }, select: ['id','firstname','lastname','email'] }))    
-      await this.setState({ user: this.props.user.temp })
+      await this.props.dispatch(getRol({ populate: false, select: ['id','name'] }))
+      await this.props.dispatch(getUser({ populate: false, select: ['id','firstname','lastname','email'], where: { id: userId } }))    
+      await this.setState({ user: this.props.user.users.records.shift() })
       await this.setState({ model: Object.assign(this.state.model, { user: this.state.user.id }) })
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -74,9 +74,9 @@ class AdminUserRolSave extends React.PureComponent {
       //execute
       this.props.dispatch(showLoading())
       await this.props.dispatch(saveUserRol(this.state.model))
-      this.props.dispatch(hideLoading())
       this.props.history.push(`/admin/security/user/${this.props.match.params.id}/rol`)
       this.props.dispatch(setMessage({ type: 'success', message: this.context.t('successfulOperation') }))
+      this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())
@@ -94,7 +94,7 @@ class AdminUserRolSave extends React.PureComponent {
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
           <div className="form-group col-md-6">
             <label>User <span>*</span></label>
-            <input type="text" className="form-control" disabled="true" value={`${this.state.user.email}`} />
+            <input type="text" className="form-control" disabled={true} value={`${this.state.user.email}`} />
           </div>
           <div className="form-group col-md-6">
             <label>Rol <span>*</span></label>

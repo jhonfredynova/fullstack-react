@@ -86,9 +86,9 @@ class AdminCatalogSave extends React.PureComponent {
       }else{
         await this.props.dispatch(saveCatalog(this.state.model))
       }
-      this.props.dispatch(hideLoading())
-      this.props.history.goBack()
+      this.props.history.push('/admin/configuration/catalog')
       this.props.dispatch(setMessage({ type: 'success', message: this.context.t('successfulOperation') }))
+      this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())

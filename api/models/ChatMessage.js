@@ -12,7 +12,11 @@ module.exports = {
       type: 'boolean',
       defaultsTo: true
     },
-    value: {
+    sender: {
+      model: 'user',
+      required: true
+    },
+    text: {
       type: 'string',
       required: true
     },

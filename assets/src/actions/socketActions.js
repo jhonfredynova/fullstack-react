@@ -2,7 +2,17 @@ import socket from 'components/socket'
 import { handleRequestError } from 'components/helper'
 
 export const EVENT = {
-  CONNECT: 'connect'
+  CONNECT: 'connect',
+  CATALOG: 'catalog',
+  CHAT: 'chat',
+  CHAT_MESSAGE: 'chatmessage',
+  LOCALE: 'locale',
+  PASSPORT: 'passport',
+  PLAN: 'plan',
+  PLAN_FEATURE: 'planfeature',
+  ROL: 'rol',
+  TRANSACTION: 'transaction',
+  USER: 'user'
 }
 
 export const SOCKET = {

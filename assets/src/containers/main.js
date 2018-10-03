@@ -13,19 +13,15 @@ import Message from 'components/message'
 import Style from 'components/style'
 import { getConfig, setMessage, deleteMessage, setPreference } from 'actions/appActions'
 import { getToken, me } from 'actions/authActions'
-import { connectSocket, disconnectSocket, onEvent, EVENT } from 'actions/socketActions'
+import { connectSocket, onEvent, EVENT } from 'actions/socketActions'
 
 class Main extends React.PureComponent {
 
   async componentWillMount() {
     try{      
-      //socket
-      this.props.dispatch(onEvent(EVENT.CONNECT, () => {
-        this.props.dispatch(connectSocket())
-      }))
-      //config
-      await this.props.dispatch(getConfig())      
       this.props.dispatch(getToken())
+      this.props.dispatch(onEvent(EVENT.CONNECT, (data) => this.props.dispatch(connectSocket()) ))
+      await this.props.dispatch(getConfig())      
       this.props.dispatch(me())
       const { config } = this.props.app
       const { session } = this.props.auth      

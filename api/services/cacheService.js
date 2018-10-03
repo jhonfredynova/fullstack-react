@@ -4,7 +4,9 @@ module.exports = {
 
   KEY: Object.freeze({   
     INTL: 'CACHE_INTL',
+    LOCALES: 'CACHE_LOCALES',
     PAYU: 'CACHE_PAYU',
+    RATES: 'CACHE_RATES',
     STRIPE: 'CACHE_STRIPE'
   }),
 

@@ -26,7 +26,7 @@ class AdminRolSave extends React.PureComponent {
     try{
       this.props.dispatch(showLoading())
       const rolId = this.props.match.params.id || ''
-      await this.props.dispatch(getRol({ select: keys(this.state.model), where: { id: rolId } }))
+      await this.props.dispatch(getRol({ populate: false, select: keys(this.state.model), where: { id: rolId } }))
       await this.setState({ model: defaults(this.props.rol.roles.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -68,9 +68,9 @@ class AdminRolSave extends React.PureComponent {
       }else{
         await this.props.dispatch(saveRol(this.state.model))
       }
-      this.props.dispatch(hideLoading())
       this.props.history.push('/admin/security/rol')
       this.props.dispatch(setMessage({ type: 'success', message: this.context.t('successfulOperation') }))
+      this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
       this.props.dispatch(hideLoading())

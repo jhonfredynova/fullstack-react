@@ -75,8 +75,8 @@ module.exports = {
     }
   },
   customToJSON: function() {
-    this.online = socketService.getRoom(`user-${this.id}`).length>0
     this.fullname = `${this.firstname} ${this.lastname}`    
+    this.online = socketService.getRoom(socketService.getUserRoomId(this)).length>0
     return _.omit(this, ['password','passwordResetExpiration','passwordResetToken','passports'])
   },
   beforeCreate: async (values, next) => {

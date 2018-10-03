@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import classnames from 'classnames'
 import { defaultTo, isEmpty, set, clean, compact, get } from 'lodash'
 import { setMessage } from 'actions/appActions'
 import Style from 'components/style.js'
@@ -10,7 +11,7 @@ class ChatMessage extends React.PureComponent {
     super(props)
     this.state = { 
       errors: {},
-      chat: defaultTo(this.props.chat, {}) ,
+      chat: defaultTo(this.props.chat, {}),
       message: ''
     }
   }
@@ -52,6 +53,7 @@ class ChatMessage extends React.PureComponent {
 
   render() {
     const { chat } = this.state
+    const { session } = this.props.auth
     const { isLoading, className } = this.props
     const chatMessages = get(chat, 'messages', [])
     return (
@@ -65,11 +67,14 @@ class ChatMessage extends React.PureComponent {
             </div>
           }
           {
-            chatMessages.map(item => 
-              <div key={item.id} className="d-flex flex-row">
-                <div className="alert alert-primary">{item.value}</div>
-              </div>
-            )
+            chatMessages.map(item => {
+              item.isSender = item.sender===session.id
+              return (
+                <div key={item.id} className={classnames({ "d-flex": true, "flex-row": !item.isSender, "flex-row-reverse": item.isSender })}>
+                  <div className={classnames({ "alert": true, "alert-primary": !item.isSender, "alert-secondary": item.isSender })}>{item.text}</div>
+                </div>
+              )
+            })
           }
         </div>
         {

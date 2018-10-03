@@ -1,3 +1,4 @@
+import 'components/polyfill'
 import React from 'react'
 import { render } from 'react-snapshot'
 import { BrowserRouter, Route, Switch } from 'react-router-dom'
@@ -5,7 +6,6 @@ import I18n from "redux-i18n"
 import { Provider } from "react-redux"
 import Store from "./store"
 import RegisterServiceWorker from './registerServiceWorker'
-import 'components/polyfill'
 //CSS
 import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-social/bootstrap-social.css'

@@ -1,7 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { Table } from 'reactstrap'
-import classnames from 'classnames'
 import { set } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
@@ -81,10 +80,10 @@ class AdminUserRol extends React.PureComponent {
   }
 
   render() {    
-    const { isLoading } = this.props.app
+    const { isLoading, className } = this.props.app
     const { records } = this.state.userRoles
     return (
-      <div className={classnames({'d-none': isLoading})}>
+      <div className={className}>
         <NavigationBar
           title={<h1>Roles</h1>} 
           description={<h2>{this.state.user.username}</h2>} 

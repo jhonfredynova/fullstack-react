@@ -10,11 +10,10 @@ module.exports = {
   connect: (req, res) => {
     try{
       if(!req.isSocket) return res.badRequest()
-      let roomName = req.user ? `user-${req.user.id}` : 'anonymous'
-      sails.sockets.join(req, roomName)
-      sails.sockets.blast('user', { verb: 'userConnected' })  
+      let user = req.user
+      socketService.login(req, user) 
       req.socket.on('disconnect', () => {
-        sails.sockets.blast('user', { verb: 'userDisconnected' })  
+        socketService.logout(req, null) 
       })
       res.ok()
     }catch(e){

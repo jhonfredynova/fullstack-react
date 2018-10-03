@@ -50,6 +50,7 @@ module.exports.routes = {
   //AUTHENTICATION
   'get    /api/auth/me': 'AuthController.me',
   'post   /api/auth/login': 'AuthController.login',
+  'post   /api/auth/logout': 'AuthController.logout',
   'post   /api/auth/register': 'AuthController.register',
   'get    /api/auth/:provider': 'AuthController.provider',
   'get    /api/auth/:provider/callback': 'AuthController.providerCallback',

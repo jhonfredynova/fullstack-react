@@ -13,7 +13,7 @@ export const AUTH = {
 }
 
 export function socketConnect(data) {
-  return (dispatch, state) => {
+  return dispatch => {
     return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/socketConnect`, data)
     .then(response => dispatch({type: AUTH.SOCKET_CONNECT, payload: response.data}))
     .catch(err => handleRequestError(err) )
@@ -21,8 +21,8 @@ export function socketConnect(data) {
 }
 
 export function me() {
-  return (dispatch, state) => {
-    if (!state().auth.token) return dispatch({type: AUTH.GET, payload: null})
+  return dispatch => {
+    if (!localStorage.getItem(AUTH.TOKEN_NAME)) return dispatch({type: AUTH.GET, payload: null})
     return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/auth/me`)
     .then(response => dispatch({type: AUTH.GET, payload: response.data}))
     .catch(err => dispatch({type: AUTH.GET, payload: null}) )
@@ -37,10 +37,14 @@ export function login(data) {
   }
 }
 
-export function logout(username) {
-  return (dispatch, state) => {
-    localStorage.removeItem(AUTH.TOKEN_NAME)
-    dispatch({type: AUTH.LOGOUT, payload: null})
+export function logout(data) {
+  return dispatch => {
+    return socket.post(`${process.env.REACT_APP_LOCAL_API_URL}/auth/logout`, data)
+    .then(response => {
+      localStorage.removeItem(AUTH.TOKEN_NAME)
+      dispatch({type: AUTH.LOGOUT, payload: null})  
+    })
+    .catch(err => handleRequestError(err) )
   }
 }
 
@@ -53,17 +57,15 @@ export function register(data) {
 }
 
 export function getToken() {
-  return (dispatch, state) => {
+  return dispatch => {
     let token = localStorage.getItem(AUTH.TOKEN_NAME) ? JSON.parse(localStorage.getItem(AUTH.TOKEN_NAME)) : null
-    state().auth.token = token
     dispatch({ type: AUTH.GET_TOKEN, payload: token })
   }
 }
 
 export function setToken(data) {
-  return (dispatch, state) => {
+  return dispatch => {
     localStorage.setItem(AUTH.TOKEN_NAME, JSON.stringify(data))
-    state().auth.token = data
     dispatch({ type: AUTH.SET_TOKEN, payload: data })
   }
 }

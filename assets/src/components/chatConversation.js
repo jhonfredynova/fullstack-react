@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { defaultTo, set } from 'lodash'
+import classnames from 'classnames'
+import { defaultTo, set, last } from 'lodash'
 
 class ChatConversation extends React.PureComponent {
 
@@ -28,16 +29,17 @@ class ChatConversation extends React.PureComponent {
   render() {
     const { className } = this.props
     const { chat } = this.state
-    const lastMessage = chat.messages.shift()
+    const lastMessage = last(chat.messages)
     return (
       <div id="chatConversation" className={className}>
-        <div className="media border-top border-bottom pt-2 bg-light btn text-left" onClick={this.handleSelectChat.bind(this, chat)}>
-          <img className="align-self-start mr-3 rounded-circle" src={chat.to.photo} height={30} alt={chat.to.fullname} />
-          <div className="media-body">
-            <h5 className="mt-0">
-              { chat.to.fullname }
+        <div className="media border-top border-bottom pt-2 btn text-left align-items-center" onClick={this.handleSelectChat.bind(this, chat)}>
+          <span className="mr-2 small"><i className={classnames({'fas fa-circle text-black-50': true, 'text-success': chat.to.online})} /></span>
+          <img className="align-self-start mr-3 rounded-circle" src={chat.to.photo} height={40} alt={chat.to.fullname} />
+          <div className="media-body text-truncate">
+            <h5 className="mt-0 mb-0">
+              {chat.to.fullname}
             </h5>
-            { lastMessage && <p>{lastMessage.value}</p> }
+            { lastMessage && <p className="font-italic small text-truncate p-0 m-0">{lastMessage.text}</p> }
           </div>
         </div>
       </div>
