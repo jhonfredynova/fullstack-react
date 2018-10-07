@@ -68,10 +68,10 @@ class AdminPlanSave extends React.PureComponent {
       errors.model.planCode = "Select plan."
     }
     if (this.state.model.paymentType==='transaction' && isEmpty(get(this.state.model.transactionValue, 'currency'))) {
-      set(errors.model.transactionValue, 'currency', 'Select transaction currency.')
+      errors.model.transactionValue = set(errors.model.transactionValue, 'currency', 'Select transaction currency.')
     }
     if (this.state.model.paymentType==='transaction' && isEmpty(get(this.state.model.transactionValue, 'value'))) {
-      set(errors.model.transactionValue, 'value',  'Enter transaction value.')
+      errors.model.transactionValue = set(errors.model.transactionValue, 'value',  'Enter transaction value.')
     }
     if(isEmpty(this.state.model.order)) {
       errors.model.order = "Enter order."
@@ -151,7 +151,7 @@ class AdminPlanSave extends React.PureComponent {
             <label>Transaction Value *</label>
             <div className="row">
               <div className="col-4 pr-0">
-                <Select placeholder='Select...' className="form-control" options={currencies} optionRenderer={option => option.label} valueRenderer={option => option.label} value={get(this.state.model.transactionValue, 'currency')} simpleValue={true} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.transactionValue.currency', value)} /> 
+                <Select placeholder='Select...' options={currencies} value={currencies.find(item => item.value===get(this.state.model.transactionValue, 'currency'))} onChange={option => this.handleChangeState('model.transactionValue.currency', option.value)} /> 
                 <span className="text-danger">{get(this.state.errors.model.transactionValue, 'currency')}</span>
               </div>
               <div className="col-8">

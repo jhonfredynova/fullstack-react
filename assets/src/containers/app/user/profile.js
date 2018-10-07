@@ -3,10 +3,11 @@ import { connect } from 'react-redux'
 import { Tooltip } from 'reactstrap'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
-import { clean, compact, defaults, isEmail, keys, get, set, omit, isEmpty } from 'lodash'
+import { clean, compact, defaults, isEmail, keys, get, set, omit, isEmpty, pick } from 'lodash'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
 import { getUser, updateUser } from 'actions/userActions'
 import NavigationBar from 'components/navigationBar'
+import Upload from 'components/upload'
 
 class Profile extends React.PureComponent {
 
@@ -18,6 +19,7 @@ class Profile extends React.PureComponent {
       },
       changePassword: false,
       showTooltipEmail: false,
+      userPassports: [],
       model: {
         id: undefined,
         firstname: '',
@@ -36,8 +38,10 @@ class Profile extends React.PureComponent {
     try{
       this.props.dispatch(showLoading())
       const { session } = this.props.auth
-      await this.props.dispatch(getUser({ populate: false, select: keys(omit(this.state.model,['passwordConfirmation'])), where:{ id: session.id } }))
-      await this.setState({ model: defaults(this.props.user.users.records[0], this.state.model) })
+      await this.props.dispatch(getUser({ select: keys(omit(this.state.model,['passwordConfirmation'])), where:{ id: session.id } }))
+      const user = this.props.user.users.records[0]
+      this.setState({ userPassports: user.passports })
+      this.setState({ model: defaults(pick(user, keys(this.state.model)), this.state.model) })
       this.props.dispatch(hideLoading())
     }catch(e){
       this.props.dispatch(setMessage({ type: 'error', message: e.message }))
@@ -64,10 +68,10 @@ class Profile extends React.PureComponent {
      if(isEmpty(this.state.model.username)) {
       errors.model.username = this.context.t('enterUsername')
     }
-    if (!isEmpty(this.state.model.email) && !isEmail(this.state.model.email)) {
+    if(!isEmpty(this.state.model.email) && !isEmail(this.state.model.email)) {
       errors.model.email = this.context.t('enterEmailFormat')
     }
-    if (this.state.changePassword) {
+    if(this.state.changePassword) {
       if(isEmpty(this.state.model.password) || Object.keys(this.state.model.password).length<6) {
         errors.model.password = this.context.t('enterPasswordMin5Char')
       }
@@ -108,29 +112,57 @@ class Profile extends React.PureComponent {
   }
 
   render() {    
+    const { defaultUser: defaultUserPhoto } = this.props.app.config.images
     return (
       <div id="profile">
         <NavigationBar
           title={<h1>{this.context.t('profileTitle')}</h1>} 
           description={<h2>{this.context.t('profileDescription')}</h2>} />
-          <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
-          <form className="row" onSubmit={this.handleSubmit.bind(this)}>
-            <div className="form-group col-md-6">
+        <div className="alert alert-warning" role="alert">{this.context.t('requiredFields')}</div>
+        <form className="row" onSubmit={this.handleSubmit.bind(this)}>
+          <div className="col-md-6">
+            <div className="form-group text-center">
+              <h3>{`${this.state.model.firstname} ${this.state.model.lastname}`}</h3>
+              <Upload legend={this.context.t('uploadPhoto')} maxAllowed={3} defaultValue={defaultUserPhoto} value={this.state.model.photo} onChange={value => this.handleChangeState('model.photo', value)} />
+            </div>
+            <div className="alert alert-secondary">
+              Passports: 
+              {
+                this.state.userPassports.map(item => {
+                  let iconClass = ''
+                  switch(item.provider){
+                    default:
+                      iconClass = 'far fa-envelope'
+                      break
+                    case 'facebook-token':
+                      iconClass = 'fab fa-facebook'
+                      break
+                    case 'google-token':
+                      iconClass = 'fab fa-google'
+                      break
+                  }
+                  return <i key={item.provider} className={`${iconClass} ml-2`} />
+                })
+              }
+            </div>
+          </div>
+          <div className="col-md-6">
+            <div className="form-group">
               <label>{this.context.t('firstname')} *</label>
               <input type="text" className="form-control" value={this.state.model.firstname} onChange={e => this.handleChangeState('model.firstname', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.firstname}</span>
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group">
               <label>{this.context.t('lastname')} *</label>
               <input type="text" className="form-control" value={this.state.model.lastname} onChange={e => this.handleChangeState('model.lastname', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.lastname}</span>
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group">
               <label>{this.context.t('username')} *</label>
               <input type="text" className="form-control" value={this.state.model.username} onChange={e => this.handleChangeState('model.username', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.username}</span>
             </div>
-            <div className="form-group col-md-6">
+            <div className="form-group">
               <label>{this.context.t('email')} *</label>
               <div className="input-group">
                 <span id="tooltipEmail" className="input-group-addon">
@@ -143,24 +175,23 @@ class Profile extends React.PureComponent {
               </div>
               <span className="text-danger">{this.state.errors.model.email}</span>
             </div>
-            <div className="form-group col-md-12">
-              <div className="alert alert-warning">
-                <input type="checkbox" checked={this.state.changePassword} onChange={e => this.handleChangeState('changePassword', !this.state.changePassword)} /> Do you want to change your password?
-              </div>
+            <div className="alert alert-info">
+              <input type="checkbox" checked={this.state.changePassword} onChange={e => this.handleChangeState('changePassword', !this.state.changePassword)} /> Do you want to change your password?
             </div>
-            <div className={classnames({"form-group col-md-6": true, "d-none": !this.state.changePassword})}>
+            <div className={classnames({"form-group": true, "d-none": !this.state.changePassword})}>
               <label>{this.context.t('password')} *</label>
               <input type="password" className="form-control" value={this.state.model.password} onChange={e => this.handleChangeState('model.password', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.password}</span>
             </div>
-            <div className={classnames({"form-group col-md-6": true, "d-none": !this.state.changePassword})}>
+            <div className={classnames({"form-group": true, "d-none": !this.state.changePassword})}>
               <label>{this.context.t('passwordConfirm')} *</label>
               <input type="password" className="form-control" value={this.state.model.passwordConfirmation} onChange={e => this.handleChangeState('model.passwordConfirmation', e.target.value)} />
               <span className="text-danger">{this.state.errors.model.passwordConfirmation}</span>
             </div>
-            <div className="form-group col-md-12 text-right">
+            <div className="form-group text-right">
               <button type="submit" className="btn btn-success btn-lg">{this.context.t('save')}</button>
             </div>
+          </div>
         </form>
       </div>
     )

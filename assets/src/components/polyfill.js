@@ -64,6 +64,16 @@ _.mixin({
   set: (object, path, value) => {
     return lodashSet(_.cloneDeep(object), path, value)
   },
+  setDeep: (object, property, value) => {
+    let exec = (object, property, value) => {
+      for(let key in object) {
+        if(_.isObject(object[key])) object[key] = exec(object[key], property, value)
+        if(key===property) object[key] = value
+      }
+      return object
+    }
+    return exec(_.cloneDeep(object), property, value)
+  },
   toUrl: (value) => {
     let encodedUrl = value.toString().toLowerCase()
     encodedUrl = encodedUrl.replace(/[^\w ]+/g,'')

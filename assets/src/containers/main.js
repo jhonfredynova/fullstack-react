@@ -19,8 +19,8 @@ class Main extends React.PureComponent {
 
   async componentWillMount() {
     try{      
-      this.props.dispatch(getToken())
-      this.props.dispatch(onEvent(EVENT.CONNECT, (data) => this.props.dispatch(connectSocket()) ))
+      await this.props.dispatch(getToken())
+      await this.props.dispatch(onEvent(EVENT.CONNECT, (data) => this.props.dispatch(connectSocket()) ))
       await this.props.dispatch(getConfig())      
       this.props.dispatch(me())
       const { config } = this.props.app

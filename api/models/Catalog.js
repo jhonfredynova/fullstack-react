@@ -34,16 +34,39 @@ module.exports = {
       via: 'parent'
     }
   },
-  beforeCreate: async (values, next) => {
+  afterValidate: async function(values){
     try{
       let errors = []
-      let data = await sails.models.catalog.findOne({ id: { '!=': values.id }, parent: values.parent, name: values.name })
-      if(data){
-        errors.push(intlService.i18n('catalogNameAlreadyExist'))
+      let data = null
+      if(values.name){
+        data = await sails.models.catalog.findOne({ id: { '!=': values.id }, parent: values.parent, name: values.name })
+        if(data) errors.push(intlService.i18n('catalogNameAlreadyExist'))
       }
-      if(errors.length>0) {
-        throw errors.join(intlService.i18n('errorSeparator'))
+      if(errors.length>0){
+        errors = errors.join(intlService.i18n('errorSeparator'))
       }
+      return errors
+    }catch(e){
+      throw e
+    }
+  },
+  beforeCreate: async function(values, next){
+    try{
+      //validate
+      let errors = await this.afterValidate(values)
+      if(errors.length>0) throw errors
+      //execute
+      next()
+    }catch(e){
+      next(e)
+    }
+  },
+  beforeUpdate: async function(values, next){
+    try{
+      //validate
+      let errors = await this.afterValidate(values)
+      if(errors.length>0) throw errors
+      //execute
       next()
     }catch(e){
       next(e)

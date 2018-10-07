@@ -6,7 +6,6 @@
  */
 
 module.exports = {
-
   attributes: {
     status: {
       type: 'string',
@@ -22,9 +21,8 @@ module.exports = {
       required: true
     }
   },
-  customToJSON: function() {
+  customToJSON: function(){
     return _.omit(this, ['description'])
   }
-
 }
 

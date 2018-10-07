@@ -4,6 +4,7 @@ import { clean, compact, defaultTo, isEmpty, isEmail, keys, get, set } from 'lod
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import { hideLoading, showLoading, setMessage } from 'actions/appActions'
+import { getPlan } from 'actions/planActions'
 import { getUser, saveUser, updateUser } from 'actions/userActions'
 
 class AdminUserSave extends React.PureComponent {
@@ -14,12 +15,14 @@ class AdminUserSave extends React.PureComponent {
       errors: {
         model: {}
       },
+      plans: [],
       model: {
         id: undefined,
         firstname: '',
         lastname: '',
         username: '',
-        email: ''
+        email: '',
+        plan: ''
       }
     }
   }
@@ -28,6 +31,8 @@ class AdminUserSave extends React.PureComponent {
     try{
       this.props.dispatch(showLoading())
       const userId = this.props.match.params.id || ''
+      await this.props.dispatch(getPlan({ select: ['id','name'], where: { paymentType: { '!=': 'transaction' } } }))
+      await this.setState({ plans: this.props.plan.plans.records })
       await this.props.dispatch(getUser({ populate: false, select: keys(this.state.model), where: { id: userId } }))
       await this.setState({ model: defaultTo(this.props.user.users.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
@@ -58,6 +63,9 @@ class AdminUserSave extends React.PureComponent {
     }
     if(!isEmpty(this.state.model.email) && !isEmail(this.state.model.email)) {
       errors.model.email = "The written email does not have the correct format."
+    }
+    if(isEmpty(this.state.model.plan)) {
+      errors.model.plan = "Select plan."
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
     await this.setState({ errors: errors })
@@ -117,6 +125,18 @@ class AdminUserSave extends React.PureComponent {
             <input type="text" className="form-control" value={this.state.model.email} onChange={event => this.handleChangeState('model.email', event.target.value)} />
             <span className="text-danger">{this.state.errors.model.email}</span>
           </div>
+          <div className="form-group col-md-6">
+            <label>Plan <span>*</span></label>
+            <select className="form-control" value={this.state.model.plan} onChange={event => this.handleChangeState('model.plan', event.target.value)}>
+              <option>{this.context.t('select')}...</option>
+              {
+                this.state.plans.map(item => 
+                  <option value={item.id}>{item.name}</option>
+                )
+              }
+            </select>
+            <span className="text-danger">{this.state.errors.model.plan}</span>
+          </div>
           <button type="submit" className="d-none" />
         </form>
       </div>
@@ -131,6 +151,7 @@ AdminUserSave.contextTypes = {
 function mapStateToProps(state, props) {
   return {
     app: state.app,
+    plan: state.plan,
     user: state.user
   }
 }

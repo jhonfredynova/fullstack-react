@@ -1,6 +1,6 @@
 import React from 'react'
 import { InputGroupButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem, Pagination, PaginationItem, PaginationLink } from 'reactstrap'
-import { defaultTo, isObject, set, range } from 'lodash'
+import { defaultTo, set, setDeep, range } from 'lodash'
 import classnames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -37,16 +37,8 @@ class Pager extends React.PureComponent {
 
   async handleChangeKeyword(value){
     if(value.indexOf('%')===-1) value = `%${value}%`
-    let where = this.state.query.where
-    let setKeyword = (object, property, value) => {
-      for(let key in object) {
-        if(isObject(object[key])) object[key] = setKeyword(object[key], property, value)
-        if(key===property) object[key] = value
-      }
-      return object
-    }
-    where = setKeyword(where, 'like', value)
-    await this.setState(set(this.state.query, 'where', where))
+    let where = setDeep(this.state.query.where, 'like', value)
+    await this.setState({ query: set(this.state.query, 'where', where) })
   }
 
   async handleChangeSearch(e){

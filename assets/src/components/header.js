@@ -65,16 +65,16 @@ class Header extends React.PureComponent {
             <div className="form-inline">
               {/* PREFERENCES */}
               <button id="popoverPreferences" className="btn btn-success mr-1" onClick={() => this.handleChangeState('showPopoverPreferences', !this.state.showPopoverPreferences)}><i className="fas fa-cog"></i></button>
-              <Popover target="popoverPreferences" placement="bottom" isOpen={this.state.showPopoverPreferences} toggle={() => this.handleChangeState('showPopoverPreferences', !this.state.showPopoverPreferences)}>
+              <Popover style={{width:200}} target="popoverPreferences" placement="bottom" isOpen={this.state.showPopoverPreferences} toggle={() => this.handleChangeState('showPopoverPreferences', !this.state.showPopoverPreferences)}>
                 <PopoverHeader>{this.context.t('preferences')}</PopoverHeader>
                 <PopoverBody>
                   <div className="form-group">
                     <label>{this.context.t('language')}</label>
-                    <Select placeholder='Select...' options={languages} optionRenderer={option => option.label} valueRenderer={option => option.label} simpleValue={true} value={get(appPreferences, 'language', '')} clearable={false} autosize={false} onChange={value => this.handleChangeLanguage(value)} />
+                    <Select placeholder={this.context.t('select')} options={languages} value={languages.find(item => item.value===get(appPreferences, 'language', ''))} onChange={option => this.handleChangeLanguage(option.value)} />
                   </div>
                   <div className="form-group">
                     <label>{this.context.t('currency')}</label>
-                    <Select placeholder='Select...' options={currencies} optionRenderer={option => option.label} valueRenderer={option => option.label} simpleValue={true} value={get(appPreferences, 'currency', '')} clearable={false} autosize={false} onChange={value => this.handleChangeCurrency(value)} />
+                    <Select placeholder={this.context.t('select')} options={currencies} value={currencies.find(item => item.value===get(appPreferences, 'currency', ''))} onChange={option => this.handleChangeCurrency(option.value)} />
                   </div>
                 </PopoverBody>
               </Popover>

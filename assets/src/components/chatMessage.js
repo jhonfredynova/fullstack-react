@@ -26,7 +26,7 @@ class ChatMessage extends React.PureComponent {
 
   async handleValidate(path){
     let errors = clean(this.state.errors)
-    if(isEmpty(this.state.value)) {
+    if(isEmpty(this.state.message)) {
       errors.value = this.context.t('enterMessage')
     }
     if(path) errors = set(this.state.errors, path, get(errors, path))
@@ -38,12 +38,18 @@ class ChatMessage extends React.PureComponent {
       if(e) e.preventDefault()
       //validate
       await this.handleValidate()
-      if(!compact(this.state.errors)){
+      if(!isEmpty(compact(this.state.errors))){
         return
       }
       //execute
+      const { session } = this.props.auth
+      const chatMessage = {
+        sender: session.id,
+        text: this.state.message,
+        chat: this.state.chat.id
+      }
       if(this.props.onSend){
-        await this.props.onSend(this.state.message)
+        await this.props.onSend(chatMessage)
       }
       this.setState({ message: '' })
     }catch(e){

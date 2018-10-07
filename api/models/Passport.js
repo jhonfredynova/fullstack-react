@@ -11,10 +11,7 @@ module.exports = {
     protocol: {
       type: 'string',
       required: true
-    },
-    password: {
-      type: 'string'
-    },    
+    }, 
     identifier: {
       type: 'string',
       allowNull: true
@@ -29,6 +26,9 @@ module.exports = {
       model: 'User',
       required: true
     }
+  },
+  customToJSON: function(){
+    return _.omit(this, ['id','user','token'])
   }
   
 }

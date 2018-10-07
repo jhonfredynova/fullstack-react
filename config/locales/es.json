@@ -218,5 +218,10 @@
   "mailSubscriptionCanceledSubject": "Tu suscripción ha sido cancelada",
   "mailSubscriptionCanceledMessage": "Tu suscripción ha sido cancelada, tuvimos problemas debitando el pago en tu tarjeta de crédito, verifique los fondos de tu tarjeta de crédito o comunicate con tu banco para más información.",
   "chatConversationsEmpty": "No tienes conversaciones hasta el momento.",
-  "search": "Buscar"
+  "search": "Buscar",
+  "dashboardTitle": "Dashboard",
+  "dashboardDescription": "Bienvenido a tu tablero de control",
+  "select": "Seleccione",
+  "photo": "Foto",
+  "uploadPhoto": "Arrastra aquí tu imagen de perfil o sube una foto"
 }

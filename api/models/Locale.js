@@ -20,16 +20,39 @@ module.exports = {
       required: true
     }
   },
-  beforeCreate: async (values, next) => {
+  afterValidate: async function(values){
     try{
       let errors = []
-      let data = await sails.models.locale.findOne({ id: { '!=': values.id }, name: values.name })
-      if(data){
-        errors.push(intlService.i18n('localeNameAlreadyExist'))
+      let data = null
+      if(values.name){
+        data = await sails.models.locale.findOne({ id: { '!=': values.id }, name: values.name })
+        if(data) errors.push(intlService.i18n('localeNameAlreadyExist'))
       }
       if(errors.length>0){
-        throw errors.join(intlService.i18n('errorSeparator'))
+        errors = errors.join(intlService.i18n('errorSeparator'))
       }
+      return errors
+    }catch(e){
+      throw e
+    }
+  },
+  beforeCreate: async function(values, next){
+    try{
+      //validate
+      let errors = await this.afterValidate(values)
+      if(errors.length>0) throw errors
+      //execute
+      next()
+    }catch(e){
+      next(e)
+    }
+  },
+  beforeUpdate: async function(values, next){
+    try{
+      //validate
+      let errors = await this.afterValidate(values)
+      if(errors.length>0) throw errors
+      //execute
       next()
     }catch(e){
       next(e)

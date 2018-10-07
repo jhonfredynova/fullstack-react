@@ -29,16 +29,39 @@ module.exports = {
       required: true
     }
   },
-  beforeCreate: async function (values, next) {
+  afterValidate: async function(values){
     try{
       let errors = []
-      let data = await PlanFeature.findOne({ id: { '!=': values.id }, plan: values.plan, feature: values.feature })
-      if(data){
-        errors.push(intlService.i18n('planFeatureAlreadyExist'))
+      let data = null
+      if(values.plan && values.feature){
+        data = await PlanFeature.findOne({ id: { '!=': values.id }, plan: values.plan, feature: values.feature })
+        if(data) errors.push(intlService.i18n('planFeatureAlreadyExist'))
       }
       if(errors.length>0){
-        throw errors.join(intlService.i18n('errorSeparator'))
+        errors = errors.join(intlService.i18n('errorSeparator'))
       }
+      return errors
+    }catch(e){
+      throw e
+    }
+  },
+  beforeCreate: async function (values, next) {
+    try{
+      //validate
+      let errors = await this.afterValidate(values)
+      if(errors.length>0) throw errors
+      //execute
+      next()
+    }catch(e){
+      next(e)
+    }
+  },
+  beforeUpdate: async function (values, next) {
+    try{
+      //validate
+      let errors = await this.afterValidate(values)
+      if(errors.length>0) throw errors
+      //execute
       next()
     }catch(e){
       next(e)

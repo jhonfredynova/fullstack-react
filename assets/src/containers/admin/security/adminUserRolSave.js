@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Select from 'react-select'
 import { clean, compact, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
@@ -39,7 +38,7 @@ class AdminUserRolSave extends React.PureComponent {
       const userId = this.props.match.params.id || ''
       await this.props.dispatch(getRol({ populate: false, select: ['id','name'] }))
       await this.props.dispatch(getUser({ populate: false, select: ['id','firstname','lastname','email'], where: { id: userId } }))    
-      await this.setState({ user: this.props.user.users.records.shift() })
+      await this.setState({ user: this.props.user.users.records[0] })
       await this.setState({ model: Object.assign(this.state.model, { user: this.state.user.id }) })
       this.props.dispatch(hideLoading())
     }catch(e){
@@ -98,7 +97,14 @@ class AdminUserRolSave extends React.PureComponent {
           </div>
           <div className="form-group col-md-6">
             <label>Rol <span>*</span></label>
-            <Select options={this.state.roles} valueKey='id' labelKey='name' value={this.state.model.rol} clearable={false} autosize={false} onChange={value => this.handleChangeState('model.rol', value.id)} />
+            <select className="form-control" value={this.state.model.rol} onChange={e => this.handleChangeState('model.rol', e.target.value)}>
+              <option value="">{this.context.t('select')}...</option>
+              {
+                this.state.roles.map(item => 
+                  <option value={item.id}>{item.name}</option>
+                ) 
+              }
+            </select>
             <span className="text-danger">{this.state.errors.model.rol}</span>
           </div>
           <button type="submit" className="d-none" />

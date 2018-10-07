@@ -1,7 +1,7 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Select from 'react-select'
-import { clean, compact, defaults, keys, get, set, isEmpty } from 'lodash'
+import AsyncSelect from 'react-select/lib/Async'
+import { clean, compact, defaults, keys, get, set, setDeep, unionBy, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import Counter from 'components/counter'
 import NavigationBar from 'components/navigationBar'
@@ -13,8 +13,23 @@ class AdminCatalogSave extends React.PureComponent {
 
   constructor(props) {
     super(props)
+    const catalogId = this.props.match.params.id || ''
     this.state = {
       catalogs: this.props.catalog.catalogs.records,
+      catalogQuery: {
+        pageSize: 10,
+        select: ['id','name'],
+        sort: [
+          { name: 'ASC' }
+        ],
+        where: {
+          id: { '!=': catalogId },
+          active: true, 
+          or: [
+            { name: { like: '%' } }
+          ]
+        }
+      },
       errors: {
         model: {}
       },
@@ -29,17 +44,12 @@ class AdminCatalogSave extends React.PureComponent {
     }
   }
 
-  componentWillReceiveProps(nextProps) {
-    this.setState({
-      catalogs: nextProps.catalog.catalogs.records
-    })
-  }
-
   async componentWillMount() {
     try{
       this.props.dispatch(showLoading())
       const catalogId = this.props.match.params.id || ''
-      await this.props.dispatch(getCatalog({ select: keys(this.state.model), sort: [{name: 'ASC'}], where: { active: true } }))
+      await this.props.dispatch(getCatalog(this.state.catalogQuery))
+      await this.setState({ catalogs: this.props.catalog.catalogs.records })
       await this.props.dispatch(getCatalog({ populate: false, select: keys(this.state.model), where: {id: catalogId} }))
       await this.setState({ model: defaults(this.props.catalog.catalogs.records[0], this.state.model) })
       this.props.dispatch(hideLoading())
@@ -52,6 +62,20 @@ class AdminCatalogSave extends React.PureComponent {
   async handleChangeState(path, value) {
     await this.setState(set(this.state, path, value))
     await this.handleValidate(path)
+  }
+
+  async handleCatalogSearch(value, callback){
+    try{
+      if(value.indexOf('%')===-1) value = `%${value}%`
+      let where = setDeep(this.state.catalogQuery.where, 'like', value)
+      await this.handleChangeState('catalogQuery.where', where)
+      await this.props.dispatch(getCatalog(this.state.catalogQuery))
+      let results = this.props.catalog.catalogs.records
+      this.setState({ users: unionBy(results, this.state.parentCatalogs, 'id') })
+      callback(results)
+    }catch(e){
+      this.props.dispatch(setMessage({ type: 'error', message: e.message }))
+    }
   }
 
   async handleValidate(path) {
@@ -97,9 +121,6 @@ class AdminCatalogSave extends React.PureComponent {
 
   render() {    
     const { config } = this.props.app
-    const parentCatalogs = this.state.catalogs.filter(item => item.id!==this.props.match.params.id).map((item, index) => {
-      return { label: item.name, id: item.id }
-    })
     return (
       <div id="adminCatalogSave">
         <NavigationBar 
@@ -110,7 +131,7 @@ class AdminCatalogSave extends React.PureComponent {
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
           <div className="form-group col-md-6">
             <label>Parent Catalog</label>
-            <Select className="form-control" options={parentCatalogs} valueKey='id' value={this.state.model.parent} simpleValue={true} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.parent', value)} />
+            <AsyncSelect cacheOptions={true} defaultOptions={this.state.catalogs} value={this.state.catalogs.find(item => item.id===this.state.model.parent)} getOptionLabel={option => option.name} getOptionValue={option => option.id} loadOptions={this.handleCatalogSearch.bind(this)} onChange={option => this.handleChangeState('model.parent', option.id)} />
             <span className="text-danger">{this.state.errors.model.parent}</span>
           </div>
           <div className="form-group col-md-6">

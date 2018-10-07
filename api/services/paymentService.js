@@ -13,8 +13,9 @@ module.exports = {
 
   createCreditCard: async (data) => {
     try{
-      const { creditCard } = data
-      let responseStripe = await stripe.tokens.create({
+      //validating
+      const { clientCode, creditCard } = data
+      const responseStripe = await stripe.tokens.create({
         card: {
           "number": creditCard.number,
           "exp_month": creditCard.expiration.month,
@@ -29,7 +30,15 @@ module.exports = {
         expYear: creditCard.expiration.year,
         type: responseStripe.card.brand.toUpperCase()
       }
-      return await paymentService.executeApiPayu('POST', `/customers/${data.clientCode}/creditCards`, data.creditCard)
+      //updating
+      const client = await paymentService.executeApiPayu('GET', `/customers/${clientCode}`)
+      client.creditCards = _.get(client, 'creditCards', [])
+      if(client.creditCards.length>0){
+        for(let creditCard of client.creditCards){
+          await paymentService.executeApiPayu('DELETE', `/customers/${clientCode}/creditCards/${creditCard.token}`)
+        }
+      }
+      return await paymentService.executeApiPayu('POST', `/customers/${clientCode}/creditCards`, data.creditCard)
     }catch(e){
       throw e
     }

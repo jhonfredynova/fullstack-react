@@ -15,8 +15,8 @@ function Socket(params){
     return url.replace(process.env.REACT_APP_LOCAL_SOCKET_URL, '')
   }
 
-  this.setHeader = (headers) => {
-    io.socket.headers = headers
+  this.setHeader = (key, value) => {
+    io.sails.headers[key] = value
   }
 
   this.get = (url, data) => {
@@ -70,6 +70,7 @@ function Socket(params){
 
 const socket = new Socket({ 
   autoConnect: true,
+  headers: {},
   url: process.env.REACT_APP_LOCAL_SOCKET_URL,
   useCORSRouteToGetCookie: false
 })

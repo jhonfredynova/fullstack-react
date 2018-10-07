@@ -11,7 +11,6 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-social/bootstrap-social.css'
 import 'react-input-range/lib/bundle/react-input-range.css'
 import 'react-loading-bar/dist/index.css'
-import 'react-select/dist/react-select.css'
 import 'react-quill/dist/quill.snow.css'
 //ADMIN-CONTAINERS
 import AdminCatalog from 'containers/admin/configuration/adminCatalog'

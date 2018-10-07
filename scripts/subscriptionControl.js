@@ -34,7 +34,7 @@ module.exports = {
         for(let subscription of user.clientInfo.subscriptions){
           currentBilling = await paymentService.executeApiPayu('GET', `/recurringBill?subscriptionId=${subscription.id}`)
           currentBilling = _.orderBy(currentBilling.recurringBillList, ['dateCharge'], ['desc'])[0] || {}
-          if(user.nextPlan && (currentBilling.dateCharge-Date.now())/36e5<2){
+          if(user.nextPlan && (currentBilling.dateCharge-Date.now())/36e5<4){
             await paymentService.executeApiPayu('DELETE', `/subscriptions/${subscription.id}`)
             if(user.nextPlan.planCode){
               let subscriptionData = {

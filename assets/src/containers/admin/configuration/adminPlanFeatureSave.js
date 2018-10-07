@@ -1,6 +1,5 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import Select from 'react-select'
 import { clean, compact, defaults, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
@@ -23,7 +22,7 @@ class AdminPlanFeatureSave extends React.PureComponent {
       model: {
         id: undefined,
         plan: null,
-        feature: null,
+        feature: '',
         quantity: '',
         order: ''
       }
@@ -112,7 +111,14 @@ class AdminPlanFeatureSave extends React.PureComponent {
         <form className="row" onSubmit={this.handleSubmit.bind(this)}>
           <div className="form-group col-md-6">
             <label>Feature <span>*</span></label>
-            <Select className="form-control" options={this.state.planFeatures} valueKey='id' labelKey='name' value={this.state.model.feature} clearable={true} autosize={false} onChange={value => this.handleChangeState('model.feature', value.id)} />
+            <select className="form-control"  value={this.state.model.feature} onChange={e => this.handleChangeState('model.feature', e.target.value)}>
+              <option value="">{this.context.t('select')}...</option>
+              {
+                this.state.planFeatures.map(item => 
+                  <option key={item.id} value={item.id}>{item.name}</option>
+                ) 
+              }
+            </select>
             <span className="text-danger">{this.state.errors.model.feature}</span>
           </div>
           <div className="form-group col-md-6">

@@ -1,5 +1,5 @@
-import shortid from 'shortid'
 import socket from 'components/socket'
+import shortid from 'shortid'
 import { isEqual, mapValues, pick } from 'lodash'
 import { handleRequestError, handleRequestQuery } from 'components/helper'
 

@@ -43,7 +43,7 @@ module.exports = {
       via: 'plan'
     }
   },
-  afterFind: async (values, next) => {
+  afterFind: async function(values, next){
     try{ 
       let subscriptionPlans = await paymentService.executeApiPayu('GET', '/plans', null)
       let planFeatures = await sails.models.planfeature.find().populateAll()
@@ -59,20 +59,42 @@ module.exports = {
       next(e)
     }
   },
-  beforeCreate: async (values, next) => {
+  afterValidate: async function(values){
     try{
-      //validations
       let errors = []
-      let data = await Plan.findOne({ id: { '!=': values.id }, name: values.name })
-      if(data){
-        errors.push(intlService.i18n('planNameAlreadyExist'))
+      let data = null
+      if(values.name){
+        data = await user.models.plan.findOne({ id: { '!=': values.id }, name: values.name })
+        if(data) errors.push(intlService.i18n('planNameAlreadyExist'))
       }
-      if(errors.length>0) {
-        throw errors.join(intlService.i18n('errorSeparator'))
+      if(errors.length>0){
+        errors = errors.join(intlService.i18n('errorSeparator'))
       }
-      //others
+      return errors
+    }catch(e){
+      throw e
+    }
+  },
+  beforeCreate: async function(values, next){
+    try{
+      ///validate
+      let errors = await this.afterValidate(values)
+      if(errors.length>0) throw errors
+      //execute
       if(values.paymentType==='transaction') delete values.planCode
-      next()
+      next()      
+    }catch(e){
+      next(e)
+    }
+  },
+  beforeUpdate: async function(values, next){
+    try{
+      ///validate
+      let errors = await this.afterValidate(values)
+      if(errors.length>0) throw errors
+      //execute
+      if(values.paymentType==='transaction') delete values.planCode
+      next()      
     }catch(e){
       next(e)
     }

@@ -3,13 +3,13 @@ import { get, isArray, isObject, isString, join } from 'lodash'
 //REQUESTS
 export function handleRequestError(e){
   let message = null
-  let messageDetail = get(e,'response.data', e.error) 
+  let messageDetail = get(e,'body', e.error) 
   if(isString(messageDetail) && !message) message = messageDetail
   if(isObject(messageDetail) && !message) message = get(messageDetail, 'message', null)
   if(isObject(messageDetail) && !message) message = get(messageDetail, 'raw', null)
   if(isObject(messageDetail) && !message) message = get(messageDetail, 'details', null)  
   if(!message) message = e.message
-  throw new Error(message)
+  throw new Error(message.replace(/"/g,""))
 }
 
 export function handleRequestQuery(data){

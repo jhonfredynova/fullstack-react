@@ -218,5 +218,10 @@
   "mailSubscriptionCanceledSubject": "Your subscription has been canceled ",
   "mailSubscriptionCanceledMessage": "Your subscription has been canceled, we had problems debiting the payment on your credit card, verify the funds of your credit card or contact your bank for more information.",
   "chatConversationsEmpty": "You don't have conversations so far.",
-  "search": "Search"
+  "search": "Search",
+  "dashboardTitle": "Dashboard",
+  "dashboardDescription": "Welcome to your dashboard",
+  "select": "Select",
+  "photo": "Photo",
+  "uploadPhoto": "Here, drag your profile picture or upload a photo"
 }
