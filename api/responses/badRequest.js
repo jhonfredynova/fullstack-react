@@ -52,8 +52,8 @@ module.exports = function badRequest(data) {
     // > the Error might reveal the `stack`.  And since `res.badRequest()` could certainly be used in
     // > production, we wouldn't want to inadvertently dump a stack trace.
     if (!_.isFunction(data.toJSON)) {
-      if (process.env.NODE_ENV === 'production') {
-        return res.sendStatus(400);
+      if (process.env.NODE_ENV==='production') {
+        data.stack = null
       }
       // No need to JSON stringify (this is already a string).
       return res.send(util.inspect(data));

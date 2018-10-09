@@ -37,7 +37,7 @@ module.exports = function serverError (data) {
   // Don't output error data with response in production.
   var dontRevealErrorInResponse = process.env.NODE_ENV === 'production';
   if (dontRevealErrorInResponse) {
-    data = undefined;
+    if (!_.isUndefined(data))  data.stack = null
   }
 
   // Set status code
