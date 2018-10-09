@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import { omit } from 'lodash'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
@@ -14,7 +15,7 @@ export const USER = {
 
 export function getUser(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/user?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/user?${handleRequestQuery(parameters)}`)
     .then(response => { dispatch({type: USER.GET, payload: handleResponseQuery(response) }) })
     .catch(err => handleRequestError(err) )
   }
@@ -77,7 +78,7 @@ export const USER_ROL = {
 
 export function getUserRol(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/user/${parameters.where.user}/roles?${handleRequestQuery(omit(parameters,['where.user']))}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/user/${parameters.where.user}/roles?${handleRequestQuery(omit(parameters,['where.user']))}`)
     .then(response => { dispatch({type: USER_ROL.GET, payload: handleResponseQuery(response) }) })
     .catch(err => handleRequestError(err) )
   }

@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import { handleRequestError } from 'components/helper'
 
@@ -23,7 +24,7 @@ export function socketConnect(data) {
 export function me() {
   return dispatch => {
     if (!localStorage.getItem(AUTH.TOKEN_NAME)) return dispatch({type: AUTH.GET, payload: null})
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/auth/me`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/auth/me`)
     .then(response => dispatch({type: AUTH.GET, payload: response.data}))
     .catch(err => dispatch({type: AUTH.GET, payload: null}) )
   }

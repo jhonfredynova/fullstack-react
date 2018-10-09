@@ -19,10 +19,10 @@ class Main extends React.PureComponent {
 
   async componentWillMount() {
     try{      
-      await this.props.dispatch(getToken())
-      await this.props.dispatch(onEvent(EVENT.CONNECT, (data) => this.props.dispatch(connectSocket()) ))
-      await this.props.dispatch(getConfig())      
+      await this.props.dispatch(getConfig())     
+      this.props.dispatch(getToken())
       this.props.dispatch(me())
+      this.props.dispatch(onEvent(EVENT.CONNECT, (data) => this.props.dispatch(connectSocket()) )) 
       const { config } = this.props.app
       const { session } = this.props.auth      
       const preferences = defaults(get(session, 'preferences'), config.appPreferences)
@@ -117,6 +117,9 @@ class Main extends React.PureComponent {
             height: 36px;
             line-height: 36px;
           } 
+          .text-deleted{
+            text-decoration: line-through;
+          }
         `}
         </Style>
       </div>

@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
@@ -10,7 +11,7 @@ export const LOCALE = {
 
 export function getLocale(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/locale?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/locale?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: LOCALE.GET, payload: handleResponseQuery(response)}) )
     .catch(err => handleRequestError(err) )
   }

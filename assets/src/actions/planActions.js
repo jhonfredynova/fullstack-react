@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
@@ -10,7 +11,7 @@ export const PLAN = {
 
 export function getPlan(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/plan?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/plan?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: PLAN.GET, payload: handleResponseQuery(response) }) )
     .catch(err => handleRequestError(err) )
   }
@@ -49,7 +50,7 @@ export const PLAN_FEATURE = {
 
 export function getPlanFeature(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/planFeature?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/planFeature?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: PLAN_FEATURE.GET, payload: handleResponseQuery(response) }) )
     .catch(err => handleRequestError(err) )
   }

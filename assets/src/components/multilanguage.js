@@ -2,7 +2,7 @@ import React from 'react'
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap'
 import ReactQuill, { Quill } from 'react-quill'
 import classnames from 'classnames'
-import { defaultTo, get, set } from 'lodash'
+import { defaultTo, get, set, isHtml } from 'lodash'
 // Editor configuration
 let BlockEmbed = Quill.import('blots/block/embed')
 class Hr extends BlockEmbed {}
@@ -16,7 +16,7 @@ class Multilanguage extends React.PureComponent {
     super(props)
     this.state = {
       activeTab: 'en',
-      isHtml: defaultTo(this.props.type, false),
+      isHtml: null,
       languages: defaultTo(this.props.languages, []),
       value: defaultTo(this.props.value, {})
     }
@@ -32,7 +32,8 @@ class Multilanguage extends React.PureComponent {
   }
 
   render(){
-    const reactQuillModules = {
+    const editorIsHtml = this.state.isHtml===null ? isHtml(this.state.value[this.state.activeTab]) : this.state.isHtml 
+    const editorModules = {
       toolbar: {
         container: [
           [{'font': []}, { 'header': [] }, { 'size': [] }],
@@ -57,8 +58,8 @@ class Multilanguage extends React.PureComponent {
            {
             this.state.languages.map(item =>
               <TabPane key={item} tabId={item} title={item}>
-                { this.state.isHtml
-                  ? <ReactQuill modules={reactQuillModules} value={get(this.state, `value[${item}]`, '')} onChange={value => this.handleChangeState(`value[${item}]`, value)} />
+                { editorIsHtml 
+                  ? <ReactQuill modules={editorModules} value={get(this.state, `value[${item}]`, '')} onChange={value => this.handleChangeState(`value[${item}]`, value)} />
                   : <textarea value={get(this.state, `value[${item}]`, '')} className="form-control" rows="4" onChange={e => this.handleChangeState(`value[${item}]`, e.target.value)} />
                 }
               </TabPane>
@@ -66,8 +67,8 @@ class Multilanguage extends React.PureComponent {
           }
         </TabContent>
         <div className="btn-group">
-          <button type="button" className={classnames({'btn btn-default': true}, {'btn-success': !this.state.isHtml} )} onClick={this.handleChangeState.bind(this, 'isHtml', false)}>TEXT</button> 
-          <button type="button" className={classnames({'btn btn-default': true}, {'btn-success': this.state.isHtml} )} onClick={this.handleChangeState.bind(this, 'isHtml', true)}>HTML</button> 
+          <button type="button" className={classnames({'btn btn-default': true}, {'btn-success': !editorIsHtml} )} onClick={this.handleChangeState.bind(this, 'isHtml', false)}>TEXT</button> 
+          <button type="button" className={classnames({'btn btn-default': true}, {'btn-success': editorIsHtml} )} onClick={this.handleChangeState.bind(this, 'isHtml', true)}>HTML</button> 
         </div>
       </div>
     )

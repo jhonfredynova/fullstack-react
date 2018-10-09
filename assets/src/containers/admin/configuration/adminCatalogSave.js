@@ -151,7 +151,7 @@ class AdminCatalogSave extends React.PureComponent {
           </div>
           <div className="form-group col-md-12">
             <label>Value *</label>
-            <Multilanguage languages={config.appLanguages} type='html' value={this.state.model.value} onChange={value => this.handleChangeState('model.value', value)} />
+            <Multilanguage languages={config.appLanguages} value={this.state.model.value} onChange={value => this.handleChangeState('model.value', value)} />
             <span className="text-danger">{this.state.errors.model.value}</span>
           </div>
           <button type="submit" className="d-none" />

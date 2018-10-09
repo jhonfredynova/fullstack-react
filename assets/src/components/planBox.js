@@ -51,7 +51,7 @@ class PlanBox extends React.PureComponent {
       <div id="planBox" className={classnames({'popular': info.popular, 'selected': info.selected})} onClick={this.handleClick.bind(this)}>
         <div id={`plan-${info.id}`} className="card" onClick={() => this.handleChangeState('showTooltipPlanFree', !this.state.showTooltipPlanFree)}>
           <div className="card-header text-center">
-            <div id="popular" className={classnames({'d-none': !info.popular})}>
+            <div id="popular" className={classnames({'d-none': !info.popular})}> 
               <i className="fas fa-star"></i>
             </div>
             <div id="selected" className={classnames({'d-none': !info.selected})}>
@@ -59,7 +59,7 @@ class PlanBox extends React.PureComponent {
             </div>
             {info.name}
             <div className="paymentInfo">
-              <div className="d-inline text-danger small">
+              <div className="d-inline text-dark small">
                 <Numeric amount={info.price.value} display='text' decimalScale={2} from={config.appPreferences.currency} to={info.price.currency} prefix='$' suffix={` ${config.appPreferences.currency.toUpperCase()}${info.price.recurrence}`} currencyConversion={config.appIntl.currencyConversion} thousandSeparator=',' />
               </div>  
             </div>

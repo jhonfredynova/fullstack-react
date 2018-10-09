@@ -112,6 +112,7 @@ class Profile extends React.PureComponent {
   }
 
   render() {    
+    const photo = [].concat(this.state.model.photo)
     const { defaultUser: defaultUserPhoto } = this.props.app.config.images
     return (
       <div id="profile">
@@ -123,7 +124,7 @@ class Profile extends React.PureComponent {
           <div className="col-md-6">
             <div className="form-group text-center">
               <h3>{`${this.state.model.firstname} ${this.state.model.lastname}`}</h3>
-              <Upload legend={this.context.t('uploadPhoto')} maxAllowed={3} defaultValue={defaultUserPhoto} value={this.state.model.photo} onChange={value => this.handleChangeState('model.photo', value)} />
+              <Upload legend={this.context.t('uploadPhoto')} maxAllowed={5} defaultValue={defaultUserPhoto} value={photo} onChange={value => this.handleChangeState('model.photo', value)} />
             </div>
             <div className="alert alert-secondary">
               Passports: 

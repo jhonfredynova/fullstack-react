@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import shortid from 'shortid'
 import { isEqual, mapValues, pick } from 'lodash'
@@ -36,7 +37,7 @@ export function showLoading() {
 
 export function getConfig(parameters) {
   return (dispatch, state)  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/app/config?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/app/config?${handleRequestQuery(parameters)}`)
     .then(response => { 
       response = response.data
       // updating locales

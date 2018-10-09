@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
@@ -10,7 +11,7 @@ export const CATALOG = {
 
 export function getCatalog(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/catalog?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/catalog?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: CATALOG.GET, payload: handleResponseQuery(response)}) )
     .catch(err => handleRequestError(err) )
   }

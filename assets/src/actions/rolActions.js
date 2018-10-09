@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
@@ -10,7 +11,7 @@ export const ROL = {
 
 export function getRol(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/rol?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/rol?${handleRequestQuery(parameters)}`)
     .then(response => { dispatch({type: ROL.GET, payload: handleResponseQuery(response) }) })
     .catch(err => handleRequestError(err) )
   }

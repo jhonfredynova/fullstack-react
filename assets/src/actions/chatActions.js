@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
@@ -10,7 +11,7 @@ export const CHAT = {
 
 export function getChat(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/chat?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/chat?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: CHAT.GET, payload: handleResponseQuery(response)}) )
     .catch(err => handleRequestError(err) )
   }
@@ -49,7 +50,7 @@ export const CHAT_MESSAGE = {
 
 export function getChatMessage(parameters) {
   return dispatch  => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/chatMessage?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: CHAT_MESSAGE.GET, payload: handleResponseQuery(response) }) )
     .catch(err => handleRequestError(err) )
   }

@@ -1,3 +1,4 @@
+import axios from 'axios'
 import socket from 'components/socket'
 import { handleRequestError, handleRequestQuery, handleResponseQuery } from 'components/helper'
 
@@ -14,7 +15,7 @@ export const PAYMENT = {
 
 export function getBilling(parameters) {
   return dispatch => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/billing?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/billing?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: PAYMENT.GET_BILLING, payload: handleResponseQuery(response)}))
     .catch(err => handleRequestError(err) )
   }
@@ -22,7 +23,7 @@ export function getBilling(parameters) {
 
 export function getSubscription(parameters) {
   return dispatch => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${parameters.subscriptionId}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/${parameters.subscriptionId}`)
     .then(response => dispatch({type: PAYMENT.GET_SUBSCRIPTION, payload: response.data}))
     .catch(err => handleRequestError(err) )
   }
@@ -30,7 +31,7 @@ export function getSubscription(parameters) {
 
 export function getSubscriptionPlan(parameters) {
   return dispatch => {
-    return socket.get(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/plan?${handleRequestQuery(parameters)}`)
+    return axios.get(`${process.env.REACT_APP_LOCAL_API_URL}/payment/subscription/plan?${handleRequestQuery(parameters)}`)
     .then(response => dispatch({type: PAYMENT.GET_SUBSCRIPTION_PLAN, payload: response.data}))
     .catch(err => handleRequestError(err) )
   }

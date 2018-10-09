@@ -1,6 +1,6 @@
 import React from 'react'
 import { connect } from 'react-redux'
-import { clean, compact, defaults, isHtml, keys, get, set, isEmpty } from 'lodash'
+import { clean, compact, defaults, keys, get, set, isEmpty } from 'lodash'
 import PropTypes from 'prop-types'
 import NavigationBar from 'components/navigationBar'
 import Multilanguage from 'components/multilanguage'
@@ -103,7 +103,7 @@ class AdminLocaleSave extends React.PureComponent {
           </div>
           <div className="form-group col-md-12">
             <label>Value *</label>
-            <Multilanguage isHtml={isHtml(this.state.model.value.en)} languages={config.appLanguages} value={this.state.model.value } onChange={value => this.handleChangeState('model.value', value)} />
+            <Multilanguage languages={config.appLanguages} value={this.state.model.value } onChange={value => this.handleChangeState('model.value', value)} />
             <span className="text-danger">{this.state.errors.model.value}</span>
           </div>
           <button type="submit" className="d-none" />

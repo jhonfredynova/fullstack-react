@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { defaultTo, set } from 'lodash'
+import { isObject, defaultTo, set } from 'lodash'
 import Style from 'components/style'
 
 class Upload extends React.PureComponent {
@@ -18,10 +18,15 @@ class Upload extends React.PureComponent {
 
   componentDidMount(){
     try{
-      let dropArea = this.refs.divUpload
       let events = ['dragenter','dragover','dragleave','drop']
-      events.forEach(event => dropArea.addEventListener(event, this.handlePreventDefault))
-      dropArea.addEventListener('drop', this.handleDrop)
+      //dropArea
+      let dropArea = this.refs.uploadDropArea
+      events.forEach(event => dropArea.addEventListener(event, this.handlePreventDefault.bind(this)))
+      dropArea.addEventListener('drop', this.handleDropFiles.bind(this))
+      //dragArea
+      let dragArea = this.refs.uploadDragArea
+      dragArea.addEventListener('dragenter', this.handleDragStart.bind(this))
+      dragArea.addEventListener('drop', this.handleDragEnd.bind(this))
     }catch(e){
       console.error(e)
     }
@@ -49,7 +54,7 @@ class Upload extends React.PureComponent {
     }
   }
 
-  async handleDrop(e){
+  async handleDropFiles(e){
     try{
       let files = (e.dataTransfer).files
       this.handleFiles(files)
@@ -58,39 +63,87 @@ class Upload extends React.PureComponent {
     }
   }
 
+  async handleDragStart(e){
+    try{
+      if(e.target.draggable){
+        e.dataTransfer.effectAllowed = 'move'
+        e.dataTransfer.setData('text/plain', e.target.id)
+      }
+    }catch(e){
+      console.error(e)
+    }
+  }
+
+  async handleDragEnd(e){
+    try{
+      if(e.target.draggable){
+        e.preventDefault()
+        e.stopPropagation()
+        let newIndex = parseInt(e.target.id,10)
+        let oldIndex = parseInt(2,10)//e.dataTransfer.getData('text')
+        e.dataTransfer.clearData()
+        const { value } = this.state
+        const movedItem = value.find((item, index) => index===oldIndex)
+        const remainingItems = value.filter((item, index) => index!==oldIndex)
+        const reorderedItems = [
+          ...remainingItems.slice(0, newIndex),
+          movedItem,
+          ...remainingItems.slice(newIndex)
+        ]
+        this.setState({ value: reorderedItems })
+      }
+    }catch(e){
+      console.error(e)
+    }
+  }
+
   async handleFiles(files){
     try{
-      files = Array.from(files).slice(0, this.props.maxAllowed)
-      await this.setState({ value: files })
+      const value = [...this.state.value].concat(Array.from(files).slice(0, this.props.maxAllowed-this.state.value.length))
+      await this.setState({ value: value })
       this.props.onChange(this.state.value)
     }catch(e){
       console.error(e)
     }
   }
 
-  async handleFilePreview(imgId, file){
+  async handleFileDelete(fileId, e){
     try{
-      if(!file.size) return file
-      let reader = new FileReader()
-      reader.onload = (e) => this.refs[imgId].src = e.target.result
-      reader.readAsDataURL(file)
+      e.preventDefault()
+      e.stopPropagation()
+      const { value } = this.state
+      this.setState({ value: value.filter((item, index) => index!==fileId) })
+    }catch(e){
+      console.error(e)
+    }
+  }
+
+  async handleFilePreview(fileId, file){
+    try{
+      if(isObject(file)){
+        const reader = new FileReader()
+        reader.onload = (e) => this.refs[fileId].src = e.target.result
+        reader.readAsDataURL(file)
+      }
     }catch(e){
       console.error(e)
     }
   }
 
   render() {
-    const value = [].concat(this.state.value)
     const { className, defaultValue, legend, maxAllowed } = this.props
     return (
-      <div ref="divUpload" id="upload" className={`row justify-content-start p-3 ${className}`} onClick={() => this.refs.inputUpload.click()}>
-        {
-          value.map((item, index) => 
-            <div key={index} className="col mb-3">
-              <img ref={index} src={this.handleFilePreview(index, item)} alt={'upload'} width={200} />
-            </div>   
-          )
-        }
+      <div ref="uploadDropArea" id="upload" className={className} onClick={() => this.refs.inputUpload.click()}>
+        <div ref="uploadDragArea" className="row justify-content-start align-items-center p-3">
+          {
+            this.state.value.map((item, index) => 
+              <div key={index} className="col m-3 border">
+                <span className="closeIcon" onClick={this.handleFileDelete.bind(this,index)}><i className="fas fa-times-circle text-danger" /></span>
+                <img ref={index} id={index} src={this.handleFilePreview(index, item)} alt={'upload'} width={150} draggable={true} />
+              </div>   
+            )
+          }
+        </div>
         <div className="col-12">{legend}</div>
         <input ref="inputUpload" className="d-none" type="file" name={Date.now()} multiple={maxAllowed>1} onChange={this.handleChangeInput.bind(this)} />
         <Style>
@@ -98,6 +151,11 @@ class Upload extends React.PureComponent {
           #upload{
             cursor: pointer;
             border: 2px dashed #dbdbe2;
+          }
+          #upload .closeIcon{
+            position: absolute;
+            top: -12px;
+            right: -8px;
           }
         `}
         </Style>

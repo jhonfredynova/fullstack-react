@@ -50,7 +50,7 @@ module.exports = {
       for(let plan of values){
         if(plan.features) plan.features = _.filter(planFeatures, item => item.plan.id===plan.id)
         plan.subscriptionInfo = _.find(subscriptionPlans.subscriptionPlanList, { planCode: plan.planCode })
-        if (plan.subscriptionInfo) {
+        if(plan.subscriptionInfo) {
           plan.subscriptionInfo.price = _.find(plan.subscriptionInfo.additionalValues, { name:'PLAN_VALUE' })
         }
       } 

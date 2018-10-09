@@ -28,7 +28,7 @@ module.exports = {
     }
   },
   customToJSON: function(){
-    return _.omit(this, ['id','user','token'])
+    return _.omit(this, ['id'])
   }
   
 }
