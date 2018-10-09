@@ -5,22 +5,23 @@
 var _ = require('@sailshq/lodash');
 
 
-
 /**
- * 500 (Server Error) Response
+ * 500 (Server Error) Handler
  *
  * Usage:
  * return res.serverError();
- * return res.serverError(err);
- * return res.serverError(err, 'some/specific/error/view');
+ * return res.serverError(data);
  *
- * NOTE:
- * If something throws in a policy or controller, or an internal
- * error is encountered, Sails will call `res.serverError()`
- * automatically.
+ * e.g.:
+ * ```
+ * return res.serverError(
+ *   'Please choose a valid `password` (6-12 characters)',
+ *   'trial/signup'
+ * );
+ * ```
  */
 
-module.exports = function serverError (data) {
+module.exports = function badRequest(data) {
 
   // Get access to `req` and `res`
   var req = this.req;
@@ -31,62 +32,31 @@ module.exports = function serverError (data) {
 
   // Log error to console
   if (!_.isUndefined(data)) {
-    sails.log.error('Sending 500 ("Server Error") response: \n', data);
-  }
-
-  // Don't output error data with response in production.
-  var dontRevealErrorInResponse = process.env.NODE_ENV === 'production';
-  if (dontRevealErrorInResponse) {
-    if (!_.isUndefined(data))  data.stack = null
+    sails.log.verbose('Sending 500 ("Server Error") response: \n', data);
   }
 
   // Set status code
   res.status(500);
 
-  // If appropriate, serve data as JSON.
-  if (req.wantsJSON || !res.view) {
-    // If no data was provided, use res.sendStatus().
-    if (_.isUndefined(data)) {
-      return res.sendStatus(500);
-    }
-    // If the data is an error instance and it doesn't have a custom .toJSON(),
-    // use its stack instead (otherwise res.json() will turn it into an empty dictionary).
-    if (_.isError(data)) {
-      if (!_.isFunction(data.toJSON)) {
-        // data = data.stack;
-        // No need to stringify the stack (it's already a string).
-        return res.send(data);
-      }
-    }
-    return res.json(data);
+  // If no data was provided, use res.sendStatus().
+  if (_.isUndefined(data)) {
+    return res.sendStatus(500);
   }
 
-  return res.view('500', { error: data }, function (err, html) {
-
-    // If a view error occured, fall back to JSON.
-    if (err) {
-      //
-      // Additionally:
-      // • If the view was missing, ignore the error but provide a verbose log.
-      if (err.code === 'E_VIEW_FAILED') {
-        sails.log.verbose(
-          'res.serverError() :: Could not locate view for error page'+
-          (dontRevealErrorInResponse? '':' (sending JSON instead)')+'.  '+
-          'Details: ', err
-        );
+  if (_.isError(data)) {
+    // If the data is an Error instance and it doesn't have a custom .toJSON(),
+    // then util.inspect() it instead (otherwise res.json() will turn it into an empty dictionary).
+    // > Note that we don't do this in production, since (depending on your Node.js version) inspecting
+    // > the Error might reveal the `stack`.  And since `res.badRequest()` could certainly be used in
+    // > production, we wouldn't want to inadvertently dump a stack trace.
+    if (!_.isFunction(data.toJSON)) {
+      if (process.env.NODE_ENV==='production') {
+        data.stack = null
       }
-      // Otherwise, if this was a more serious error, log to the console with the details.
-      else {
-        sails.log.warn(
-          'res.serverError() :: When attempting to render error page view, '+
-          'an error occured'+(dontRevealErrorInResponse? '':' (sending JSON instead)')+'.  '+
-          'Details: ', err
-        );
-      }
-      return res.json(data);
+      // No need to JSON stringify (this is already a string).
+      return res.send(data);
     }
-
-    return res.send(html);
-  });
+  }
+  return res.json(data);
 
 };

@@ -2,9 +2,7 @@
  * Module dependencies
  */
 
-var util = require('util');
 var _ = require('@sailshq/lodash');
-
 
 
 /**
@@ -56,7 +54,7 @@ module.exports = function badRequest(data) {
         data.stack = null
       }
       // No need to JSON stringify (this is already a string).
-      return res.send(util.inspect(data));
+      return res.send(data);
     }
   }
   return res.json(data);
