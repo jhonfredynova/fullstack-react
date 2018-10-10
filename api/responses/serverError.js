@@ -4,21 +4,18 @@
 
 var _ = require('@sailshq/lodash');
 
-
 /**
- * 500 (Server Error) Handler
+ * 500 (Server Error) Response
  *
  * Usage:
  * return res.serverError();
- * return res.serverError(data);
+ * return res.serverError(err);
+ * return res.serverError(err, 'some/specific/error/view');
  *
- * e.g.:
- * ```
- * return res.serverError(
- *   'Please choose a valid `password` (6-12 characters)',
- *   'trial/signup'
- * );
- * ```
+ * NOTE:
+ * If something throws in a policy or controller, or an internal
+ * error is encountered, Sails will call `res.serverError()`
+ * automatically.
  */
 
 module.exports = function badRequest(data) {
@@ -51,7 +48,7 @@ module.exports = function badRequest(data) {
     // > production, we wouldn't want to inadvertently dump a stack trace.
     if (!_.isFunction(data.toJSON)) {
       if (process.env.NODE_ENV==='production') {
-        data.stack = null
+        data = _.set(data, 'stack', null)
       }
       // No need to JSON stringify (this is already a string).
       return res.send(data);

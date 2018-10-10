@@ -4,7 +4,6 @@
 
 var _ = require('@sailshq/lodash');
 
-
 /**
  * 400 (Bad Request) Handler
  *
@@ -51,7 +50,7 @@ module.exports = function badRequest(data) {
     // > production, we wouldn't want to inadvertently dump a stack trace.
     if (!_.isFunction(data.toJSON)) {
       if (process.env.NODE_ENV==='production') {
-        data.stack = null
+        data = _.set(data, 'stack', null)
       }
       // No need to JSON stringify (this is already a string).
       return res.send(data);

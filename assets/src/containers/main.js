@@ -97,25 +97,8 @@ class Main extends React.PureComponent {
           .ql-editor p{
             margin: 0 0 10px;
           }
-          .Select .Select-menu-outer {
+          .css-15k3avv {
             z-index: 999!important;
-          }
-          .Select img{
-            width: 18px;
-            margin-right: 2px;
-            margin-bottom: 3px;
-          }
-          .Select.form-control{
-            padding: 0px;
-            border: none;
-          }
-          .Select.form-control .Select-control{
-            height: 38px;
-          }
-          .Select.form-control .Select-input,
-          .Select.form-control .Select-value{
-            height: 36px;
-            line-height: 36px;
           } 
           .text-deleted{
             text-decoration: line-through;
